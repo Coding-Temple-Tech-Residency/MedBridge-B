@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedBridge — Sprint 1 Deliverables</title>
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-2: #475569;
+    --text-3: #94a3b8;
+    --accent: #0ea5e9;
+    --accent-dim: #e0f2fe;
+    --accent-dark: #0369a1;
+    --green: #10b981;
+    --green-dim: #d1fae5;
+    --amber: #f59e0b;
+    --amber-dim: #fef3c7;
+    --red: #ef4444;
+    --red-dim: #fee2e2;
+    --purple: #8b5cf6;
+    --purple-dim: #ede9fe;
+    --teal: #14b8a6;
+    --teal-dim: #ccfbf1;
+    --font: 'Inter', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .top-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 56px;
+  }
+  .nav-brand {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--accent-dark);
+    margin-right: 32px;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    height: 100%;
+  }
+  .nav-tab {
+    padding: 0 18px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent-dark); border-bottom-color: var(--accent); }
+  .nav-badge {
+    background: var(--accent-dim);
+    color: var(--accent-dark);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 20px;
+    margin-left: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  /* PAGES */
+  .page { display: none; padding: 32px; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .page-header {
+    margin-bottom: 28px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+  .page-header .sprint-tag {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent-dark);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .card-header .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .card-body { padding: 20px; }
+
+  /* ─────────────────────────────────────────
+     PAGE 1: ERD
+  ───────────────────────────────────────── */
+  .erd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .erd-entity {
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .erd-entity.hub {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-dim), var(--shadow);
+  }
+  .erd-entity-header {
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .erd-entity-header .icon { font-size: 14px; }
+  .erd-entity-body { padding: 6px 0 8px; }
+  .erd-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 12px;
+    font-size: 11.5px;
+  }
+  .erd-field:hover { background: var(--bg); }
+  .field-key {
+    font-size: 9px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 3px;
+    min-width: 26px;
+    text-align: center;
+    letter-spacing: 0.3px;
+  }
+  .pk { background: var(--amber-dim); color: #92400e; }
+  .fk { background: var(--purple-dim); color: #5b21b6; }
+  .field-name { font-family: var(--mono); color: var(--text); font-size: 11px; flex: 1; }
+  .field-type { font-size: 10px; color: var(--text-3); font-family: var(--mono); }
+  .erd-divider { border: none; border-top: 1px dashed var(--border); margin: 4px 12px; }
+
+  .erd-legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 12px;
+    color: var(--text-2);
+    align-items: center;
+  }
+  .erd-legend span { display: flex; align-items: center; gap: 6px; }
+
+  .erd-rel-section {
+    margin-top: 24px;
+  }
+  .erd-rel-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .rel-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rel-table th {
+    background: var(--surface-2);
+    padding: 9px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .rel-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .rel-table tr:last-child td { border-bottom: none; }
+  .rel-tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--mono);
+  }
+  .rel-1m { background: var(--accent-dim); color: var(--accent-dark); }
+  .rel-mm { background: var(--purple-dim); color: #5b21b6; }
+  .entity-ref {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--surface-2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .arrow { color: var(--text-3); font-size: 16px; }
+
+  /* ─────────────────────────────────────────
+     PAGE 2: DATA COLLECTION REQUIREMENTS
+  ───────────────────────────────────────── */
+  .req-section { margin-bottom: 28px; }
+  .req-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-2);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .req-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .req-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .req-table th {
+    background: var(--surface-2);
+    padding: 9px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .req-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .req-table tr:last-child td { border-bottom: none; }
+  .req-table tr:hover td { background: var(--surface-2); }
+
+  .must { background: var(--green-dim); color: #065f46; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+  .nice { background: var(--amber-dim); color: #92400e; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+
+  .source-tag {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .src-supabase { background: #ecfdf5; color: #065f46; }
+  .src-fastapi  { background: #eff6ff; color: #1e40af; }
+  .src-fhir     { background: var(--purple-dim); color: #5b21b6; }
+  .src-groq     { background: #fff7ed; color: #9a3412; }
+  .src-fe       { background: #faf5ff; color: #6b21a8; }
+
+  .assumption-box {
+    background: var(--amber-dim);
+    border: 1px solid #fcd34d;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-top: 20px;
+  }
+  .assumption-box h4 { font-size: 12px; font-weight: 700; color: #92400e; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .assumption-box ul { list-style: none; padding: 0; }
+  .assumption-box li { font-size: 13px; color: #78350f; padding: 3px 0; padding-left: 16px; position: relative; line-height: 1.5; }
+  .assumption-box li::before { content: '→'; position: absolute; left: 0; color: #b45309; font-size: 12px; }
+
+  /* ─────────────────────────────────────────
+     PAGE 3: KPIs
+  ───────────────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .kpi-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .kpi-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .kpi-category {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+  .cat-engagement { background: var(--accent-dim); color: var(--accent-dark); }
+  .cat-health     { background: var(--green-dim); color: #065f46; }
+  .cat-ai         { background: var(--purple-dim); color: #5b21b6; }
+  .cat-auth       { background: var(--amber-dim); color: #92400e; }
+  .cat-fhir       { background: var(--teal-dim); color: #0f766e; }
+
+  .kpi-def {
+    font-size: 12.5px;
+    color: var(--text-2);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .kpi-formula {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .kpi-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .kpi-meta-item {
+    font-size: 11px;
+    color: var(--text-2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kpi-meta-item strong { color: var(--text); font-weight: 600; }
+  .feasibility {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .feas-high { background: var(--green-dim); color: #065f46; }
+  .feas-med  { background: var(--amber-dim); color: #92400e; }
+  .feas-tbd  { background: var(--surface-2); color: var(--text-3); border: 1px solid var(--border); }
+
+  /* ─────────────────────────────────────────
+     PAGE 4: WIREFRAMES
+  ───────────────────────────────────────── */
+  .wireframe-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: fit-content;
+  }
+  .wf-tab {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .wf-tab.active {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+  }
+  .wf-tab:hover:not(.active) { background: var(--bg); color: var(--text); }
+
+  .wireframe { display: none; }
+  .wireframe.active { display: block; }
+
+  /* Wireframe chrome */
+  .wf-browser {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .wf-browser-bar {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wf-dots { display: flex; gap: 6px; }
+  .wf-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .wf-url {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--text-2);
+    font-family: var(--mono);
+  }
+
+  /* Dashboard layout */
+  .wf-app {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: 520px;
+  }
+  .wf-sidebar {
+    background: #0f172a;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .wf-sidebar-logo {
+    color: white;
+    font-weight: 800;
+    font-size: 15px;
+    padding: 0 8px;
+    margin-bottom: 20px;
+    letter-spacing: -0.3px;
+  }
+  .wf-sidebar-logo span { color: var(--accent); }
+  .wf-nav-item {
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: default;
+  }
+  .wf-nav-item.active-nav { background: #1e293b; color: white; }
+  .wf-nav-item .nav-icon { font-size: 14px; }
+  .wf-main { padding: 24px; background: #f8fafc; overflow: auto; }
+  .wf-page-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+  .wf-page-sub { font-size: 12px; color: var(--text-2); margin-bottom: 20px; }
+
+  /* Stat row */
+  .wf-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .wf-stat {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .wf-stat-label { font-size: 11px; color: var(--text-2); font-weight: 500; margin-bottom: 6px; }
+  .wf-stat-value { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+  .wf-stat-sub { font-size: 11px; color: var(--green); margin-top: 3px; font-weight: 600; }
+  .wf-stat-sub.neg { color: var(--red); }
+
+  /* Chart */
+  .wf-charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .wf-chart-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+  .wf-chart-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 90px; }
+  .bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+  .bar {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    min-height: 4px;
+  }
+  .bar-label { font-size: 9px; color: var(--text-3); }
+
+  /* Donut chart placeholder */
+  .donut-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 90px;
+    gap: 8px;
+  }
+  .donut {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: conic-gradient(var(--green) 0% 62%, var(--accent) 62% 83%, var(--amber) 83% 100%);
+    position: relative;
+  }
+  .donut::after {
+    content: '';
+    position: absolute;
+    inset: 16px;
+    background: white;
+    border-radius: 50%;
+  }
+  .donut-legend { display: flex; flex-direction: column; gap: 3px; }
+  .donut-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-2); }
+  .donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Line chart placeholder */
+  .line-chart-placeholder {
+    height: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .line-chart-placeholder svg { width: 100%; height: 100%; }
+
+  /* Table */
+  .wf-mini-table { width: 100%; border-collapse: collapse; }
+  .wf-mini-table th {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    padding: 6px 10px;
+    background: var(--surface-2);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .wf-mini-table td {
+    font-size: 12px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .wf-mini-table tr:last-child td { border: none; }
+  .status-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .sp-green { background: var(--green-dim); color: #065f46; }
+  .sp-amber { background: var(--amber-dim); color: #92400e; }
+  .sp-red   { background: var(--red-dim); color: #991b1b; }
+
+  /* Annotation layer */
+  .wf-annotations {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .wf-anno {
+    background: var(--amber-dim);
+    border: 1px dashed #fcd34d;
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-size: 11.5px;
+    color: #78350f;
+    line-height: 1.4;
+  }
+  .wf-anno strong { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; color: #92400e; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-brand">🏥 MedBridge</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage('erd')">ERD</div>
+    <div class="nav-tab" onclick="showPage('req')">Data Requirements</div>
+    <div class="nav-tab" onclick="showPage('kpi')">KPIs</div>
+    <div class="nav-tab" onclick="showPage('wf')">Dashboard Wireframes</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 1: ERD
+════════════════════════════════════════════ -->
+<div id="page-erd" class="page active">
+  <div class="page-header">
+    <div class="sprint-tag">Sprint 1 · Deliverable 1 of 4</div>
+    <h1>Entity Relationship Diagram</h1>
+    <p>Reflects the actual Supabase schema as built — 15 tables across 4 migrations (001–004) plus ALTER TABLE additions. Table names and columns match what's live in the database.</p>
+  </div>
+
+  <div class="erd-legend card" style="box-shadow:none; margin-bottom:18px;">
+    <span><span class="field-key pk">PK</span> Primary key</span>
+    <span><span class="field-key fk">FK</span> Foreign key → references another table</span>
+    <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:50%;background:var(--accent);display:inline-block;"></span>Hub / anchor table</span>
+    <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:50%;background:var(--green);display:inline-block;"></span>Clinical table (migration 003)</span>
+    <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;border-radius:50%;background:var(--purple);display:inline-block;"></span>Engagement / feature table (added via ALTER)</span>
+    <span style="display:flex;align-items:center;gap:6px;"><span style="background:var(--amber-dim);border:1px dashed #fcd34d;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;color:#92400e;">ALT</span> Column added via ALTER TABLE (post-migration patch)</span>
+  </div>
+
+  <!-- Layer 0: Auth (Supabase managed) -->
+  <div class="req-section-title">Layer 0 — Identity &amp; Auth (Supabase Auth — auth.users)</div>
+  <div class="erd-grid" style="grid-template-columns:1fr 1fr; margin-bottom:20px;">
+
+    <div class="erd-entity hub">
+      <div class="erd-entity-header" style="background:var(--accent-dim);">
+        <span class="icon">👤</span> auth.users <span style="font-size:10px;color:var(--accent-dark);font-weight:400;margin-left:auto;">Supabase managed</span>
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">email</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">role</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">email_confirmed_at</span><span class="field-type">timestamptz</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">last_sign_in_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity hub" style="border-color:var(--teal);">
+      <div class="erd-entity-header" style="background:var(--teal-dim);">
+        <span class="icon">🔗</span> fhir_connections <span style="font-size:10px;color:#0f766e;font-weight:400;margin-left:auto;">migration 002</span>
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">fhir_base_url</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">fhir_patient_id</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">epic_client_id</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">access_token</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">refresh_token</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">token_expires_at</span><span class="field-type">timestamptz</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">updated_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layer 1: Hub table -->
+  <div class="req-section-title">Layer 1 — Core Hub (migration 001)</div>
+  <div class="erd-grid" style="grid-template-columns:1fr 1fr; margin-bottom:20px;">
+
+    <div class="erd-entity hub">
+      <div class="erd-entity-header" style="background:var(--accent-dim);">
+        <span class="icon">📄</span> health_records <span style="font-size:10px;color:var(--accent-dark);font-weight:400;margin-left:auto;">migration 001</span>
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">source_type</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">filename</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">display_name</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">storage_path</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">status</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">raw_text</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">error_message</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">fhir_connection_id</span><span class="field-type">→ fhir_connections.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">fhir_patient_id</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">file_type</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">updated_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <!-- summaries -->
+      <div class="erd-entity">
+        <div class="erd-entity-header" style="background:var(--purple-dim);">
+          <span class="icon">🤖</span> summaries
+        </div>
+        <div class="erd-entity-body">
+          <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+          <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+          <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+          <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">plain_summary</span><span class="field-type">text</span></div>
+          <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+          <hr class="erd-divider">
+          <div class="erd-field">
+            <span class="field-key" style="min-width:26px;background:var(--amber-dim);color:#92400e;font-size:9px;font-weight:800;padding:1px 3px;border-radius:3px;">ALT</span>
+            <span class="field-name">audio_url</span><span class="field-type">text</span>
+          </div>
+        </div>
+      </div>
+      <!-- chat_messages -->
+      <div class="erd-entity">
+        <div class="erd-entity-header" style="background:var(--purple-dim);">
+          <span class="icon">💬</span> chat_messages
+        </div>
+        <div class="erd-entity-body">
+          <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+          <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+          <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+          <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">role</span><span class="field-type">enum: user|assistant</span></div>
+          <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">content</span><span class="field-type">text</span></div>
+          <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layer 2: Clinical (migration 003) -->
+  <div class="req-section-title">Layer 2 — Clinical Tables (migration 003)</div>
+  <div class="erd-grid" style="margin-bottom:20px;">
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:var(--green-dim);">
+        <span class="icon">🧪</span> lab_results
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">name</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">code</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">code_system</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">value_quantity</span><span class="field-type">numeric</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">value_text</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">unit</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">reference_range_low</span><span class="field-type">numeric</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">reference_range_high</span><span class="field-type">numeric</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">reference_range_text</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">flag</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">observed_at</span><span class="field-type">timestamptz</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:var(--green-dim);">
+        <span class="icon">💊</span> medications
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">name</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">code</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">code_system</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">dose</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">frequency</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">route</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">status</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">start_date</span><span class="field-type">date</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">end_date</span><span class="field-type">date</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:var(--green-dim);">
+        <span class="icon">🩺</span> conditions
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">name</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">code</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">code_system</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">onset_date</span><span class="field-type">date</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">status</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">note</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:var(--green-dim);">
+        <span class="icon">🏥</span> encounters
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">encounter_type</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">provider</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">facility</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">occurred_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:var(--green-dim);">
+        <span class="icon">📌</span> follow_ups
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">what</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">when_text</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">due_date</span><span class="field-type">date</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">completed</span><span class="field-type">boolean</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:var(--green-dim);">
+        <span class="icon">⚠️</span> allergies
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">substance</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">reaction</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">severity</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">status</span><span class="field-type">text</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layer 3: Feature tables (added post-migration) -->
+  <div class="req-section-title">Layer 3 — Feature Tables (added from team requirements)</div>
+  <div class="erd-grid" style="margin-bottom:20px;">
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:#faf5ff; border-color:var(--purple);">
+        <span class="icon">📊</span> health_scores
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">score</span><span class="field-type">numeric</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">score_label</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">rationale</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">scored_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:#faf5ff;">
+        <span class="icon">🔔</span> reminders
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">health_record_id</span><span class="field-type">→ health_records.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">reminder_type</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">title</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">remind_at</span><span class="field-type">timestamptz</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">repeat_interval</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">completed</span><span class="field-type">boolean</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:#faf5ff;">
+        <span class="icon">🤝</span> trusted_contacts
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">contact_name</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">contact_email</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">access_level</span><span class="field-type">enum: read|full</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">status</span><span class="field-type">enum: pending|accepted|revoked</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:#faf5ff;">
+        <span class="icon">🏥</span> providers
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key fk">FK</span><span class="field-name">user_id</span><span class="field-type">→ auth.users.id</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">name</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">specialty</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">phone</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">fhir_provider_id</span><span class="field-type">text</span></div>
+      </div>
+    </div>
+
+    <div class="erd-entity">
+      <div class="erd-entity-header" style="background:#faf5ff;">
+        <span class="icon">📚</span> resources
+        <span style="font-size:10px;color:var(--text-3);font-weight:400;margin-left:auto;">no user FK — shared content</span>
+      </div>
+      <div class="erd-entity-body">
+        <div class="erd-field"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">uuid</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">title</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">description</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">url</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">resource_type</span><span class="field-type">text</span></div>
+        <div class="erd-field"><span class="field-key" style="min-width:26px;"></span><span class="field-name">tags</span><span class="field-type">text</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Relationships table -->
+  <div class="erd-rel-section">
+    <div class="card">
+      <div class="card-header">
+        <div class="dot" style="background:var(--accent);"></div>
+        <h2>Key Relationships for Reporting</h2>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="rel-table">
+          <thead>
+            <tr>
+              <th>Parent</th>
+              <th></th>
+              <th>Child</th>
+              <th>Cardinality</th>
+              <th>Reporting Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="entity-ref">auth.users</span></td>
+              <td class="arrow">→</td>
+              <td><span class="entity-ref">health_records</span></td>
+              <td><span class="rel-tag rel-1m">1 : M</span></td>
+              <td>All records per patient; upload frequency; source_type split</td>
+            </tr>
+            <tr>
+              <td><span class="entity-ref">auth.users</span></td>
+              <td class="arrow">→</td>
+              <td><span class="entity-ref">fhir_connections</span></td>
+              <td><span class="rel-tag rel-1m">1 : M</span></td>
+              <td>FHIR adoption rate; sync success/failure tracking</td>
+            </tr>
+            <tr>
+              <td><span class="entity-ref">health_records</span></td>
+              <td class="arrow">→</td>
+              <td><span class="entity-ref">summaries</span></td>
+              <td><span class="rel-tag rel-1m">1 : M</span></td>
+              <td>Summary generation rate; AI model used; latency</td>
+            </tr>
+            <tr>
+              <td><span class="entity-ref">health_records</span></td>
+              <td class="arrow">→</td>
+              <td><span class="entity-ref">chat_messages</span></td>
+              <td><span class="rel-tag rel-1m">1 : M</span></td>
+              <td>Q&amp;A conversation history per document; engagement depth</td>
+            </tr>
+            <tr>
+              <td><span class="entity-ref">health_records</span></td>
+              <td class="arrow">→</td>
+              <td><span class="entity-ref">lab_results / conditions / medications / encounters / follow_ups / allergies</span></td>
+              <td><span class="rel-tag rel-1m">1 : M</span></td>
+              <td>Clinical data richness per record; parser completeness</td>
+            </tr>
+            <tr>
+              <td><span class="entity-ref">health_records</span></td>
+              <td class="arrow">→</td>
+              <td><span class="entity-ref">health_scores</span></td>
+              <td><span class="rel-tag rel-1m">1 : M</span></td>
+              <td>AI-computed health scores per ingestion event</td>
+            </tr>
+            <tr>
+              <td><span class="entity-ref">auth.users</span></td>
+              <td class="arrow">→</td>
+              <td><span class="entity-ref">reminders / trusted_contacts / providers</span></td>
+              <td><span class="rel-tag rel-1m">1 : M</span></td>
+              <td>Per-user engagement features; caregiver access scope</td>
+            </tr>
+            <tr>
+              <td><span class="entity-ref">resources</span></td>
+              <td class="arrow">→</td>
+              <td><em style="font-size:12px;color:var(--text-2);">(no FK — shared content table)</em></td>
+              <td><span class="rel-tag" style="background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);">static</span></td>
+              <td>Discover area; curated health resources surfaced by AI</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 2: DATA COLLECTION REQUIREMENTS
+════════════════════════════════════════════ -->
+<div id="page-req" class="page">
+  <div class="page-header">
+    <div class="sprint-tag">Sprint 1 · Deliverable 2 of 4</div>
+    <h1>Data Collection Requirements</h1>
+    <p>What data MedBridge must capture, where it comes from, and which items are must-have vs nice-to-have. For team review before Sprint 1 closes.</p>
+  </div>
+
+  <!-- Section A: User identity & auth -->
+  <div class="req-section">
+    <div class="req-section-title">A — User Identity &amp; Authentication</div>
+    <div class="card">
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Data Point</th>
+            <th>Priority</th>
+            <th>Source</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>User signup (email, timestamp)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-supabase">Supabase Auth</span></td>
+            <td>Signup conversion rate; cohort analysis</td>
+          </tr>
+          <tr>
+            <td><strong>Login events (timestamp, method)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-supabase">Supabase Auth</span></td>
+            <td>Auth success/failure rate; DAU/WAU calculation</td>
+          </tr>
+          <tr>
+            <td><strong>Email verification status</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-supabase">Supabase Auth</span></td>
+            <td>Funnel drop-off: signup → verified</td>
+          </tr>
+          <tr>
+            <td>Preferred language</td>
+            <td><span class="nice">NICE TO HAVE</span></td>
+            <td><span class="source-tag src-fe">Frontend</span></td>
+            <td>Localization planning; plain-language summary tuning</td>
+          </tr>
+          <tr>
+            <td>Date of birth</td>
+            <td><span class="nice">NICE TO HAVE</span></td>
+            <td><span class="source-tag src-fe">Frontend</span></td>
+            <td>Age-adjusted reference ranges for lab results</td>
+          </tr>
+          <tr>
+            <td>Onboarding completion timestamp</td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Onboarding funnel completion rate</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section B: Usage / Sessions -->
+  <div class="req-section">
+    <div class="req-section-title">B — Usage &amp; Session Data</div>
+    <div class="card">
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Data Point</th>
+            <th>Priority</th>
+            <th>Source</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Session start / end timestamps</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Session duration; DAU/WAU; retention</td>
+          </tr>
+          <tr>
+            <td><strong>Session duration (seconds)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Average session length KPI</td>
+          </tr>
+          <tr>
+            <td>Device type (mobile / desktop)</td>
+            <td><span class="nice">NICE TO HAVE</span></td>
+            <td><span class="source-tag src-fe">Frontend</span></td>
+            <td>Responsive design prioritization</td>
+          </tr>
+          <tr>
+            <td>Entry point (upload / summary / Q&amp;A)</td>
+            <td><span class="nice">NICE TO HAVE</span></td>
+            <td><span class="source-tag src-fe">Frontend</span></td>
+            <td>Navigation flow analysis; feature adoption</td>
+          </tr>
+          <tr>
+            <td><strong>Days active per user per week</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>WAU and weekly retention calculation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section C: Document uploads -->
+  <div class="req-section">
+    <div class="req-section-title">C — Document Upload &amp; Ingestion</div>
+    <div class="card">
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Data Point</th>
+            <th>Priority</th>
+            <th>Source</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Upload timestamp</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Uploads per user per week; growth trend</td>
+          </tr>
+          <tr>
+            <td><strong>Source type (PDF upload vs FHIR sync)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Channel split; FHIR adoption rate</td>
+          </tr>
+          <tr>
+            <td><strong>Ingestion status (success / failure / processing)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Pipeline reliability; error rate tracking</td>
+          </tr>
+          <tr>
+            <td>File type (PDF, FHIR JSON, etc.)</td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Parser routing and error attribution</td>
+          </tr>
+          <tr>
+            <td>File size (bytes)</td>
+            <td><span class="nice">NICE TO HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Storage growth planning; timeout risk prediction</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section D: AI Interactions -->
+  <div class="req-section">
+    <div class="req-section-title">D — AI / Summary &amp; Q&amp;A Interactions</div>
+    <div class="card">
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Data Point</th>
+            <th>Priority</th>
+            <th>Source</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Summary generation timestamp &amp; latency (ms)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-groq">Groq API</span></td>
+            <td>AI latency KPI; SLA monitoring</td>
+          </tr>
+          <tr>
+            <td><strong>Model used (e.g. Llama-3.3-70B)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-groq">Groq API</span></td>
+            <td>Cost tracking; model comparison over time</td>
+          </tr>
+          <tr>
+            <td><strong>Q&amp;A question count per session</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>AI engagement depth KPI</td>
+          </tr>
+          <tr>
+            <td><strong>Q&amp;A answer feedback rating (1–5)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fe">Frontend</span></td>
+            <td>AI quality; user satisfaction signal</td>
+          </tr>
+          <tr>
+            <td>Q&amp;A response latency (ms)</td>
+            <td><span class="nice">NICE TO HAVE</span></td>
+            <td><span class="source-tag src-groq">Groq API</span></td>
+            <td>UX quality; Groq performance benchmarking</td>
+          </tr>
+          <tr>
+            <td>Summary regeneration count</td>
+            <td><span class="nice">NICE TO HAVE</span></td>
+            <td><span class="source-tag src-fastapi">FastAPI</span></td>
+            <td>Quality signal — repeated summaries may indicate poor output</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section E: FHIR -->
+  <div class="req-section">
+    <div class="req-section-title">E — FHIR / EHR Connection Events</div>
+    <div class="card">
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Data Point</th>
+            <th>Priority</th>
+            <th>Source</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>FHIR OAuth connection created (timestamp)</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fhir">FHIR OAuth</span></td>
+            <td>FHIR adoption rate; demo KPI</td>
+          </tr>
+          <tr>
+            <td><strong>Last sync timestamp &amp; status</strong></td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fhir">FHIR OAuth</span></td>
+            <td>Sync reliability; stale data detection</td>
+          </tr>
+          <tr>
+            <td>Scopes granted by patient</td>
+            <td><span class="must">MUST HAVE</span></td>
+            <td><span class="source-tag src-fhir">FHIR OAuth</span></td>
+            <td>Data completeness; what clinical data is available</td>
+          </tr>
+          <tr>
+            <td>Token expiry &amp; refresh events</td>
+            <td><span class="nice">NICE TO HAVE</span></td>
+            <td><span class="source-tag src-fhir">FHIR OAuth</span></td>
+            <td>Session continuity; silent re-auth success rate</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Assumptions -->
+  <div class="assumption-box">
+    <h4>📋 Assumptions — Share with team for feedback</h4>
+    <ul>
+      <li>No PII beyond email is stored in analytics tables; date of birth and display name stay in <code>user_profiles</code> behind RLS.</li>
+      <li>Session tracking is server-side (FastAPI creates/closes sessions on auth events), not browser analytics (no Mixpanel/Segment).</li>
+      <li>"Transaction data" from the program template is not applicable to MedBridge in the financial sense; document uploads and AI interactions are the equivalent engagement events.</li>
+      <li>All clinical data (lab values, medications, conditions) is sourced from either FHIR or PDF extraction — no manual patient input in Sprint 1.</li>
+      <li>Groq token counts are not tracked in Sprint 1; latency (ms) is the primary AI cost proxy until we have billing data.</li>
+      <li>FHIR scope is Epic public sandbox only for Sprint 1 — no real patient data, synthetic only.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 3: KPIs
+════════════════════════════════════════════ -->
+<div id="page-kpi" class="page">
+  <div class="page-header">
+    <div class="sprint-tag">Sprint 1 · Deliverable 3 of 4</div>
+    <h1>KPI Definitions</h1>
+    <p>12 KPIs across 5 categories. Each is defined with its formula, data source, reporting cadence, and current feasibility assessment for Backend and Frontend to validate.</p>
+  </div>
+
+  <!-- Engagement -->
+  <div class="req-section-title" style="margin-bottom:14px;">User Engagement</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Daily Active Users (DAU)</div>
+        <span class="kpi-category cat-engagement">Engagement</span>
+      </div>
+      <div class="kpi-def">Count of distinct users who completed at least one authenticated session on a given calendar day.</div>
+      <div class="kpi-formula">COUNT(DISTINCT user_id) FROM sessions WHERE DATE(session_start) = target_date</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Daily</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>sessions</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Weekly Active Users (WAU)</div>
+        <span class="kpi-category cat-engagement">Engagement</span>
+      </div>
+      <div class="kpi-def">Count of distinct users with at least one session in a rolling 7-day window.</div>
+      <div class="kpi-formula">COUNT(DISTINCT user_id) FROM sessions WHERE session_start >= NOW() - INTERVAL '7 days'</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Weekly</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>sessions</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Weekly Retention Rate</div>
+        <span class="kpi-category cat-engagement">Engagement</span>
+      </div>
+      <div class="kpi-def">% of users active in week N who also had a session in week N+1. Measures stickiness of the core workflow.</div>
+      <div class="kpi-formula">WAU(week N+1 returning) / WAU(week N) × 100</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Weekly</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>sessions</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Avg Session Duration</div>
+        <span class="kpi-category cat-engagement">Engagement</span>
+      </div>
+      <div class="kpi-def">Mean session length in minutes across all completed sessions in the reporting period. Proxy for depth of engagement.</div>
+      <div class="kpi-formula">AVG(duration_seconds) / 60 FROM sessions WHERE session_end IS NOT NULL</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Weekly</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>sessions</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth -->
+  <div class="req-section-title" style="margin:24px 0 14px;">Authentication</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Signup Conversion Rate</div>
+        <span class="kpi-category cat-auth">Auth</span>
+      </div>
+      <div class="kpi-def">% of users who signed up and also verified their email within 24 hours. Measures top-of-funnel health.</div>
+      <div class="kpi-formula">COUNT(email_confirmed_at IS NOT NULL) / COUNT(created_at) × 100 FROM users</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Weekly</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>users</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Auth Success Rate</div>
+        <span class="kpi-category cat-auth">Auth</span>
+      </div>
+      <div class="kpi-def">% of login attempts that result in a valid session. Surfaces token, OAuth, or PKCE issues early.</div>
+      <div class="kpi-formula">SELECT * FROM public.kpi_auth_activity — view live in Supabase, queries auth.audit_log_entries payload JSON</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Daily</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>kpi_auth_activity view</strong></span>
+        <span class="feasibility feas-high">✓ View live — populates when auth wired up</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI -->
+  <div class="req-section-title" style="margin:24px 0 14px;">AI &amp; Document Intelligence</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Summary Generation Rate</div>
+        <span class="kpi-category cat-ai">AI</span>
+      </div>
+      <div class="kpi-def">% of uploaded health records that result in a successfully generated plain-language summary.</div>
+      <div class="kpi-formula">COUNT(summaries.id) / COUNT(health_records.id) × 100 (joined on health_record_id)</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Weekly</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>health_records, summaries</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">AI Response Latency (P50 / P95)</div>
+        <span class="kpi-category cat-ai">AI</span>
+      </div>
+      <div class="kpi-def">Median and 95th-percentile time in ms from upload to summary delivery. Tracks Groq performance and pipeline health.</div>
+      <div class="kpi-formula">PERCENTILE_CONT(0.5) / (0.95) WITHIN GROUP (ORDER BY generation_ms) FROM summaries</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Daily</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>summaries</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Q&amp;A Engagement Depth</div>
+        <span class="kpi-category cat-ai">AI</span>
+      </div>
+      <div class="kpi-def">Average number of user messages per health_record_id in chat_messages. Higher = deeper AI engagement with a document.</div>
+      <div class="kpi-formula">AVG(msg_count) FROM (SELECT health_record_id, COUNT(*) AS msg_count FROM chat_messages WHERE role='user' GROUP BY health_record_id)</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Weekly</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>chat_messages</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">AI Answer Satisfaction Score</div>
+        <span class="kpi-category cat-ai">AI</span>
+      </div>
+      <div class="kpi-def">Average user feedback rating (1–5 stars) on Q&amp;A answers. Primary quality signal for Llama 3.3 output on medical context.</div>
+      <div class="kpi-formula">AVG(feedback_rating) FROM chat_messages WHERE feedback_rating IS NOT NULL</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Weekly</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>chat_messages</strong></span>
+        <span class="feasibility feas-med">⚡ FE ticket open — James to add feedback_rating col + rating widget</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Health / Clinical -->
+  <div class="req-section-title" style="margin:24px 0 14px;">Clinical Data Richness</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Avg Clinical Tables Populated per Record</div>
+        <span class="kpi-category cat-health">Clinical</span>
+      </div>
+      <div class="kpi-def">Average number of clinical tables (lab_results, medications, conditions, encounters, follow_ups, allergies, summaries) with at least 1 row per health_record_id. Measures parser completeness.</div>
+      <div class="kpi-formula">SELECT * FROM public.kpi_clinical_completeness -- view queries all 7 clinical tables via UNION COUNT</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Per upload</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>kpi_clinical_completeness view</strong></span>
+        <span class="feasibility feas-high">&#10003; View ready -- run SQL below to create</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">Abnormal Lab Flag Rate</div>
+        <span class="kpi-category cat-health">Clinical</span>
+      </div>
+      <div class="kpi-def">% of lab results flagged as high or low (not normal). Useful for validating parser accuracy against known Synthea data distributions.</div>
+      <div class="kpi-formula">COUNT(flag IN ('high','low','critical')) / COUNT(*) × 100 FROM lab_results</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Per ingestion run</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>lab_results</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FHIR -->
+  <div class="req-section-title" style="margin:24px 0 14px;">FHIR / EHR Integration</div>
+  <div class="kpi-grid" style="grid-template-columns:1fr 1fr;">
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">FHIR Connection Adoption Rate</div>
+        <span class="kpi-category cat-fhir">FHIR</span>
+      </div>
+      <div class="kpi-def">% of registered users who have completed at least one SMART on FHIR OAuth connection. Key demo metric for stakeholders.</div>
+      <div class="kpi-formula">COUNT(DISTINCT user_id FROM fhir_connections) / COUNT(DISTINCT id FROM users) × 100</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Weekly</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>users, fhir_connections</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-top">
+        <div class="kpi-name">FHIR Sync Success Rate</div>
+        <span class="kpi-category cat-fhir">FHIR</span>
+      </div>
+      <div class="kpi-def">% of FHIR data sync attempts (token refresh + bundle fetch) that completed without error. Validates Epic sandbox reliability.</div>
+      <div class="kpi-formula">successful_syncs / total_sync_attempts × 100 (from ingestion_status on health_records where source_type = 'fhir')</div>
+      <div class="kpi-meta">
+        <span class="kpi-meta-item">📅 <strong>Per sync</strong></span>
+        <span class="kpi-meta-item">🗄️ <strong>health_records, fhir_connections</strong></span>
+        <span class="feasibility feas-high">✓ Feasible</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 4: WIREFRAMES
+════════════════════════════════════════════ -->
+<div id="page-wf" class="page">
+  <div class="page-header">
+    <div class="sprint-tag">Sprint 1 · Deliverable 4 of 4</div>
+    <h1>Dashboard Wireframes</h1>
+    <p>Three views showing how KPIs surface to stakeholders. Annotated for FE/BE validation. For refinement with James (FE).</p>
+  </div>
+
+  <div class="wireframe-tabs">
+    <div class="wf-tab active" onclick="showWireframe('overview')">📊 Stakeholder Overview</div>
+    <div class="wf-tab" onclick="showWireframe('patient')">🏥 Patient Health View</div>
+    <div class="wf-tab" onclick="showWireframe('ai')">🤖 AI Interactions</div>
+  </div>
+
+  <!-- Wireframe 1: Stakeholder Overview -->
+  <div id="wf-overview" class="wireframe active">
+    <div class="wf-browser">
+      <div class="wf-browser-bar">
+        <div class="wf-dots">
+          <div class="wf-dot" style="background:#ef4444;"></div>
+          <div class="wf-dot" style="background:#f59e0b;"></div>
+          <div class="wf-dot" style="background:#10b981;"></div>
+        </div>
+        <div class="wf-url">medbridge.app/admin/dashboard</div>
+      </div>
+      <div class="wf-app">
+        <div class="wf-sidebar">
+          <div class="wf-sidebar-logo">Med<span>Bridge</span></div>
+          <div class="wf-nav-item active-nav"><span class="nav-icon">📊</span> Overview</div>
+          <div class="wf-nav-item"><span class="nav-icon">👥</span> Users</div>
+          <div class="wf-nav-item"><span class="nav-icon">🤖</span> AI Activity</div>
+          <div class="wf-nav-item"><span class="nav-icon">🔗</span> FHIR Connections</div>
+          <div class="wf-nav-item"><span class="nav-icon">🧪</span> Lab Data</div>
+          <div class="wf-nav-item" style="margin-top:auto;"><span class="nav-icon">⚙️</span> Settings</div>
+        </div>
+        <div class="wf-main">
+          <div class="wf-page-title">Stakeholder Overview</div>
+          <div class="wf-page-sub">Sprint 1 · Week of Jun 9 · Last sync 2 min ago</div>
+
+          <div class="wf-stat-row">
+            <div class="wf-stat">
+              <div class="wf-stat-label">DAU (Today)</div>
+              <div class="wf-stat-value">47</div>
+              <div class="wf-stat-sub">↑ 12% vs yesterday</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-label">WAU (7-day)</div>
+              <div class="wf-stat-value">183</div>
+              <div class="wf-stat-sub">↑ 8% vs last week</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-label">Signup → Verified</div>
+              <div class="wf-stat-value">71%</div>
+              <div class="wf-stat-sub neg">↓ 3% vs last week</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-label">Weekly Retention</div>
+              <div class="wf-stat-value">58%</div>
+              <div class="wf-stat-sub">↑ 5% vs last week</div>
+            </div>
+          </div>
+
+          <div class="wf-charts-row">
+            <div class="wf-chart-box">
+              <div class="wf-chart-title">DAU — Last 7 Days</div>
+              <div class="bar-chart">
+                <div class="bar-wrap"><div class="bar" style="height:52px;background:var(--accent-dim);border:1px solid var(--accent);"></div><div class="bar-label">Mon</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:65px;background:var(--accent-dim);border:1px solid var(--accent);"></div><div class="bar-label">Tue</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:44px;background:var(--accent-dim);border:1px solid var(--accent);"></div><div class="bar-label">Wed</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:78px;background:var(--accent);"></div><div class="bar-label">Thu</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:60px;background:var(--accent-dim);border:1px solid var(--accent);"></div><div class="bar-label">Fri</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:35px;background:var(--accent-dim);border:1px solid var(--accent);"></div><div class="bar-label">Sat</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:47px;background:var(--accent);"></div><div class="bar-label">Sun</div></div>
+              </div>
+            </div>
+
+            <div class="wf-chart-box">
+              <div class="wf-chart-title">Data Source Split</div>
+              <div style="display:flex;gap:12px;align-items:center;height:90px;">
+                <div class="donut"></div>
+                <div class="donut-legend">
+                  <div class="donut-item"><div class="donut-dot" style="background:var(--green);"></div>FHIR Sync 62%</div>
+                  <div class="donut-item"><div class="donut-dot" style="background:var(--accent);"></div>PDF Upload 21%</div>
+                  <div class="donut-item"><div class="donut-dot" style="background:var(--amber);"></div>Manual 17%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wf-chart-box" style="margin-bottom:0;">
+            <div class="wf-chart-title">Recent User Activity</div>
+            <table class="wf-mini-table">
+              <thead><tr><th>User</th><th>Last Active</th><th>Sessions (7d)</th><th>Records</th><th>FHIR</th></tr></thead>
+              <tbody>
+                <tr><td>p.johnson@…</td><td>2 hrs ago</td><td>5</td><td>3</td><td><span class="status-pill sp-green">Connected</span></td></tr>
+                <tr><td>m.rodriguez@…</td><td>Yesterday</td><td>2</td><td>1</td><td><span class="status-pill sp-amber">Pending</span></td></tr>
+                <tr><td>k.chen@…</td><td>3 days ago</td><td>1</td><td>2</td><td><span class="status-pill sp-red">Not connected</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wf-annotations">
+      <div class="wf-anno"><strong>📌 KPIs shown</strong>DAU/WAU from <code>chat_messages</code> user activity + <code>health_records</code> upload timestamps. Signup conversion from <code>auth.users</code>.</div>
+      <div class="wf-anno"><strong>📌 Data source donut</strong><code>source_type</code> confirmed in <code>health_records</code> schema. Values: fhir | pdf | synthea | manual.</div>
+      <div class="wf-anno"><strong>📌 Charts resolved</strong>Recharts BarChart works for daily cadence. Use daily grouping (not hourly) for Sprint 1. Date range selector is a Sprint 2 enhancement.</div>
+    </div>
+  </div>
+
+  <!-- Wireframe 2: Patient Health View -->
+  <div id="wf-patient" class="wireframe">
+    <div class="wf-browser">
+      <div class="wf-browser-bar">
+        <div class="wf-dots">
+          <div class="wf-dot" style="background:#ef4444;"></div>
+          <div class="wf-dot" style="background:#f59e0b;"></div>
+          <div class="wf-dot" style="background:#10b981;"></div>
+        </div>
+        <div class="wf-url">medbridge.app/patient/health-summary</div>
+      </div>
+      <div class="wf-app">
+        <div class="wf-sidebar">
+          <div class="wf-sidebar-logo">Med<span>Bridge</span></div>
+          <div class="wf-nav-item"><span class="nav-icon">🏠</span> Home</div>
+          <div class="wf-nav-item active-nav"><span class="nav-icon">❤️</span> My Health</div>
+          <div class="wf-nav-item"><span class="nav-icon">📄</span> My Records</div>
+          <div class="wf-nav-item"><span class="nav-icon">💬</span> Ask a Question</div>
+          <div class="wf-nav-item"><span class="nav-icon">🔔</span> Reminders</div>
+        </div>
+        <div class="wf-main">
+          <div class="wf-page-title">Your Health Summary</div>
+          <div class="wf-page-sub">Based on your latest records from Epic · Synced Jun 9, 2026</div>
+
+          <div class="wf-stat-row" style="grid-template-columns:repeat(3,1fr);">
+            <div class="wf-stat">
+              <div class="wf-stat-label">Active Conditions</div>
+              <div class="wf-stat-value">3</div>
+              <div class="wf-stat-sub" style="color:var(--text-2);">Type 2 Diabetes, HTN…</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-label">Current Medications</div>
+              <div class="wf-stat-value">5</div>
+              <div class="wf-stat-sub" style="color:var(--text-2);">Metformin, Lisinopril…</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-label">Abnormal Labs</div>
+              <div class="wf-stat-value" style="color:var(--amber);">2</div>
+              <div class="wf-stat-sub" style="color:var(--amber);">HbA1c, LDL flagged ↑</div>
+            </div>
+          </div>
+
+          <div class="wf-chart-box" style="margin-bottom:12px;">
+            <div class="wf-chart-title">Lab Results — Last 6 Months</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <div style="font-size:11px;color:var(--text-2);margin-bottom:6px;">HbA1c (%)</div>
+                <div class="line-chart-placeholder">
+                  <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+                    <polyline points="0,45 40,42 80,38 120,44 160,36 200,32" fill="none" stroke="var(--amber)" stroke-width="2"/>
+                    <polyline points="0,50 200,50" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4"/>
+                    <text x="202" y="54" font-size="8" fill="var(--text-3)">5.7</text>
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--text-2);margin-bottom:6px;">LDL Cholesterol (mg/dL)</div>
+                <div class="line-chart-placeholder">
+                  <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+                    <polyline points="0,30 40,35 80,28 120,32 160,40 200,38" fill="none" stroke="var(--red)" stroke-width="2"/>
+                    <polyline points="0,45 200,45" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4"/>
+                    <text x="202" y="49" font-size="8" fill="var(--text-3)">100</text>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wf-chart-box">
+            <div class="wf-chart-title">Recent Lab Results</div>
+            <table class="wf-mini-table">
+              <thead><tr><th>Test</th><th>Value</th><th>Reference</th><th>Flag</th><th>Date</th></tr></thead>
+              <tbody>
+                <tr><td>HbA1c</td><td>7.8%</td><td>&lt; 5.7%</td><td><span class="status-pill sp-red">HIGH</span></td><td>Jun 1</td></tr>
+                <tr><td>LDL Cholesterol</td><td>142 mg/dL</td><td>&lt; 100 mg/dL</td><td><span class="status-pill sp-amber">HIGH</span></td><td>Jun 1</td></tr>
+                <tr><td>eGFR</td><td>74 mL/min</td><td>&gt; 60 mL/min</td><td><span class="status-pill sp-green">NORMAL</span></td><td>Jun 1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wf-annotations">
+      <div class="wf-anno"><strong>📌 Data sources confirmed</strong>Active conditions → <code>conditions WHERE status='active'</code>. Medications → <code>medications WHERE status='active'</code>. Abnormal labs → <code>lab_results WHERE flag != 'normal'</code>.</div>
+      <div class="wf-anno"><strong>📌 Line chart</strong>Use <code>name</code> + <code>observed_at</code> from <code>lab_results</code>. 85 Synthea patients already have multi-point lab history — data is available now for dev/testing.</div>
+      <div class="wf-anno"><strong>📌 Copy resolved</strong>Use <code>conditions.name</code> (plain text e.g. "Diabetes mellitus type 2") — Synthea populates this already. No ICD code display needed on patient view.</div>
+    </div>
+  </div>
+
+  <!-- Wireframe 3: AI Interactions -->
+  <div id="wf-ai" class="wireframe">
+    <div class="wf-browser">
+      <div class="wf-browser-bar">
+        <div class="wf-dots">
+          <div class="wf-dot" style="background:#ef4444;"></div>
+          <div class="wf-dot" style="background:#f59e0b;"></div>
+          <div class="wf-dot" style="background:#10b981;"></div>
+        </div>
+        <div class="wf-url">medbridge.app/admin/ai-activity</div>
+      </div>
+      <div class="wf-app">
+        <div class="wf-sidebar">
+          <div class="wf-sidebar-logo">Med<span>Bridge</span></div>
+          <div class="wf-nav-item"><span class="nav-icon">📊</span> Overview</div>
+          <div class="wf-nav-item"><span class="nav-icon">👥</span> Users</div>
+          <div class="wf-nav-item active-nav"><span class="nav-icon">🤖</span> AI Activity</div>
+          <div class="wf-nav-item"><span class="nav-icon">🔗</span> FHIR Connections</div>
+          <div class="wf-nav-item"><span class="nav-icon">🧪</span> Lab Data</div>
+        </div>
+        <div class="wf-main">
+          <div class="wf-page-title">AI Activity</div>
+          <div class="wf-page-sub">Groq / Llama-3.3-70B · Sprint 1 baseline</div>
+
+          <div class="wf-stat-row">
+            <div class="wf-stat">
+              <div class="wf-stat-label">Summaries Generated</div>
+              <div class="wf-stat-value">312</div>
+              <div class="wf-stat-sub">↑ 22% this week</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-label">Summary Rate</div>
+              <div class="wf-stat-value">94%</div>
+              <div class="wf-stat-sub">of uploads succeeded</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-label">Median Latency</div>
+              <div class="wf-stat-value">1.8s</div>
+              <div class="wf-stat-sub">P95: 4.2s</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-label">Avg Q&amp;A Rating</div>
+              <div class="wf-stat-value">4.1/5</div>
+              <div class="wf-stat-sub" style="color:var(--text-2);">from 89 ratings</div>
+            </div>
+          </div>
+
+          <div class="wf-charts-row">
+            <div class="wf-chart-box">
+              <div class="wf-chart-title">Summaries Generated — Last 7 Days</div>
+              <div class="bar-chart">
+                <div class="bar-wrap"><div class="bar" style="height:40px;background:var(--purple-dim);border:1px solid var(--purple);"></div><div class="bar-label">Mon</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:55px;background:var(--purple-dim);border:1px solid var(--purple);"></div><div class="bar-label">Tue</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:48px;background:var(--purple-dim);border:1px solid var(--purple);"></div><div class="bar-label">Wed</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:70px;background:var(--purple);"></div><div class="bar-label">Thu</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:60px;background:var(--purple-dim);border:1px solid var(--purple);"></div><div class="bar-label">Fri</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:30px;background:var(--purple-dim);border:1px solid var(--purple);"></div><div class="bar-label">Sat</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:42px;background:var(--purple);"></div><div class="bar-label">Sun</div></div>
+              </div>
+            </div>
+
+            <div class="wf-chart-box">
+              <div class="wf-chart-title">Q&amp;A per Session</div>
+              <div class="bar-chart" style="height:90px;">
+                <div class="bar-wrap"><div class="bar" style="height:70px;background:var(--teal-dim);border:1px solid var(--teal);"></div><div class="bar-label">1</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:90px;background:var(--teal);"></div><div class="bar-label">2</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:55px;background:var(--teal-dim);border:1px solid var(--teal);"></div><div class="bar-label">3</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:35px;background:var(--teal-dim);border:1px solid var(--teal);"></div><div class="bar-label">4</div></div>
+                <div class="bar-wrap"><div class="bar" style="height:20px;background:var(--teal-dim);border:1px solid var(--teal);"></div><div class="bar-label">5+</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wf-chart-box">
+            <div class="wf-chart-title">Recent Q&amp;A Interactions with Feedback</div>
+            <table class="wf-mini-table">
+              <thead><tr><th>Question (truncated)</th><th>Latency</th><th>Rating</th><th>Session</th></tr></thead>
+              <tbody>
+                <tr><td>"What does my HbA1c result mean?"</td><td>1.4s</td><td>⭐⭐⭐⭐⭐</td><td>Jun 9 · 10:42am</td></tr>
+                <tr><td>"Are any of my medications interacting?"</td><td>2.1s</td><td>⭐⭐⭐⭐</td><td>Jun 9 · 9:18am</td></tr>
+                <tr><td>"When should I follow up with my doctor…"</td><td>1.8s</td><td>⭐⭐⭐</td><td>Jun 8 · 3:05pm</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wf-annotations">
+      <div class="wf-anno"><strong>📌 KPIs shown</strong>Summary rate and latency from <code>summaries</code>. Q&A depth from <code>chat_messages WHERE role='user'</code> grouped by <code>health_record_id</code>.</div>
+      <div class="wf-anno"><strong>📌 Q&A histogram resolved</strong>Group <code>chat_messages WHERE role='user'</code> by <code>health_record_id</code>, count per record. No session_id needed — health_record_id is the natural grouping unit.</div>
+      <div class="wf-anno"><strong>📌 Rating UI</strong>Add <code>feedback_rating INTEGER</code> column to <code>chat_messages</code>. James to build inline thumbs up/down or 1-5 stars after each assistant message. FE ticket open.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    event.target.closest('.nav-tab').classList.add('active');
+  }
+  function showWireframe(id) {
+    document.querySelectorAll('.wireframe').forEach(w => w.classList.remove('active'));
+    document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('wf-' + id).classList.add('active');
+    event.target.closest('.wf-tab').classList.add('active');
+  }
+</script>
+</body>
+</html>
