@@ -39,6 +39,23 @@ MedBridge helps patients understand their health records through AI-powered summ
       postman/              API collection for local testing
       tests/                Unit, integration, and security tests
 
+## Running integration tests
+
+Integration and security tests call a live FastAPI server against a real Supabase test project.
+
+1. Start the server: `uvicorn app.main:app --reload`
+2. Point `.env` at a **test** Supabase project (not production)
+3. Create test users (one-time):
+   - `POST /auth/register` with the emails/passwords from `.env.example` (`TEST_USER_A_*`, `TEST_USER_B_*`), or
+   - create users in the Supabase Auth dashboard
+4. Create the Supabase Storage bucket `medical-documents` (private) in the Storage dashboard
+5. If Supabase requires email confirmation, disable it for the test project or confirm users manually — otherwise login returns 401
+6. Run: `pytest tests/integration/ -v --timeout=60`
+
+If POST routes return 500 after pulling code changes, restart the server so middleware updates are loaded.
+
+---
+
 ## Team
 
 | Name                | Role                     |

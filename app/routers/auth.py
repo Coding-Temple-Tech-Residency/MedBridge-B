@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
+from supabase_auth.errors import AuthApiError
 from app.schemas.auth import RegisterRequest, LoginRequest, AuthResponse
-from app.database import get_supabase
+from app.database import get_supabase, get_supabase_auth
+from app.services.auth_errors import map_auth_error
 import logging
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -9,9 +11,10 @@ logger = logging.getLogger(__name__)
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 async def register(payload: RegisterRequest):
-    supabase = get_supabase()
+    auth_client = get_supabase_auth()
+    admin = get_supabase()
     try:
-        response = supabase.auth.sign_up({
+        response = auth_client.auth.sign_up({
             "email": payload.email,
             "password": payload.password,
         })
@@ -20,13 +23,33 @@ async def register(payload: RegisterRequest):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Registration failed. Please check your email and try again.",
             )
-        # Create user_profiles row
-        supabase.table("user_profiles").insert({
-            "user_id": response.user.id,
-            "full_name": payload.full_name,
-            "preferred_language": "en",
-            "explanation_level": "plain",
-        }).execute()
+
+        try:
+            admin.table("user_profiles").insert({
+                "user_id": response.user.id,
+                "full_name": payload.full_name,
+                "preferred_language": "en",
+                "explanation_level": "plain",
+            }).execute()
+        except Exception as e:
+            logger.exception("Profile setup failed for user %s: %s", response.user.id, e)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(
+                    "Account created but profile setup failed. "
+                    "Contact support or retry after logging in."
+                ),
+            )
+
+        if not response.session:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    "Account created but email confirmation is required. "
+                    "Confirm your email in Supabase or disable confirmation for local dev, "
+                    "then log in."
+                ),
+            )
 
         return AuthResponse(
             access_token=response.session.access_token,
@@ -35,19 +58,23 @@ async def register(payload: RegisterRequest):
         )
     except HTTPException:
         raise
+    except AuthApiError as e:
+        logger.warning("Registration rejected by Supabase: %s", e)
+        status_code, detail = map_auth_error(e, context="register")
+        raise HTTPException(status_code=status_code, detail=detail)
     except Exception as e:
         logger.exception(f"Registration error: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Registration failed. This email may already be registered.",
+            detail="Registration failed. Please try again.",
         )
 
 
 @router.post("/login", response_model=AuthResponse)
 async def login(payload: LoginRequest):
-    supabase = get_supabase()
+    auth_client = get_supabase_auth()
     try:
-        response = supabase.auth.sign_in_with_password({
+        response = auth_client.auth.sign_in_with_password({
             "email": payload.email,
             "password": payload.password,
         })
@@ -63,6 +90,10 @@ async def login(payload: LoginRequest):
         )
     except HTTPException:
         raise
+    except AuthApiError as e:
+        logger.warning("Login rejected by Supabase: %s", e)
+        status_code, detail = map_auth_error(e, context="login")
+        raise HTTPException(status_code=status_code, detail=detail)
     except Exception as e:
         logger.exception(f"Login error: {e}")
         raise HTTPException(
@@ -75,9 +106,9 @@ async def login(payload: LoginRequest):
 async def logout():
     # Supabase JWTs are stateless; client discards the token.
     # Server-side sign-out invalidates the refresh token.
-    supabase = get_supabase()
+    auth_client = get_supabase_auth()
     try:
-        supabase.auth.sign_out()
+        auth_client.auth.sign_out()
     except Exception:
         pass  # Best-effort logout
     return

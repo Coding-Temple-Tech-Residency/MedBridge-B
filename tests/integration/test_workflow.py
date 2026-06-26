@@ -18,7 +18,7 @@ import httpx
 
 BASE_URL = os.getenv("TEST_BASE_URL", "http://localhost:8000")
 USER = {
-    "email": os.getenv("TEST_USER_A_EMAIL", "user_a@test.medbridge.local"),
+    "email": os.getenv("TEST_USER_A_EMAIL", "user_a@test.com"),
     "password": os.getenv("TEST_USER_A_PASSWORD", "TestPassword123!"),
 }
 
@@ -58,7 +58,7 @@ def client():
 @pytest.fixture(scope="module")
 def token(client):
     resp = client.post("/auth/login", json=USER)
-    assert resp.status_code == 200
+    assert resp.status_code == 200, f"Login failed ({resp.status_code}): {resp.text}"
     return resp.json()["access_token"]
 
 

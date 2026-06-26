@@ -22,11 +22,11 @@ import httpx
 BASE_URL = os.getenv("TEST_BASE_URL", "http://localhost:8000")
 
 USER_A = {
-    "email": os.getenv("TEST_USER_A_EMAIL", "user_a@test.medbridge.local"),
+    "email": os.getenv("TEST_USER_A_EMAIL", "user_a@test.com"),
     "password": os.getenv("TEST_USER_A_PASSWORD", "TestPassword123!"),
 }
 USER_B = {
-    "email": os.getenv("TEST_USER_B_EMAIL", "user_b@test.medbridge.local"),
+    "email": os.getenv("TEST_USER_B_EMAIL", "user_b@test.com"),
     "password": os.getenv("TEST_USER_B_PASSWORD", "TestPassword456!"),
 }
 
@@ -42,7 +42,7 @@ def client():
 def _login(client: httpx.Client, creds: dict) -> str:
     """Returns access token."""
     resp = client.post("/auth/login", json=creds)
-    assert resp.status_code == 200, f"Login failed: {resp.text}"
+    assert resp.status_code == 200, f"Login failed ({resp.status_code}): {resp.text}"
     return resp.json()["access_token"]
 
 

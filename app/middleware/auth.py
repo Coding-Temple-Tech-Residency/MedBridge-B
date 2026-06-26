@@ -1,7 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from app.database import get_supabase
-from app.config import get_settings
+from app.database import get_supabase_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,7 +20,7 @@ async def get_current_user(
             user_id = user["id"]
     """
     token = credentials.credentials
-    supabase = get_supabase()
+    supabase = get_supabase_auth()
 
     try:
         response = supabase.auth.get_user(token)
@@ -71,7 +70,7 @@ async def get_current_user_sse(
             detail="Authentication required",
         )
 
-    supabase = get_supabase()
+    supabase = get_supabase_auth()
     try:
         response = supabase.auth.get_user(raw_token)
         if not response or not response.user:
