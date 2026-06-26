@@ -16,13 +16,14 @@ Every request except `/auth/register` and `/auth/login` requires:
 Authorization: Bearer <supabase_jwt>
 ```
 
-Store the JWT in memory (not localStorage). On 401, redirect to login.
+Store the JWT in memory (not localStorage). On 401, redirect to login. On logout, call `POST /auth/logout` before clearing the token (see below).
 
 ---
 
 ## Auth Endpoints
 
 ### Register
+
 ```
 POST /auth/register
 Content-Type: application/json
@@ -31,15 +32,57 @@ Content-Type: application/json
 ```
 
 ### Login
+
 ```
 POST /auth/login
 Content-Type: application/json
 
 { "email": "patient@example.com", "password": "securepassword" }
 ```
+
 Response:
+
 ```json
-{ "access_token": "<jwt>", "token_type": "bearer" }
+{ "access_token": "<jwt>", "token_type": "bearer", "user_id": "<uuid>", "email": "patient@example.com" }
+```
+
+### Logout
+
+```
+POST /auth/logout
+Authorization: Bearer <jwt>
+```
+
+Response: `204 No Content` (empty body)
+
+**Frontend logout flow (required):**
+
+1. Call `POST /auth/logout` with the current Bearer token (best-effort — use `try/finally` so local cleanup always runs).
+2. Clear the JWT from in-memory auth state (React context, Zustand, etc.) — never `localStorage`.
+3. Clear cached user-specific data (documents, chat, settings).
+4. Redirect to the login route.
+5. If the token is already expired (401 from logout), skip or ignore the API error — still clear locally and redirect.
+
+**Security note:** Supabase access JWTs remain cryptographically valid until their `exp` time even after logout. Client-side token discard plus server-side refresh-token revocation is the intended protection for normal logout (especially on shared devices).
+
+Example:
+
+```javascript
+async function logout() {
+  const token = getAccessToken(); // from in-memory auth state
+  try {
+    if (token) {
+      await fetch("http://localhost:8000/auth/logout", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
+  } finally {
+    clearAccessToken();
+    clearUserState();
+    window.location.href = "/login";
+  }
+}
 ```
 
 ---
@@ -47,6 +90,7 @@ Response:
 ## Document Endpoints
 
 ### Upload
+
 ```
 POST /documents/upload
 Authorization: Bearer <jwt>
@@ -54,30 +98,37 @@ Content-Type: multipart/form-data
 
 file: <pdf or image>
 ```
+
 Response (201):
+
 ```json
 { "document_id": "uuid", "status": "uploaded" }
 ```
+
 - Accepts PDF, JPG, PNG including phone photos (OCR handles them)
 - Processing is async — poll GET /documents/{id} until status = "summarized"
 
 ### List
+
 ```
 GET /documents
 Authorization: Bearer <jwt>
 ```
 
 ### Get one
+
 ```
 GET /documents/{document_id}
 Authorization: Bearer <jwt>
 ```
 
 ### Delete
+
 ```
 DELETE /documents/{document_id}
 Authorization: Bearer <jwt>
 ```
+
 Response: 204 No Content
 
 ---
@@ -95,11 +146,14 @@ Show a loading indicator until status is `summarized` before enabling summary or
 ## Summary Endpoints
 
 ### Get summary
+
 ```
 GET /documents/{document_id}/summary
 Authorization: Bearer <jwt>
 ```
+
 Response (200):
+
 ```json
 {
   "summary_id": "uuid",
@@ -108,11 +162,13 @@ Response (200):
   "created_at": "..."
 }
 ```
+
 - Returns 202 if still generating — retry after 3 seconds
 - All summaries written at 6th-grade reading level
 - Medical terms explained inline
 
 ### Rate understanding
+
 ```
 POST /summaries/{summary_id}/understanding
 Authorization: Bearer <jwt>
@@ -120,6 +176,7 @@ Content-Type: application/json
 
 { "rating": "yes" }
 ```
+
 Valid values: "yes", "somewhat", "no"
 
 ---
@@ -127,6 +184,7 @@ Valid values: "yes", "somewhat", "no"
 ## Chat Endpoints
 
 ### Standard chat (full response, waits for complete answer)
+
 ```
 POST /documents/{document_id}/chat
 Authorization: Bearer <jwt>
@@ -134,7 +192,9 @@ Content-Type: application/json
 
 { "question": "What does my LDL result mean?" }
 ```
+
 Response (201):
+
 ```json
 {
   "message_id": "uuid",
@@ -144,6 +204,7 @@ Response (201):
   "created_at": "..."
 }
 ```
+
 If the patient asks "tell me more" or "explain more", the AI automatically
 returns a longer response.
 
@@ -184,6 +245,7 @@ function streamChat(documentId, message, token, onChunk, onDone, onError) {
 ```
 
 React usage:
+
 ```javascript
 const [response, setResponse] = useState('');
 const [loading, setLoading] = useState(false);
@@ -201,13 +263,16 @@ function handleSend(message) {
 ```
 
 ### Get chat history
+
 ```
 GET /documents/{document_id}/chat
 Authorization: Bearer <jwt>
 ```
+
 Returns array of `{ id, role, content, created_at }` — role is "user" or "assistant".
 
 ### Rate a message — OPEN TICKET (James)
+
 ```
 PATCH /chat/{message_id}/rating
 Authorization: Bearer <jwt>
@@ -215,6 +280,7 @@ Content-Type: application/json
 
 { "rating": 5 }
 ```
+
 Valid: 1-5 integer. Feeds the AI Satisfaction Score KPI. Wire to a star or thumbs widget.
 
 ---
@@ -225,7 +291,9 @@ Valid: 1-5 integer. Feeds the AI Satisfaction Score KPI. Wire to a star or thumb
 POST /documents/{document_id}/prep
 Authorization: Bearer <jwt>
 ```
+
 Response (201):
+
 ```json
 {
   "prep_id": "uuid",
@@ -243,7 +311,9 @@ Response (201):
 GET /dashboard
 Authorization: Bearer <jwt>
 ```
+
 Response:
+
 ```json
 {
   "documents": [...],
@@ -283,6 +353,7 @@ All errors return a consistent envelope — never a blank screen:
 ```
 GET /health
 ```
+
 No auth. Returns `{ "status": "ok" }`.
 Call this on app startup to confirm backend is reachable before showing the UI.
 
@@ -297,12 +368,14 @@ Post in the Discord team channel or DM Kathy.
 ## Reminders
 
 ### List reminders
+
 ```
 GET /reminders
 Authorization: Bearer <jwt>
 ```
 
 ### Create reminder
+
 ```
 POST /reminders
 Authorization: Bearer <jwt>
@@ -317,10 +390,12 @@ Content-Type: application/json
   "health_record_id": "uuid (optional)"
 }
 ```
+
 Valid reminder_type: "medication", "appointment", "follow_up", "general"
 Valid repeat_interval: "daily", "weekly", "monthly", null
 
 ### Update reminder
+
 ```
 PATCH /reminders/{reminder_id}
 Authorization: Bearer <jwt>
@@ -330,16 +405,19 @@ Content-Type: application/json
 ```
 
 ### Complete reminder
+
 ```
 POST /reminders/{reminder_id}/complete
 Authorization: Bearer <jwt>
 ```
 
 ### Delete reminder
+
 ```
 DELETE /reminders/{reminder_id}
 Authorization: Bearer <jwt>
 ```
+
 Response: 204 No Content
 
 ---
@@ -347,12 +425,14 @@ Response: 204 No Content
 ## Trusted Contacts (Caregiver Access)
 
 ### List trusted contacts
+
 ```
 GET /trusted-contacts
 Authorization: Bearer <jwt>
 ```
 
 ### Add trusted contact
+
 ```
 POST /trusted-contacts
 Authorization: Bearer <jwt>
@@ -364,10 +444,12 @@ Content-Type: application/json
   "access_level": "read"
 }
 ```
+
 Valid access_level: "read", "full"
 Status starts as "pending" until the contact accepts.
 
 ### Update contact
+
 ```
 PATCH /trusted-contacts/{contact_id}
 Authorization: Bearer <jwt>
@@ -375,13 +457,16 @@ Content-Type: application/json
 
 { "access_level": "full", "status": "accepted" }
 ```
+
 Valid status: "pending", "accepted", "revoked"
 
 ### Remove contact
+
 ```
 DELETE /trusted-contacts/{contact_id}
 Authorization: Bearer <jwt>
 ```
+
 Response: 204 No Content
 
 ---
@@ -389,12 +474,14 @@ Response: 204 No Content
 ## Follow-ups
 
 ### List follow-ups for a document
+
 ```
 GET /documents/{document_id}/follow-ups
 Authorization: Bearer <jwt>
 ```
 
 ### Create follow-up
+
 ```
 POST /documents/{document_id}/follow-ups
 Authorization: Bearer <jwt>
@@ -408,6 +495,7 @@ Content-Type: application/json
 ```
 
 ### Update follow-up
+
 ```
 PATCH /follow-ups/{followup_id}
 Authorization: Bearer <jwt>
@@ -417,12 +505,14 @@ Content-Type: application/json
 ```
 
 ### Complete follow-up
+
 ```
 POST /follow-ups/{followup_id}/complete
 Authorization: Bearer <jwt>
 ```
 
 ### Delete follow-up
+
 ```
 DELETE /follow-ups/{followup_id}
 Authorization: Bearer <jwt>
@@ -433,12 +523,14 @@ Authorization: Bearer <jwt>
 ## Providers (Care Team)
 
 ### List providers
+
 ```
 GET /providers
 Authorization: Bearer <jwt>
 ```
 
 ### Add provider
+
 ```
 POST /providers
 Authorization: Bearer <jwt>
@@ -453,6 +545,7 @@ Content-Type: application/json
 ```
 
 ### Update provider
+
 ```
 PATCH /providers/{provider_id}
 Authorization: Bearer <jwt>
@@ -462,6 +555,7 @@ Content-Type: application/json
 ```
 
 ### Delete provider
+
 ```
 DELETE /providers/{provider_id}
 Authorization: Bearer <jwt>
@@ -474,6 +568,7 @@ Authorization: Bearer <jwt>
 Shared content — not per-user. Read-only.
 
 ### List resources
+
 ```
 GET /resources
 GET /resources?resource_type=article
@@ -482,11 +577,14 @@ Authorization: Bearer <jwt>
 ```
 
 ### Get one resource
+
 ```
 GET /resources/{resource_id}
 Authorization: Bearer <jwt>
 ```
+
 Response:
+
 ```json
 {
   "id": "uuid",
@@ -505,17 +603,21 @@ Response:
 ## Health Scores
 
 ### List health scores
+
 ```
 GET /health-scores
 Authorization: Bearer <jwt>
 ```
 
 ### Generate health score from document
+
 ```
 POST /documents/{document_id}/health-score
 Authorization: Bearer <jwt>
 ```
+
 Response (201):
+
 ```json
 {
   "id": "uuid",
@@ -528,6 +630,7 @@ Response (201):
   "created_at": "..."
 }
 ```
+
 Valid score_label values: "Excellent" (80-100), "Good" (60-79), "Needs Attention" (40-59), "Critical" (0-39)
 
 Note: This scores patient engagement with the care plan — NOT a clinical health assessment.
