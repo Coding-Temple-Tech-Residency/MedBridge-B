@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedBridge Analytics & Reporting Program</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --teal: #1D9E75; --teal-light: #E1F5EE; --teal-dark: #085041;
+  --blue: #378ADD; --blue-light: #E6F1FB; --blue-dark: #0C447C;
+  --purple: #7F77DD; --purple-light: #EEEDFE; --purple-dark: #3C3489;
+  --amber: #BA7517; --amber-light: #FAEEDA; --amber-dark: #633806;
+  --coral: #D85A30; --coral-light: #FAECE7; --coral-dark: #712B13;
+  --gray: #888780; --gray-light: #F1EFE8; --gray-dark: #2C2C2A;
+  --text: #1a1a18; --text-2: #5a5a56; --text-3: #8a8a84;
+  --border: rgba(0,0,0,0.1); --bg: #ffffff; --bg-2: #f8f7f4; --bg-3: #f1f0ec;
+  --radius: 8px; --radius-lg: 12px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); background: var(--bg-3); line-height: 1.6; }
+.shell { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; flex-shrink: 0; background: var(--bg); border-right: 0.5px solid var(--border); padding: 1.5rem 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar-logo { padding: 0 1.25rem 1.25rem; border-bottom: 0.5px solid var(--border); margin-bottom: 1rem; }
+.sidebar-logo .app-name { font-size: 14px; font-weight: 600; color: var(--teal); }
+.sidebar-logo .app-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.nav-section { padding: 0 0.75rem; margin-bottom: 0.25rem; }
+.nav-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); padding: 0.5rem 0.5rem 0.25rem; }
+.nav-btn { display: block; width: 100%; text-align: left; padding: 7px 10px; border-radius: 6px; border: none; background: none; font-size: 13px; color: var(--text-2); cursor: pointer; transition: all 0.12s; }
+.nav-btn:hover { background: var(--bg-2); color: var(--text); }
+.nav-btn.active { background: var(--teal-light); color: var(--teal-dark); font-weight: 500; }
+.main { flex: 1; padding: 2rem 2.5rem; max-width: 900px; }
+.page { display: none; }
+.page.active { display: block; }
+.page-title { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 0.35rem; }
+.page-sub { font-size: 14px; color: var(--text-2); margin-bottom: 1.75rem; padding-bottom: 1.25rem; border-bottom: 0.5px solid var(--border); }
+.tier { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); margin: 1.75rem 0 0.75rem; padding-bottom: 6px; border-bottom: 0.5px solid var(--border); }
+.kpi-card { border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 10px; background: var(--bg); }
+.kpi-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.kpi-name .star { font-size: 11px; font-weight: 400; color: var(--text-3); }
+.pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.pill { font-size: 11px; padding: 2px 9px; border-radius: 20px; font-weight: 500; }
+.p-teal { background: var(--teal-light); color: var(--teal-dark); }
+.p-blue { background: var(--blue-light); color: var(--blue-dark); }
+.p-purple { background: var(--purple-light); color: var(--purple-dark); }
+.p-amber { background: var(--amber-light); color: var(--amber-dark); }
+.p-coral { background: var(--coral-light); color: var(--coral-dark); }
+.kpi-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+.kpi-formula { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; background: var(--bg-3); padding: 5px 10px; border-radius: 5px; margin-top: 8px; color: var(--text-2); }
+.kpi-source { font-size: 11px; color: var(--text-3); margin-top: 6px; }
+.callout { border-left: 3px solid; border-radius: 0 var(--radius) var(--radius) 0; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.6; }
+.c-teal { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); }
+.c-blue { border-color: var(--blue); background: var(--blue-light); color: var(--blue-dark); }
+.c-amber { border-color: var(--amber); background: var(--amber-light); color: var(--amber-dark); }
+.c-coral { border-color: var(--coral); background: var(--coral-light); color: var(--coral-dark); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--bg); border-radius: var(--radius-lg); overflow: hidden; border: 0.5px solid var(--border); margin-bottom: 1.25rem; }
+th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); padding: 10px 12px; background: var(--bg-2); border-bottom: 0.5px solid var(--border); }
+td { padding: 9px 12px; border-bottom: 0.5px solid var(--border); color: var(--text-2); vertical-align: top; line-height: 1.5; }
+td:first-child { color: var(--text); font-weight: 500; }
+tr:last-child td { border-bottom: none; }
+.funnel { margin-bottom: 1.5rem; }
+.f-row { display: flex; align-items: center; gap: 12px; margin-bottom: 7px; }
+.f-label { font-size: 12px; color: var(--text-2); width: 180px; flex-shrink: 0; text-align: right; }
+.f-bg { flex: 1; background: var(--bg-3); border-radius: 4px; height: 34px; overflow: hidden; }
+.f-fill { height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 600; border-radius: 4px; }
+.f-pct { font-size: 12px; color: var(--text-3); width: 36px; }
+.event-code { display: inline-block; font-family: monospace; font-size: 11px; background: var(--bg-3); border: 0.5px solid var(--border); padding: 2px 7px; border-radius: 4px; color: var(--text-2); }
+.must { background: var(--coral-light); color: var(--coral-dark); font-size: 11px; padding: 2px 7px; border-radius: 3px; font-weight: 500; }
+.nice { background: var(--teal-light); color: var(--teal-dark); font-size: 11px; padding: 2px 7px; border-radius: 3px; font-weight: 500; }
+.section-block { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+.section-block h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.section-block p { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+.section-block ul { font-size: 13px; color: var(--text-2); line-height: 1.8; padding-left: 1.25rem; margin-top: 6px; }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+.metric-card { background: var(--bg-2); border-radius: var(--radius); padding: 1rem; }
+.metric-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.metric-value { font-size: 26px; font-weight: 600; color: var(--text); }
+.metric-note { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+.activation-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+.activation-level { width: 80px; flex-shrink: 0; font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em; padding-top: 2px; }
+.activation-body { flex: 1; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
+.activation-body h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.activation-body p { font-size: 12px; color: var(--text-2); }
+.demo-visual { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; }
+.demo-num { width: 32px; height: 32px; border-radius: 50%; background: var(--teal-light); color: var(--teal-dark); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.demo-body h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.demo-body p { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.demo-body .demo-tag { font-size: 11px; color: var(--teal-dark); background: var(--teal-light); padding: 1px 7px; border-radius: 3px; display: inline-block; margin-top: 5px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="app-name">MedBridge</div>
+    <div class="app-sub">Analytics Program v1.0</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Measurement</div>
+    <button class="nav-btn active" onclick="show('kpi', this)">KPI dictionary</button>
+    <button class="nav-btn" onclick="show('funnel', this)">Patient journey funnel</button>
+    <button class="nav-btn" onclick="show('events', this)">Event tracking plan</button>
+    <button class="nav-btn" onclick="show('activation', this)">Patient activation</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Reporting</div>
+    <button class="nav-btn" onclick="show('dashboards', this)">Dashboard requirements</button>
+    <button class="nav-btn" onclick="show('reporting', this)">Reporting layers</button>
+    <button class="nav-btn" onclick="show('cms', this)">CMS / Ellijah story</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Quality & Equity</div>
+    <button class="nav-btn" onclick="show('equity', this)">Digital equity metrics</button>
+    <button class="nav-btn" onclick="show('quality', this)">Data quality & QA</button>
+    <button class="nav-btn" onclick="show('prompts', this)">Prompt performance</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Delivery</div>
+    <button class="nav-btn" onclick="show('demo', this)">Demo Day plan</button>
+    <button class="nav-btn" onclick="show('dataset', this)">Sample dataset spec</button>
+    <button class="nav-btn" onclick="show('handoff', this)">Team handoffs</button>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- KPI DICTIONARY -->
+<div id="kpi" class="page active">
+  <div class="page-title">KPI dictionary</div>
+  <div class="page-sub">Every metric MedBridge tracks, defined by formula, source, audience, and owner. The North Star is Understanding Rate — all other KPIs support or explain it.</div>
+
+  <div class="tier">Audience 1 — Patient understanding</div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Understanding Rate <span class="star">— North Star Metric</span></div>
+    <div class="pills"><span class="pill p-coral">Patient</span><span class="pill p-blue">Ellijah</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">The percentage of summary feedback responses where the patient selected "Yes, this helped me understand." This is the single most important metric. Every other KPI is either upstream (did the product work well enough to generate feedback?) or downstream (what happened after the patient understood?).</div>
+    <div class="kpi-formula">Yes responses ÷ total feedback submitted × 100</div>
+    <div class="kpi-source">Source: summary_feedback.understanding_rating &nbsp;|&nbsp; Owner: Backend (view) + Frontend (widget)</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Confidence Score</div>
+    <div class="pills"><span class="pill p-coral">Patient</span><span class="pill p-blue">Ellijah</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Average self-reported confidence (1–5 stars) on "How prepared do you feel to discuss this with your provider?" Measures activation, not just comprehension. A patient can understand a summary but still feel unequipped to talk to their doctor — this captures that gap.</div>
+    <div class="kpi-formula">SUM(confidence_rating) ÷ COUNT(feedback submitted)</div>
+    <div class="kpi-source">Source: summary_feedback.confidence_rating (column to add in migration 006) &nbsp;|&nbsp; Owner: Backend + Frontend</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Summary Helpfulness Score</div>
+    <div class="pills"><span class="pill p-coral">Patient</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Combined Yes + Somewhat rate. The broader positive signal — captures patients who got partial help, not just those who fully understood. Useful for identifying document types that are partially comprehensible vs fully opaque.</div>
+    <div class="kpi-formula">(Yes + Somewhat) ÷ total feedback × 100</div>
+    <div class="kpi-source">Source: summary_feedback &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Questions Asked Per Document</div>
+    <div class="pills"><span class="pill p-coral">Patient</span><span class="pill p-blue">Ellijah</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Average number of Q&A messages per uploaded document. A proxy for active engagement — patients who ask questions are working toward understanding, not passively scrolling. High value = deep engagement. Zero = patient may have been confused but didn't know they could ask.</div>
+    <div class="kpi-formula">Total chat messages ÷ total documents with any chat activity</div>
+    <div class="kpi-source">Source: chat_messages, health_records &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">AI Chat Satisfaction Score</div>
+    <div class="pills"><span class="pill p-coral">Patient</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Average patient rating (1–5) on individual chat answers. Already tracked in kpi_ai_satisfaction view (live). Measures quality of AI responses from the patient's perspective, not technical correctness. Low score = answers may be too technical, too long, or unhelpful.</div>
+    <div class="kpi-formula">AVG(feedback_rating) WHERE feedback_rating IS NOT NULL</div>
+    <div class="kpi-source">Source: chat_messages.feedback_rating &nbsp;|&nbsp; KPI view: kpi_ai_satisfaction (live)</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Provider Readiness Score</div>
+    <div class="pills"><span class="pill p-purple">Readiness</span><span class="pill p-blue">Ellijah</span><span class="pill p-amber">Sprint 2</span></div>
+    <div class="kpi-desc">Rate of patients who used Appointment Prep after receiving a summary. This is the final and most meaningful step in the MedBridge journey — the moment confusion becomes conversation readiness. Also the metric most directly tied to CMS patient activation requirements.</div>
+    <div class="kpi-formula">Users who generated prep questions ÷ users who received a summary × 100</div>
+    <div class="kpi-source">Source: follow_ups, summaries &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+
+  <div class="tier">Audience 2 — Ellijah / CMS stakeholder</div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Upload Success Rate</div>
+    <div class="pills"><span class="pill p-blue">Ellijah</span><span class="pill p-amber">Team</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Percentage of document uploads that complete extraction and reach summarized status. From Ellijah's perspective: if patients can't get their documents processed, MedBridge isn't helping anyone. Low rate = barrier before the product even starts working.</div>
+    <div class="kpi-formula">Documents with status = 'summarized' ÷ total uploads × 100</div>
+    <div class="kpi-source">Source: health_records.status &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Patient Journey Completion Rate</div>
+    <div class="pills"><span class="pill p-blue">Ellijah</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Percentage of patients who complete the full journey: upload → summary → feedback submitted. This is the CMS-relevant engagement metric — documented, patient-reported activation. Not just logins, not just uploads. Full completion.</div>
+    <div class="kpi-formula">Users who submitted feedback ÷ users who uploaded at least one document × 100</div>
+    <div class="kpi-source">Source: summary_feedback, health_records &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Return User Rate</div>
+    <div class="pills"><span class="pill p-blue">Ellijah</span><span class="pill p-amber">Sprint 2</span></div>
+    <div class="kpi-desc">Percentage of registered users who upload documents across multiple distinct sessions. Demonstrates sustained engagement rather than one-time use — the difference between a useful tool and a tool patients trust enough to come back to.</div>
+    <div class="kpi-formula">Users with uploads on 2+ distinct days ÷ total registered users × 100</div>
+    <div class="kpi-source">Source: health_records, app_events &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Feature Adoption Rate</div>
+    <div class="pills"><span class="pill p-blue">Ellijah</span><span class="pill p-amber">Sprint 2</span></div>
+    <div class="kpi-desc">Percentage of active users with at least one optional feature enabled: Reminders, Trusted Contacts, or MyChart Integration. CMS treats optional feature adoption as evidence of meaningful member engagement — not passive enrollment.</div>
+    <div class="kpi-formula">Users with any feature enabled ÷ total active users × 100</div>
+    <div class="kpi-source">Source: user_settings &nbsp;|&nbsp; Owner: Backend + Frontend (toggles)</div>
+  </div>
+
+  <div class="tier">Audience 3 — Team / operational</div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">OCR / Extraction Failure Rate</div>
+    <div class="pills"><span class="pill p-amber">Team</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Percentage of uploads that fail at text extraction. Track broken down by failure reason (unsupported file type, image quality too low, file too large) and by file type (PDF vs phone photo). Phone photo failure rate is the most important — that's where low-income patients are most affected.</div>
+    <div class="kpi-formula">Documents with status = 'failed' ÷ total uploads × 100</div>
+    <div class="kpi-source">Source: health_records.status, health_records.failure_reason &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Reading Level Pass Rate</div>
+    <div class="pills"><span class="pill p-amber">Team</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Percentage of summaries scoring at or below 6th grade Flesch-Kincaid level. Already live in kpi_reading_level view. Target: greater than 90% at grade 6 or below. If below target, the summary prompt needs adjustment — not the frontend.</div>
+    <div class="kpi-formula">Summaries with reading_level_score ≤ 6 ÷ total summaries × 100</div>
+    <div class="kpi-source">Source: summaries.reading_level_score &nbsp;|&nbsp; KPI view: kpi_reading_level (live)</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Guardrail Pass Rate</div>
+    <div class="pills"><span class="pill p-amber">Team</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Percentage of AI responses that pass all safety checks: no diagnosis language, no treatment recommendations, provider disclaimer present. Already live in kpi_quality view. Must be 100% on any response that contains medical terminology. Non-negotiable.</div>
+    <div class="kpi-formula">Summaries with quality_passed = true ÷ total summaries × 100</div>
+    <div class="kpi-source">Source: summaries.quality_passed &nbsp;|&nbsp; KPI view: kpi_quality (live)</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Missing Feedback Rate</div>
+    <div class="pills"><span class="pill p-amber">Team</span><span class="pill p-teal">MVP must-have</span></div>
+    <div class="kpi-desc">Percentage of summaries with no associated feedback record. High rate means patients aren't seeing or using the feedback widget. This is simultaneously a data quality problem (North Star KPI has no numerator) and a UX problem (widget is not prominent enough).</div>
+    <div class="kpi-formula">Summaries with no summary_feedback row ÷ total summaries × 100</div>
+    <div class="kpi-source">Source: summaries LEFT JOIN summary_feedback &nbsp;|&nbsp; Owner: Backend + Frontend</div>
+  </div>
+
+  <div class="tier">Audience 4 — Provider conversation readiness</div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Appointment Prep Usage Rate</div>
+    <div class="pills"><span class="pill p-purple">Readiness</span><span class="pill p-blue">Ellijah</span><span class="pill p-amber">Sprint 2</span></div>
+    <div class="kpi-desc">Percentage of summarized documents where the patient also requested appointment prep questions. This is the final and most meaningful step — the moment MedBridge converts understanding into provider conversation readiness. Not a "nice to have" metric. This is what differentiates MedBridge from a PDF summarizer.</div>
+    <div class="kpi-formula">Documents with prep questions generated ÷ total summarized documents × 100</div>
+    <div class="kpi-source">Source: follow_ups &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-name">Confidence Before vs After Prep</div>
+    <div class="pills"><span class="pill p-purple">Readiness</span><span class="pill p-amber">Sprint 2</span></div>
+    <div class="kpi-desc">Does generating appointment prep questions increase the patient's confidence rating? Compare confidence_rating submitted immediately after summary vs confidence_rating submitted after using appointment prep. A measurable before/after activation signal.</div>
+    <div class="kpi-formula">AVG(confidence after prep) − AVG(confidence at summary feedback)</div>
+    <div class="kpi-source">Source: summary_feedback (timestamp comparison) &nbsp;|&nbsp; Owner: Backend</div>
+  </div>
+</div>
+
+<!-- PATIENT JOURNEY FUNNEL -->
+<div id="funnel" class="page">
+  <div class="page-title">Patient journey funnel</div>
+  <div class="page-sub">The nine-step journey from registration to provider readiness. Drop-off at each step is the most important operational story for Demo Day and for Ellijah.</div>
+
+  <div class="callout c-blue" style="margin-bottom:1.5rem">This is the AirView equivalent for MedBridge. Where AirView shows clinicians which patients are non-compliant with CPAP therapy, this funnel shows Ellijah where patients are falling off their path to understanding.</div>
+
+  <div class="funnel" id="funnel-render"></div>
+
+  <div class="tier">What drop-off means at each step</div>
+  <table>
+    <tr><th>Step transition</th><th>If drop-off is high, investigate</th><th>Owner</th></tr>
+    <tr><td>Registered → Logged in</td><td>Onboarding friction, email verification failure, or app not loading</td><td>Frontend + Backend</td></tr>
+    <tr><td>Logged in → Uploaded</td><td>Upload UI unclear, or patients don't understand the value proposition</td><td>Frontend</td></tr>
+    <tr><td>Uploaded → Extracted</td><td>OCR failure, unsupported file type, slow connection timeout</td><td>Backend — check failure_reason breakdown</td></tr>
+    <tr><td>Extracted → Summary viewed</td><td>Processing too slow, patient abandoned before summary appeared</td><td>Backend — check kpi_processing_time</td></tr>
+    <tr><td>Summary → Feedback submitted</td><td>Widget not visible, not prominent enough, or patients don't know it's there</td><td>Frontend — widget placement review</td></tr>
+    <tr><td>Feedback → Question asked</td><td>Q&A not discoverable from summary screen, or summary was sufficient</td><td>Frontend — Q&A entry point</td></tr>
+    <tr><td>Question → Chat rated</td><td>Rating widget not appearing after answers</td><td>Frontend — James's ticket</td></tr>
+    <tr><td>Summary → Prep questions</td><td>Feature not discoverable, or patients don't know what appointment prep means</td><td>Frontend + Content</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.5rem">Reading level targets by journey step</div>
+  <table>
+    <tr><th>Step</th><th>Target reading level</th><th>Rationale</th></tr>
+    <tr><td>Summaries</td><td>Grade 4–6 (Flesch-Kincaid)</td><td>Low health literacy patients must be able to read without help</td></tr>
+    <tr><td>Q&A answers</td><td>Grade 4–8 (context dependent)</td><td>Follow-up questions may involve technical terms — explain but don't oversimplify</td></tr>
+    <tr><td>Appointment prep</td><td>Optimized for conversation, not grade level</td><td>Questions must be medically precise enough for a provider to understand</td></tr>
+    <tr><td>UI labels and instructions</td><td>Grade 5–6</td><td>Button labels, screen titles, help text — plain language throughout</td></tr>
+  </table>
+</div>
+
+<!-- EVENT TRACKING -->
+<div id="events" class="page">
+  <div class="page-title">Event tracking plan</div>
+  <div class="page-sub">Every behavioral event MedBridge must capture. Events land in the app_events table (to be created in migration 006). No PHI. No document text. Behavior only.</div>
+
+  <div class="callout c-amber">Privacy rule: the properties JSONB column in app_events must never contain document text, patient names, diagnosis codes, or any clinical information. Riman to audit on first build.</div>
+
+  <div class="tier">Authentication events</div>
+  <table>
+    <tr><th>Event name</th><th>Trigger</th><th>Required fields</th><th>KPI</th><th>Priority</th></tr>
+    <tr><td><span class="event-code">user_registered</span></td><td>Supabase auth signup complete</td><td>user_id, timestamp, device_type</td><td>Total users, funnel step 1</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">user_logged_in</span></td><td>Successful session start</td><td>user_id, timestamp, device_type</td><td>DAU/WAU, return users</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">login_failed</span></td><td>Auth failure returned</td><td>timestamp, ip_address, reason (wrong_password / user_not_found)</td><td>Security events, unauthorized attempts</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">token_expired</span></td><td>JWT expiry during active session</td><td>user_id, timestamp, endpoint</td><td>Security events</td><td><span class="nice">nice-to-have</span></td></tr>
+  </table>
+
+  <div class="tier">Document events</div>
+  <table>
+    <tr><th>Event name</th><th>Trigger</th><th>Required fields</th><th>KPI</th><th>Priority</th></tr>
+    <tr><td><span class="event-code">document_uploaded</span></td><td>File submitted to upload endpoint</td><td>user_id, document_id, file_type, timestamp</td><td>Upload volume, funnel step 3</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">document_upload_failed</span></td><td>Upload endpoint returns error</td><td>user_id, file_type, failure_reason, timestamp</td><td>Upload failure rate, OCR failure rate</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">extraction_completed</span></td><td>OCR/text extraction succeeds</td><td>user_id, document_id, method (pdf/ocr), timestamp</td><td>Extraction success rate, funnel step 4</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">extraction_failed</span></td><td>OCR/extraction returns error</td><td>user_id, document_id, failure_reason, timestamp</td><td>OCR failure rate by type</td><td><span class="must">must-have</span></td></tr>
+  </table>
+
+  <div class="tier">Summary events</div>
+  <table>
+    <tr><th>Event name</th><th>Trigger</th><th>Required fields</th><th>KPI</th><th>Priority</th></tr>
+    <tr><td><span class="event-code">summary_generated</span></td><td>Groq/Llama returns summary</td><td>user_id, document_id, summary_id, reading_level_score, quality_passed, timestamp</td><td>Summary rate, reading level, guardrail rate</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">summary_viewed</span></td><td>Patient opens summary screen</td><td>user_id, summary_id, timestamp</td><td>Funnel step 5, engagement rate</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">summary_feedback_submitted</span></td><td>Patient submits understanding widget</td><td>user_id, summary_id, understanding_rating, confidence_rating, timestamp</td><td>Understanding Rate (North Star), Confidence Score</td><td><span class="must">must-have</span></td></tr>
+  </table>
+
+  <div class="tier">Chat events</div>
+  <table>
+    <tr><th>Event name</th><th>Trigger</th><th>Required fields</th><th>KPI</th><th>Priority</th></tr>
+    <tr><td><span class="event-code">chat_question_asked</span></td><td>Patient sends chat message</td><td>user_id, document_id, message_id, timestamp</td><td>Questions per document, funnel step 7</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">chat_answer_generated</span></td><td>AI returns answer</td><td>user_id, message_id, response_time_ms, timestamp</td><td>Chat performance, processing time</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">chat_feedback_submitted</span></td><td>Patient rates chat answer</td><td>user_id, message_id, feedback_rating, timestamp</td><td>AI Satisfaction Score</td><td><span class="must">must-have</span></td></tr>
+  </table>
+
+  <div class="tier">Feature & readiness events</div>
+  <table>
+    <tr><th>Event name</th><th>Trigger</th><th>Required fields</th><th>KPI</th><th>Priority</th></tr>
+    <tr><td><span class="event-code">user_settings_updated</span></td><td>Patient changes profile toggle</td><td>user_id, setting_name, new_value, timestamp</td><td>Feature adoption rate</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">reminder_enabled</span></td><td>Reminders toggled on</td><td>user_id, timestamp</td><td>Feature adoption</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">prep_questions_generated</span></td><td>Appointment prep endpoint called</td><td>user_id, document_id, question_count, timestamp</td><td>Provider readiness rate, funnel step 9</td><td><span class="must">must-have</span></td></tr>
+    <tr><td><span class="event-code">dashboard_viewed</span></td><td>Patient opens dashboard</td><td>user_id, timestamp</td><td>Engagement, return visits</td><td><span class="nice">nice-to-have</span></td></tr>
+    <tr><td><span class="event-code">unauthorized_access_attempt</span></td><td>RLS rejection or 403 response</td><td>user_id (nullable), endpoint, ip_address, timestamp</td><td>Security events</td><td><span class="must">must-have</span></td></tr>
+  </table>
+</div>
+
+<!-- PATIENT ACTIVATION -->
+<div id="activation" class="page">
+  <div class="page-title">Patient activation framework</div>
+  <div class="page-sub">MedBridge doesn't just measure understanding — it measures whether understanding leads to action. This framework adapts Patient Activation Measure (PAM) principles for a document-understanding app.</div>
+
+  <div class="callout c-teal">The goal isn't a patient who read a summary. The goal is a patient who walks into their provider appointment knowing what to ask.</div>
+
+  <div class="tier">Activation levels</div>
+
+  <div class="activation-row">
+    <div class="activation-level">Level 1</div>
+    <div class="activation-body">
+      <h4>Passive — uploaded and read</h4>
+      <p>Patient uploads document, receives summary, takes no further action. Measures: summary viewed, no feedback submitted, no chat, no prep. This patient may have been helped but we have no evidence of it.</p>
+    </div>
+  </div>
+  <div class="activation-row">
+    <div class="activation-level">Level 2</div>
+    <div class="activation-body">
+      <h4>Aware — acknowledged understanding</h4>
+      <p>Patient submits understanding feedback. Even a "Somewhat" response signals awareness. Measures: summary_feedback.understanding_rating is not null. This is the minimum for the North Star KPI to have data.</p>
+    </div>
+  </div>
+  <div class="activation-row">
+    <div class="activation-level">Level 3</div>
+    <div class="activation-body">
+      <h4>Engaged — asked follow-up questions</h4>
+      <p>Patient sent at least one Q&A message about their document. Measures: chat_messages count greater than 0 for this document. This patient is actively working toward understanding, not just passively receiving it.</p>
+    </div>
+  </div>
+  <div class="activation-row">
+    <div class="activation-level">Level 4</div>
+    <div class="activation-body">
+      <h4>Activated — ready to talk to their provider</h4>
+      <p>Patient generated appointment prep questions AND rated confidence 4 or 5. This is the full MedBridge outcome: from confused patient to prepared patient. Measures: follow_ups row exists + confidence_rating ≥ 4.</p>
+    </div>
+  </div>
+
+  <div class="tier" style="margin-top:1.5rem">Trust metrics</div>
+  <div class="callout c-blue">Trust is not directly measurable. It is inferred from behavior. Patients who trust MedBridge return, share access, and give honest (not uniformly positive) feedback.</div>
+  <table>
+    <tr><th>Trust signal</th><th>Behavioral proxy</th><th>Source</th><th>Healthy range</th></tr>
+    <tr><td>Returns to the app</td><td>Return user rate</td><td>app_events (multiple login events)</td><td>&gt;40% return within 2 weeks</td></tr>
+    <tr><td>Enables optional features</td><td>Feature adoption rate</td><td>user_settings</td><td>&gt;30% with at least one feature on</td></tr>
+    <tr><td>Adds a trusted contact</td><td>Trusted contacts enabled rate</td><td>trusted_contacts table</td><td>Any adoption is a strong signal</td></tr>
+    <tr><td>Gives honest feedback</td><td>Rating distribution — not all 5s</td><td>chat_messages.feedback_rating</td><td>Some 1s and 2s expected in a healthy distribution</td></tr>
+    <tr><td>Reports not understanding</td><td>"No" rate in understanding feedback</td><td>summary_feedback</td><td>10–20% "No" is healthy. 0% suggests widget pressure or low visibility</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.5rem">Appointment preparation quality</div>
+  <table>
+    <tr><th>Measurement</th><th>How</th><th>Note</th></tr>
+    <tr><td>Questions generated per session</td><td>COUNT(follow_ups rows) per appointment prep call</td><td>Target: 3–5 actionable questions per session</td></tr>
+    <tr><td>Questions saved vs generated</td><td>Saved questions ÷ generated questions</td><td>Saved = patient intends to use them in an appointment</td></tr>
+    <tr><td>Confidence lift from prep</td><td>Confidence rating after prep − confidence rating at summary feedback</td><td>Positive delta = prep is doing its job</td></tr>
+    <tr><td>Reading grade of prep questions</td><td>Do NOT measure this</td><td>Prep questions must be medically precise enough for a provider. Grade level is not the goal here — usefulness is.</td></tr>
+  </table>
+</div>
+
+<!-- DASHBOARDS -->
+<div id="dashboards" class="page">
+  <div class="page-title">Dashboard requirements</div>
+  <div class="page-sub">Three dashboards. Patient sees personal progress. Ellijah sees population outcomes. Team sees reliability. Frontend builds the patient view. Ellijah and team views are backend-generated.</div>
+
+  <div class="tier">Patient dashboard — personal progress view</div>
+  <div class="callout c-teal">Modeled on ResMed myAir. Simple, encouraging, and personal. No technical metrics. No error rates. No jargon. Frontend renders all cards from GET /dashboard/patient.</div>
+  <table>
+    <tr><th>Card</th><th>Label shown to patient</th><th>API field</th><th>Format</th></tr>
+    <tr><td>Understanding Score</td><td>"How well am I understanding?"</td><td>understanding_rate</td><td>Percentage, or Yes/Somewhat/No donut chart</td></tr>
+    <tr><td>Confidence Score</td><td>"How prepared do I feel?"</td><td>avg_confidence_rating</td><td>1–5 stars or progress ring</td></tr>
+    <tr><td>Documents Reviewed</td><td>"Documents I've uploaded"</td><td>total_documents</td><td>Simple count</td></tr>
+    <tr><td>Questions Asked</td><td>"Questions I've asked"</td><td>total_questions</td><td>Simple count</td></tr>
+    <tr><td>Reminders</td><td>"My reminders"</td><td>reminders_enabled, reminder_count</td><td>On/Off indicator + count</td></tr>
+    <tr><td>Recent Activity</td><td>"Recent summaries"</td><td>recent_summaries[]</td><td>List: document name + date + understanding icon</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Data reports screen — patient-facing inline charts</div>
+  <div class="callout c-teal">Inline on the page, not pop-outs. Pop-outs add friction and fail on mobile. Mary's wireframe direction is correct — build charts that breathe on the page.</div>
+  <table>
+    <tr><th>Chart</th><th>Type</th><th>Data source</th><th>Notes</th></tr>
+    <tr><td>Understanding Score over time</td><td>Line or bar — x=date, y=% Yes responses</td><td>summary_feedback grouped by week</td><td>Most important chart in the product. Prioritize this one first.</td></tr>
+    <tr><td>Chatbot messages per session</td><td>Bar chart</td><td>chat_messages grouped by session</td><td>Mary's wireframe — keep exactly as designed</td></tr>
+    <tr><td>Feature adoption status</td><td>Three toggle status cards</td><td>user_settings</td><td>Reminders / Trusted Contacts / MyChart — on/off display</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Ellijah / client dashboard — population outcomes</div>
+  <div class="callout c-blue">Modeled on ResMed AirView. Ellijah sees all users, not one patient. This is the CMS compliance evidence dashboard. Frontend not required — backend-generated report view served from GET /dashboard/client.</div>
+  <table>
+    <tr><th>Metric</th><th>What it shows</th><th>CMS relevance</th><th>Source</th></tr>
+    <tr><td>Total active users</td><td>How many patients are using MedBridge</td><td>Member engagement evidence</td><td>app_events</td></tr>
+    <tr><td>Upload success rate</td><td>% documents successfully processed</td><td>Service reliability</td><td>health_records</td></tr>
+    <tr><td>Population understanding rate</td><td>% patients who reported understanding their document</td><td>Health literacy improvement — §422.100</td><td>kpi_patient_understanding (to build)</td></tr>
+    <tr><td>Average confidence score</td><td>How prepared patients feel to talk to their provider</td><td>Patient activation — CAHPS communication measures</td><td>summary_feedback.confidence_rating</td></tr>
+    <tr><td>Journey completion rate</td><td>% patients who went upload → summary → feedback</td><td>Documented member engagement</td><td>Funnel query</td></tr>
+    <tr><td>Feature adoption rate</td><td>% with Reminders, Trusted Contacts, or MyChart enabled</td><td>Digital engagement — CMS Health Equity Framework</td><td>user_settings</td></tr>
+    <tr><td>Guardrail pass rate</td><td>% AI responses passing all safety checks</td><td>AI safety compliance evidence</td><td>kpi_quality (live)</td></tr>
+    <tr><td>Reading level pass rate</td><td>% summaries at grade 6 or below</td><td>Health literacy standard</td><td>kpi_reading_level (live)</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Team / operations dashboard</div>
+  <div class="callout c-amber">Where the app is failing patients. Track failures by reason, not just total count. Riman owns the security section. Backend serves from GET /dashboard/team.</div>
+  <table>
+    <tr><th>Metric</th><th>Alert threshold</th><th>Source</th><th>Owner</th></tr>
+    <tr><td>Upload failure rate by reason</td><td>Any reason above 15%</td><td>health_records.failure_reason</td><td>Backend (Kyle)</td></tr>
+    <tr><td>OCR failure rate for phone photos specifically</td><td>Above 20%</td><td>health_records WHERE file_type = image</td><td>Backend</td></tr>
+    <tr><td>Average processing time (upload → summary)</td><td>Above 30 seconds average</td><td>kpi_processing_time (live)</td><td>Backend</td></tr>
+    <tr><td>Guardrail failure count</td><td>Any day below 95% pass rate</td><td>kpi_quality (live)</td><td>Backend</td></tr>
+    <tr><td>Missing feedback rate</td><td>Above 40% of summaries</td><td>summaries LEFT JOIN summary_feedback</td><td>Frontend + Backend</td></tr>
+    <tr><td>Reading level failures</td><td>Above 10% at grade 7+</td><td>kpi_reading_level (live)</td><td>Backend</td></tr>
+    <tr><td>Unauthorized access attempts</td><td>Any spike above baseline</td><td>security_events (to build)</td><td>Riman</td></tr>
+  </table>
+</div>
+
+<!-- REPORTING -->
+<div id="reporting" class="page">
+  <div class="page-title">Reporting layers</div>
+  <div class="page-sub">Three reporting layers with different audiences, cadences, and tones. Patient report = encouraging. Client report = outcomes and ROI. Team report = failures and fixes.</div>
+
+  <div class="tier">Patient — monthly progress report</div>
+  <div class="section-block">
+    <h3>Your Understanding Progress — monthly summary</h3>
+    <p>A plain-language summary shown in the patient dashboard or sent via reminder notification. Modeled on myAir's nightly summary. Tone: warm, encouraging, specific. No clinical language. No error rates.</p>
+    <ul>
+      <li>Documents reviewed this month</li>
+      <li>Understanding score trend — improving / stable / needs attention</li>
+      <li>Questions asked this month</li>
+      <li>Confidence trend — how prepared you're feeling over time</li>
+      <li>Gentle nudge toward appointment prep if not yet used</li>
+      <li>Reminder that saved questions are ready for their next appointment</li>
+    </ul>
+    <p style="margin-top:8px;color:#633806;background:#FAEEDA;padding:7px 10px;border-radius:6px;font-size:12px">Reading level target: 4th–5th grade. Tone: personal and encouraging. Never say "your data shows" — say "you've been doing great this month."</p>
+  </div>
+
+  <div class="tier" style="margin-top:1.25rem">Ellijah — product value report (sprint cadence)</div>
+  <div class="section-block">
+    <h3>MedBridge Product Value Report</h3>
+    <p>Produced at the end of each sprint. Answers: is MedBridge solving the confusion problem? Is it worth the investment? How does it map to CMS obligations?</p>
+    <ul>
+      <li><strong>Section 1 — Engagement:</strong> Total users, upload volume, return user rate, session count</li>
+      <li><strong>Section 2 — Understanding:</strong> Understanding Rate, Confidence Score trend, helpfulness score, "No" rate trend</li>
+      <li><strong>Section 3 — Activation:</strong> Questions per document, appointment prep usage, provider readiness rate</li>
+      <li><strong>Section 4 — Digital equity:</strong> Mobile vs desktop usage, phone photo upload rate, OCR failure rate for low-income use cases</li>
+      <li><strong>Section 5 — CMS alignment:</strong> How these metrics map to §422.100 digital health literacy, CAHPS communication measures, and the CMS Health Equity Framework 2022–2032</li>
+    </ul>
+  </div>
+
+  <div class="tier" style="margin-top:1.25rem">Team — operational report (weekly)</div>
+  <div class="section-block">
+    <h3>MedBridge Operations Report</h3>
+    <p>Answers: where is the app failing patients this week? What needs fixing before the next sprint review?</p>
+    <ul>
+      <li>Upload failure breakdown by file type and reason</li>
+      <li>OCR failure rate trend — is it getting better or worse?</li>
+      <li>Processing time trend — are we above 30 second threshold?</li>
+      <li>Guardrail pass/fail rate — any safety failures this week?</li>
+      <li>Missing feedback rate — is the feedback widget working?</li>
+      <li>Top 3 failure reasons for the week with recommended fix</li>
+      <li>Security events section — Riman's ownership</li>
+    </ul>
+  </div>
+</div>
+
+<!-- CMS STORY -->
+<div id="cms" class="page">
+  <div class="page-title">CMS / Ellijah executive story</div>
+  <div class="page-sub">The regulatory and business case for MedBridge — what Ellijah needs to hear on Demo Day to justify the investment and understand the product's strategic value.</div>
+
+  <div class="callout c-blue">This is not a technical pitch. It is a compliance and outcomes pitch. Ellijah needs to understand what MedBridge makes possible for a healthcare organization serving Medicaid and Medicare patients.</div>
+
+  <div class="tier">The CMS regulatory landscape MedBridge addresses</div>
+  <table>
+    <tr><th>Requirement</th><th>What it says</th><th>How MedBridge addresses it</th></tr>
+    <tr><td>CMS §422.100 — Digital Health Literacy</td><td>Medicare Advantage plans must identify members with low digital health literacy and offer them education and support</td><td>MedBridge identifies low-literacy patients through upload behavior (phone photos, retry rate) and provides plain-language summaries at 4th–6th grade level</td></tr>
+    <tr><td>CAHPS Communication Measures</td><td>CMS scores health plans on how well providers communicate with patients — whether patients understand their care instructions</td><td>Every "Yes, I understood" response is a documented patient-reported communication outcome — the same data CAHPS measures</td></tr>
+    <tr><td>CMS Health Equity Framework 2022–2032</td><td>Plans must address SDOH barriers including low income, geography, and language barriers that prevent equitable care access</td><td>MedBridge is built for mobile-first, low-bandwidth patients with phone-photo upload support — the population CMS is targeting</td></tr>
+    <tr><td>Medicaid Managed Care Final Rule (2024)</td><td>Quality and access improvements required for Medicaid managed care, with increased focus on health equity</td><td>Understanding Rate and Confidence Score provide documented member-level outcomes for quality reporting</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.5rem">The one-page Ellijah pitch</div>
+  <div class="section-block">
+    <h3>The problem MedBridge solves — in Ellijah's terms</h3>
+    <p>Patients leave appointments confused. They receive discharge paperwork, lab results, and medication instructions they cannot understand. They don't know what to do next. They don't know what to ask their provider. And healthcare organizations have no documented evidence that patients understood anything they were given.</p>
+    <p style="margin-top:10px">CMS now requires that healthcare organizations serving Medicare and Medicaid patients actively support health literacy and member engagement — and produce evidence that they're doing it.</p>
+    <p style="margin-top:10px"><strong>MedBridge delivers that evidence.</strong> Every time a patient says "Yes, this helped me understand my document," that is a patient-reported health literacy outcome a healthcare organization can point to. It is the exact type of engagement data that CAHPS measures and that CMS uses to score health plan quality.</p>
+    <p style="margin-top:10px">That is the business case. MedBridge is not just a helpful app. It is a documented patient engagement and health literacy program that a healthcare organization serving Medicaid and Medicare patients can use to demonstrate CMS compliance.</p>
+  </div>
+
+  <div class="tier" style="margin-top:1.25rem">Executive metrics for Ellijah — what to show</div>
+  <table>
+    <tr><th>Metric</th><th>Why Ellijah cares</th><th>Target for Demo Day (synthetic)</th></tr>
+    <tr><td>Understanding Rate</td><td>Documented patient health literacy outcomes</td><td>60%+ Yes rate in synthetic data</td></tr>
+    <tr><td>Confidence Score</td><td>Patient activation evidence for CAHPS</td><td>Avg 3.6/5 with realistic variance</td></tr>
+    <tr><td>Journey completion rate</td><td>Member engagement for CMS reporting</td><td>34% full funnel completion (realistic)</td></tr>
+    <tr><td>Feature adoption rate</td><td>Active digital engagement evidence</td><td>40% with at least one feature enabled</td></tr>
+    <tr><td>Reading level pass rate</td><td>Health literacy standard compliance</td><td>Already live — show actual kpi_reading_level data</td></tr>
+    <tr><td>Guardrail pass rate</td><td>AI safety for clinical environment deployment</td><td>Already live — show actual kpi_quality data</td></tr>
+  </table>
+</div>
+
+<!-- DIGITAL EQUITY -->
+<div id="equity" class="page">
+  <div class="page-title">Digital equity & accessibility metrics</div>
+  <div class="page-sub">MedBridge is built for patients who need it most. These metrics measure whether the product is actually serving them — not just whether it's accessible in principle.</div>
+
+  <div class="callout c-coral">The anchor case: a non-technical patient takes a photo of their discharge paperwork with an old smartphone on slow cell data and uploads it three times because the first two failed. Every equity metric connects back to whether MedBridge serves that patient.</div>
+
+  <div class="tier">Access metrics</div>
+  <table>
+    <tr><th>Metric</th><th>Why it matters</th><th>How to measure</th><th>CMS relevance</th></tr>
+    <tr><td>Mobile vs desktop upload rate</td><td>Low-income patients are mobile-first — if mobile doesn't work, the product fails its primary audience</td><td>device_type field in app_events</td><td>Digital access equity</td></tr>
+    <tr><td>Phone photo (OCR) vs PDF upload rate</td><td>Phone photos = patient cannot print or scan. This is a direct socioeconomic signal.</td><td>health_records.file_type distribution</td><td>SDOH indicator</td></tr>
+    <tr><td>OCR failure rate specifically for phone photos</td><td>If OCR fails for phone photos at a higher rate than PDFs, we are failing the patients who need us most</td><td>health_records WHERE file_type = image — failure_reason breakdown</td><td>Equity gap indicator</td></tr>
+    <tr><td>Upload retry rate</td><td>Patients who retry are persistent despite failure — repeated failure at the same step is both a UX and equity problem</td><td>Multiple uploads with same file characteristics within 1 hour from same user_id</td><td>Access barrier indicator</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Health literacy metrics</div>
+  <table>
+    <tr><th>Metric</th><th>Target</th><th>Source</th><th>Priority</th></tr>
+    <tr><td>% summaries at grade 4–6</td><td>Greater than 90%</td><td>kpi_reading_level (live)</td><td>MVP must-have</td></tr>
+    <tr><td>% Q&A answers at grade 4–8</td><td>Greater than 85%</td><td>Future: reading_level_score on chat_messages</td><td>Sprint 2</td></tr>
+    <tr><td>"No" understanding rate by document type</td><td>Identify which document types confuse patients most</td><td>summary_feedback JOIN health_records.file_type</td><td>Sprint 2</td></tr>
+    <tr><td>Medical term explanation coverage</td><td>Greater than 80% of medical terms explained inline</td><td>Manual audit of sample summaries initially</td><td>Sprint 2</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Language and accessibility metrics</div>
+  <table>
+    <tr><th>Metric</th><th>Why it matters</th><th>Source</th><th>Priority</th></tr>
+    <tr><td>Preferred language distribution</td><td>Are non-English speaking patients using the app? Are they getting the same quality of summaries?</td><td>user_settings.preferred_language</td><td>Sprint 2</td></tr>
+    <tr><td>Accessibility preference adoption</td><td>Screen reader, large text, high contrast usage — signals whether the UI is actually accessible</td><td>user_settings.accessibility_preferences</td><td>Sprint 2</td></tr>
+    <tr><td>Understanding rate by preferred language</td><td>If understanding drops for non-English patients, that is an equity failure — the AI is not serving them equally</td><td>summary_feedback JOIN user_settings ON preferred_language</td><td>Sprint 2</td></tr>
+  </table>
+</div>
+
+<!-- DATA QUALITY -->
+<div id="quality" class="page">
+  <div class="page-title">Data quality & QA requirements</div>
+  <div class="page-sub">The rules that protect MedBridge analytics from bad data. Every KPI is only as good as the data feeding it.</div>
+
+  <div class="tier">Data integrity rules</div>
+  <table>
+    <tr><th>Rule</th><th>What it prevents</th><th>How enforced</th><th>Owner</th></tr>
+    <tr><td>No feedback without summary_id</td><td>Orphaned feedback records that inflate the Understanding Rate</td><td>DB constraint: summary_id NOT NULL + FK reference</td><td>Backend</td></tr>
+    <tr><td>No event without event_name</td><td>Unclassifiable events that corrupt the event tracking plan</td><td>DB constraint: event_name NOT NULL with CHECK constraint against allowed values</td><td>Backend</td></tr>
+    <tr><td>No cross-user data access</td><td>User A reading User B's feedback, documents, or settings</td><td>RLS on all tables — Riman to validate</td><td>Riman</td></tr>
+    <tr><td>No PHI in app_events</td><td>HIPAA risk in the analytics pipeline</td><td>Code review on POST /events + Riman audit of properties JSONB schema</td><td>Backend + Riman</td></tr>
+    <tr><td>No document text in events</td><td>Clinical information leaking through behavioral event logs</td><td>Event schema validation — properties JSONB only accepts whitelisted behavioral fields</td><td>Backend</td></tr>
+    <tr><td>Duplicate upload detection</td><td>Same document uploaded multiple times inflating upload counts and distorting the funnel</td><td>Hash comparison on filename + file_size + user_id within 1-hour window — data_quality.py</td><td>Backend (Kathy)</td></tr>
+    <tr><td>Confidence rating range</td><td>Out-of-range values (0, 6, null after submission) corrupting the average Confidence Score</td><td>DB constraint: CHECK (confidence_rating BETWEEN 1 AND 5)</td><td>Backend</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">QA acceptance tests for analytics</div>
+  <table>
+    <tr><th>Test</th><th>Pass condition</th><th>Owner</th></tr>
+    <tr><td>Submit understanding feedback</td><td>Row appears in summary_feedback. kpi_patient_understanding view returns updated rate.</td><td>QA + Backend</td></tr>
+    <tr><td>Submit confidence rating</td><td>confidence_rating column populated. Confidence Score KPI updates.</td><td>QA + Frontend</td></tr>
+    <tr><td>Submit chat rating</td><td>feedback_rating updates on chat_messages row. kpi_ai_satisfaction view changes.</td><td>QA + Frontend (James)</td></tr>
+    <tr><td>Toggle reminder on</td><td>user_settings updated. user_settings_updated event fires in app_events. Feature adoption rate updates.</td><td>QA + Frontend</td></tr>
+    <tr><td>Upload fails</td><td>failure_reason captured in health_records. document_upload_failed event in app_events.</td><td>QA + Backend</td></tr>
+    <tr><td>User A cannot read User B feedback</td><td>GET /summaries/{id}/feedback returns 403 for wrong user_id.</td><td>QA + Riman</td></tr>
+    <tr><td>Dashboard reflects feedback</td><td>understanding_rate field in GET /dashboard/patient changes after feedback submission.</td><td>QA + Backend + Frontend</td></tr>
+    <tr><td>No PHI in event log</td><td>POST /events with document text in properties returns 400. app_events table contains no clinical text after a test session.</td><td>QA + Riman</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Cybersecurity validation requirements (Riman)</div>
+  <table>
+    <tr><th>Validation</th><th>Test</th><th>Pass condition</th></tr>
+    <tr><td>RLS on summary_feedback</td><td>User A queries summary_feedback as User B</td><td>Zero rows returned or 403</td></tr>
+    <tr><td>RLS on app_events</td><td>User A queries app_events for User B's user_id</td><td>Zero rows returned</td></tr>
+    <tr><td>RLS on user_settings</td><td>User A attempts PATCH /user-settings using User B's token</td><td>403 response</td></tr>
+    <tr><td>Storage access</td><td>Direct Supabase storage URL for User B's document accessed by User A</td><td>403 — signed URLs only</td></tr>
+    <tr><td>security_events capture</td><td>Intentional login failure and unauthorized access attempt</td><td>Both appear in security_events table with correct event_name, ip_address, and timestamp</td></tr>
+    <tr><td>No PHI in analytics</td><td>Review app_events after a full test session</td><td>properties JSONB contains no document text, diagnosis codes, or patient identifiers</td></tr>
+  </table>
+</div>
+
+<!-- PROMPT PERFORMANCE -->
+<div id="prompts" class="page">
+  <div class="page-title">Prompt performance metrics</div>
+  <div class="page-sub">Measuring whether the AI is doing its job — plain language, safe guardrails, accurate medical terminology explanations, and responses that lead to understanding.</div>
+
+  <div class="tier">Summary quality metrics</div>
+  <table>
+    <tr><th>Metric</th><th>How to measure</th><th>Target</th><th>Source</th></tr>
+    <tr><td>Guardrail pass rate</td><td>kpi_quality view — % with quality_passed = true</td><td>100% — non-negotiable</td><td>kpi_quality (live)</td></tr>
+    <tr><td>Reading level accuracy</td><td>kpi_reading_level view — % at grade 6 or below</td><td>Greater than 90%</td><td>kpi_reading_level (live)</td></tr>
+    <tr><td>Provider disclaimer presence</td><td>quality_service.py string check — "talk to your provider" or equivalent phrase present</td><td>100% of summaries</td><td>summaries.quality_passed</td></tr>
+    <tr><td>Medical term explanation coverage</td><td>Manual audit: sample 10 summaries per sprint, count medical terms with inline plain-language definitions</td><td>Greater than 80% of medical terms explained</td><td>Manual / Sprint QA process</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Response quality signals from patient feedback</div>
+  <table>
+    <tr><th>Signal</th><th>What it indicates</th><th>Source</th></tr>
+    <tr><td>Understanding Rate below 50%</td><td>Summaries may be too technical, too long, or not personalized enough for the document type</td><td>summary_feedback.understanding_rating</td></tr>
+    <tr><td>High "No" rate for specific document types</td><td>Specific document categories (lab results vs discharge papers vs medication instructions) need separate prompt tuning</td><td>summary_feedback JOIN health_records.file_type</td></tr>
+    <tr><td>Chat Satisfaction below 3.5</td><td>Q&A answers may be too long, too clinical, or not grounded enough in the patient's specific document</td><td>kpi_ai_satisfaction (live)</td></tr>
+    <tr><td>High Questions Per Document</td><td>Positive signal: patient is engaged. But if understanding rate is also low, it means the summary didn't help and patients are trying to get help through Q&A instead</td><td>chat_messages + summary_feedback correlation</td></tr>
+    <tr><td>Low Questions Per Document despite low understanding</td><td>Patients didn't understand but also didn't ask for help — they may not know they can, or they gave up</td><td>chat_messages JOIN summary_feedback WHERE understanding_rating = 'no'</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Q&A response quality</div>
+  <div class="callout c-teal">Q&A answers should be grade 4–8 depending on complexity. Appointment prep questions are NOT graded by reading level — they must be precise enough for a provider conversation.</div>
+  <table>
+    <tr><th>Metric</th><th>Target</th><th>How to measure</th><th>Priority</th></tr>
+    <tr><td>% Q&A answers at grade 4–8</td><td>Greater than 85%</td><td>Apply Flesch-Kincaid to chat_messages.content — needs reading_level_score column on chat_messages</td><td>Sprint 2</td></tr>
+    <tr><td>Guardrail pass rate on Q&A</td><td>100% — same as summaries</td><td>Extend quality_service.py check to chat responses</td><td>MVP must-have</td></tr>
+    <tr><td>Response time</td><td>Under 5 seconds average</td><td>chat_answer_generated event: response_time_ms field</td><td>MVP must-have</td></tr>
+  </table>
+</div>
+
+<!-- DEMO DAY -->
+<div id="demo" class="page">
+  <div class="callout c-teal" style="margin-bottom:1rem"><strong>Sprint 2 status:</strong> 271 behavioral events seeded across 4 real users in Supabase production. All 6 KPI scores return non-zero values. Analytics endpoints live and auth-gated. Run seed/seed_behavioral_data.py to repopulate if needed.</div>
+  <div class="page-title">Demo Day plan</div>
+  <div class="page-sub">What to show, how to show it with synthetic data, and the story that lands with both recruiters and Ellijah.</div>
+
+  <div class="callout c-blue">Every Demo Day metric must be demonstrable with synthetic behavioral data layered on Synthea's 85 patients. Metrics that require real user data are flagged — do not fake those numbers.</div>
+
+  <div class="tier">The 5 Demo Day visuals</div>
+
+  <div class="demo-visual">
+    <div class="demo-num">1</div>
+    <div class="demo-body">
+      <h4>Patient Journey Funnel — Upload to Understanding</h4>
+      <p>Shows the full 9-step journey with realistic drop-off at each step. This is the most important single visual because it tells the complete product story in one chart.</p>
+      <span class="demo-tag">Data: synthetic behavioral events on 85 Synthea patients</span>
+    </div>
+  </div>
+
+  <div class="demo-visual">
+    <div class="demo-num">2</div>
+    <div class="demo-body">
+      <h4>Population Understanding Rate</h4>
+      <p>X% of patients said "Yes, this helped me understand my document." This is the North Star on a slide. One number, enormous impact. Pair with Yes/Somewhat/No breakdown.</p>
+      <span class="demo-tag">Data: synthetic summary_feedback rows — target ~60% Yes, 25% Somewhat, 15% No</span>
+    </div>
+  </div>
+
+  <div class="demo-visual">
+    <div class="demo-num">3</div>
+    <div class="demo-body">
+      <h4>Confidence Score Trend Over Time</h4>
+      <p>Average patient confidence rating week over week. Should show a modest upward trend — patients become more confident as they use the app more. This is the CAHPS-aligned patient activation story.</p>
+      <span class="demo-tag">Data: synthetic confidence_rating data with weekly upward trend</span>
+    </div>
+  </div>
+
+  <div class="demo-visual">
+    <div class="demo-num">4</div>
+    <div class="demo-body">
+      <h4>Reading Level Distribution</h4>
+      <p>100% of summaries written at 6th grade or below. This is technical proof of health literacy commitment — show the actual kpi_reading_level view data, not synthetic numbers.</p>
+      <span class="demo-tag">Data: kpi_reading_level view — already live, use real data</span>
+    </div>
+  </div>
+
+  <div class="demo-visual">
+    <div class="demo-num">5</div>
+    <div class="demo-body">
+      <h4>Upload Failure Breakdown by Reason</h4>
+      <p>Shows that the team knows where patients fail and is measuring it. Operational maturity signal for recruiters. Also shows phone photo failure rate specifically — the equity story.</p>
+      <span class="demo-tag">Data: synthetic health_records with failure_reason distribution</span>
+    </div>
+  </div>
+
+  <div class="tier" style="margin-top:1.5rem">What NOT to show on Demo Day</div>
+  <table>
+    <tr><th>Skip this</th><th>Why</th></tr>
+    <tr><td>Auth activity / login counts</td><td>Synthetic users don't tell a meaningful story here — looks like made-up numbers</td></tr>
+    <tr><td>Security event counts</td><td>Zero security events (no real users) reads as "nothing to show"</td></tr>
+    <tr><td>Return user rate</td><td>Requires real behavioral data over time — synthetic doesn't simulate churn meaningfully</td></tr>
+    <tr><td>Processing time trend</td><td>Only meaningful with real documents being processed in real time — save for post-launch</td></tr>
+  </table>
+</div>
+
+<!-- SAMPLE DATASET -->
+<div id="dataset" class="page">
+  <div class="page-title">Sample dataset specification</div>
+  <div class="page-sub">Synthetic behavioral data to layer on top of Synthea's 85 existing patients. Do not build a standalone mock dataset — use what's already there.</div>
+
+  <div class="callout c-teal">85 Synthea patients are already loaded with 2,767 conditions, 1,754 medications, 21,830 lab results, and 3,867 encounters. The behavioral layer goes on top of this clinical foundation.</div>
+
+  <div class="tier">Behavioral data targets</div>
+  <table>
+    <tr><th>Data type</th><th>Volume</th><th>Variation to include</th></tr>
+    <tr><td>Sessions / logins</td><td>200+ events across 85 patients</td><td>Mix of mobile (60%) and desktop (40%). Spread across 4 weeks.</td></tr>
+    <tr><td>Document uploads</td><td>120+ uploads</td><td>70% PDF success, 15% phone photo success, 10% OCR failure, 5% unsupported file type</td></tr>
+    <tr><td>Summary feedback — understanding</td><td>80+ feedback rows</td><td>60% Yes, 25% Somewhat, 15% No — realistic distribution, not inflated</td></tr>
+    <tr><td>Confidence ratings</td><td>80+ ratings</td><td>Average ~3.6 with variance. Some 1s and 2s. Not all 5s.</td></tr>
+    <tr><td>Chat messages</td><td>150+ messages</td><td>30% of patients ask 0 questions. 50% ask 1–3. 20% ask 4+.</td></tr>
+    <tr><td>Chat ratings</td><td>90+ ratings</td><td>Average ~3.8. Include some 1s and 2s for realism.</td></tr>
+    <tr><td>Feature settings</td><td>All 85 patients</td><td>40% reminders on, 15% trusted contacts enabled, 10% MyChart toggle on</td></tr>
+    <tr><td>Appointment prep</td><td>25+ sessions</td><td>~25% of patients who received a summary also requested prep questions</td></tr>
+    <tr><td>Security events</td><td>10–15 events</td><td>Mix of login_failed (8), unauthorized_access_attempt (2), token_expired (4)</td></tr>
+    <tr><td>Upload failures</td><td>15–20 failed records</td><td>Include failure_reason variety: image_quality_low, unsupported_file_type, file_too_large</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Variation patterns that make the data realistic</div>
+  <div class="section-block">
+    <h3>User behavior archetypes to simulate</h3>
+    <ul>
+      <li><strong>The confused patient:</strong> uploads document, views summary, rates "No" for understanding, sends 5+ chat questions, never uses prep. ~15% of patients.</li>
+      <li><strong>The activated patient:</strong> uploads, views summary, rates "Yes", generates prep questions, confidence rating 4–5. ~20% of patients.</li>
+      <li><strong>The passive patient:</strong> uploads document, receives summary, takes no further action — no feedback, no chat. ~30% of patients.</li>
+      <li><strong>The repeat user:</strong> uploads multiple documents across multiple sessions, varying understanding scores. ~20% of patients.</li>
+      <li><strong>The feature adopter:</strong> enables reminders and trusted contacts, returns weekly. ~15% of patients.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- TEAM HANDOFFS -->
+<div id="handoff" class="page">
+  <div class="page-title">Team handoffs</div>
+  <div class="page-sub">What each team member needs to build, validate, or capture for the analytics program to work. This document is the source of truth.</div>
+
+  <div class="tier">Backend (Kathy + Kyle) — must build</div>
+  <table>
+    <tr><th>Item</th><th>Why analytics needs it</th><th>Priority</th></tr>
+    <tr><td>Migration 006: add confidence_rating and feedback_text to summary_feedback</td><td>Confidence Score KPI has no data without this column</td><td>Immediate</td></tr>
+    <tr><td>Migration 006: create app_events table</td><td>All 19 behavioral events have nowhere to land</td><td>Immediate</td></tr>
+    <tr><td>Migration 006: create security_events table</td><td>Riman cannot validate security without a table to write to</td><td>Immediate</td></tr>
+    <tr><td>Migration 006: build 6 missing KPI views</td><td>kpi_patient_understanding, kpi_feature_adoption, kpi_upload_outcomes, kpi_summary_engagement, kpi_chatbot_usage, kpi_security_events</td><td>Immediate</td></tr>
+    <tr><td>POST /summaries/{id}/feedback endpoint</td><td>Understanding Rate and Confidence Score have no write path</td><td>Immediate</td></tr>
+    <tr><td>GET + PATCH /user-settings endpoints</td><td>Feature adoption rate cannot be tracked without settings persistence</td><td>Immediate</td></tr>
+    <tr><td>GET /dashboard/patient, /dashboard/client, /dashboard/team</td><td>Three audience dashboards need three separate endpoint responses</td><td>Sprint 2</td></tr>
+    <tr><td>POST /events endpoint</td><td>Frontend needs a write path for behavioral events</td><td>Sprint 2</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Frontend (James, Mary, Melodie) — must build</div>
+  <table>
+    <tr><th>Item</th><th>Screen</th><th>Calls</th><th>Priority</th></tr>
+    <tr><td>Understanding rating widget: Yes / Somewhat / No</td><td>Summary screen — appears after every summary</td><td>POST /summaries/{id}/feedback</td><td>Immediate — North Star has no data without this</td></tr>
+    <tr><td>Confidence rating widget: 1–5 stars</td><td>Summary screen — same widget, second question</td><td>POST /summaries/{id}/feedback</td><td>Immediate</td></tr>
+    <tr><td>Chat rating widget: thumbs up/down or 1–5</td><td>Chat screen — after each AI answer</td><td>PATCH /chat/{message_id}/rating</td><td>Immediate — James's existing ticket</td></tr>
+    <tr><td>Profile settings toggles: Reminders / Trusted Contacts / MyChart</td><td>Profile screen</td><td>GET /user-settings on load, PATCH /user-settings on change</td><td>Sprint 2</td></tr>
+    <tr><td>Patient dashboard cards (6 cards)</td><td>Dashboard screen</td><td>GET /dashboard/patient</td><td>Sprint 2</td></tr>
+    <tr><td>Data Reports screen — 3 inline charts</td><td>Reports screen (Mary's wireframe)</td><td>GET /dashboard/patient analytics fields</td><td>Sprint 2</td></tr>
+  </table>
+
+  <div class="tier" style="margin-top:1.25rem">Cybersecurity (Riman) — must validate</div>
+  <table>
+    <tr><th>Validation</th><th>Priority</th></tr>
+    <tr><td>RLS on summary_feedback — User A cannot read User B feedback</td><td>Immediate</td></tr>
+    <tr><td>RLS on app_events — users see only their own events</td><td>After migration 006</td></tr>
+    <tr><td>RLS on user_settings — no cross-user settings access</td><td>After migration 006</td></tr>
+    <tr><td>security_events capture: login_failed and unauthorized_access_attempt events write correctly</td><td>After migration 006</td></tr>
+    <tr><td>No PHI in app_events — audit properties JSONB after a full test session</td><td>After migration 006</td></tr>
+    <tr><td>Storage access: direct bucket URLs blocked, signed URLs work correctly</td><td>Sprint 2</td></tr>
+  </table>
+
+  <div class="callout c-teal" style="margin-top:1.5rem">Migration 006 is the single blocker. Everything above — frontend widgets, Riman's validation, the KPI views, the dashboard endpoints — depends on the schema being in place. Build migration 006 first.</div>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+const steps = [
+  { label: 'Registered', pct: 100, color: '#1D9E75' },
+  { label: 'Logged in', pct: 88, color: '#1D9E75' },
+  { label: 'Uploaded document', pct: 72, color: '#378ADD' },
+  { label: 'Extraction succeeded', pct: 58, color: '#378ADD' },
+  { label: 'Summary viewed', pct: 52, color: '#7F77DD' },
+  { label: 'Feedback submitted', pct: 34, color: '#7F77DD' },
+  { label: 'Question asked', pct: 28, color: '#D85A30' },
+  { label: 'Chat rated', pct: 18, color: '#D85A30' },
+  { label: 'Prep questions', pct: 12, color: '#BA7517' },
+];
+
+const fc = document.getElementById('funnel-render');
+if (fc) {
+  steps.forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'f-row';
+    row.innerHTML = `
+      <div class="f-label">${s.label}</div>
+      <div class="f-bg">
+        <div class="f-fill" style="width:${s.pct}%;background:${s.color}22;color:${s.color};border-left:3px solid ${s.color}">${s.pct}%</div>
+      </div>
+      <div class="f-pct">${s.pct}%</div>
+    `;
+    fc.appendChild(row);
+  });
+}
+</script>
+</body>
+</html>

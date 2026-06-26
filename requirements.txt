@@ -1,5 +1,14 @@
 fastapi
 uvicorn[standard]
+pydantic
+pydantic-settings
+python-dotenv
+starlette
+pytest
+pytest-timeout
+httpx
+supabase
+psycopg2-binary
 httpx
 psycopg2-binary
 pdfplumber

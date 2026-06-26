@@ -1,3 +1,8 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
 # === SECRETS — NEVER COMMIT THESE ===
 .env
 *.env
