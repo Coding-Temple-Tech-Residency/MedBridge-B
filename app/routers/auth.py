@@ -51,8 +51,12 @@ async def register(payload: RegisterRequest):
                 ),
             )
 
+        #! added this for sessions that are not granted immediately(email confirmation is pending).
+
+        token = response.session.access_token if response.session else None
+
         return AuthResponse(
-            access_token=response.session.access_token,
+            access_token=token,
             user_id=response.user.id,
             email=response.user.email,
         )
