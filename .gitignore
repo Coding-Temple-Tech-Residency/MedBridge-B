@@ -1,46 +1,43 @@
-.env
-.venv/
-__pycache__/
-*.pyc
-.pytest_cache/
-# === SECRETS — NEVER COMMIT THESE ===
+# === SECRETS ===
 .env
 *.env
 .env.*
 !.env.example
+*.local
 
-# === PYTHON ===
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.venv/
-venv/
-env/
-*.egg-info/
-dist/
-build/
+# === GLOBAL WILDCARDS ===
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/build/
+**/.venv/
+**/venv/
+**/env/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/*.egg-info/
 
-# === SYNTHEA OUTPUT (too large for git) ===
-output/
-synthea-with-dependencies.jar
+# === SYNTHEA OUTPUT ===
+**/output/
 *.jar
 
 # === DATABASE ===
 *.db
 *.sqlite
 
-# === IDE ===
+# === IDE & OS ===
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# === OS ===
 .DS_Store
 Thumbs.db
 desktop.ini
 
 # === LOGS ===
 *.log
-logs/
+**/logs/
+*debug.log*
+*error.log*

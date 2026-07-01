@@ -23,17 +23,18 @@ async def register(payload: RegisterRequest):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Registration failed. Please check your email and try again.",
             )
-        if not response.session:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Registration failed. Please check your email and try again.",
-            )
-        supabase.table("user_settings").insert({
+        # Create user_profiles row
+        #maybe auth.users or user_profiles or user_settings
+        supabase.table("user_profiles").insert({
             "user_id": response.user.id,
         }).execute()
 
+        #! added this for sessions that are not granted immediately(email confirmation is pending).
+
+        token = response.session.access_token if response.session else None
+
         return AuthResponse(
-            access_token=response.session.access_token,
+            access_token=token,
             user_id=response.user.id,
             email=response.user.email,
         )

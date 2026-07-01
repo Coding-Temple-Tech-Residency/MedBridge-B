@@ -24,6 +24,13 @@ logging.basicConfig(
 
 settings = get_settings()
 
+
+# 🕵️‍♂️ UPDATE YOUR PRINT STATEMENT TO THIS:
+print("\n🔍 --- ENVIRONMENT AUDIT ---")
+print("Allowed Origins:", settings.origins_list)
+print("Supabase URL loaded:", f"'{settings.supabase_url}'")
+print("---------------------------\n")
+
 app = FastAPI(
     title="MedBridge API",
     description=(
