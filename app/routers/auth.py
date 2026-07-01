@@ -1,6 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials
+from supabase_auth.errors import AuthApiError
 from app.schemas.auth import RegisterRequest, LoginRequest, AuthResponse
 from app.database import get_supabase
+from app.middleware.auth import bearer_scheme, get_current_user
 import logging
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -24,9 +27,6 @@ async def register(payload: RegisterRequest):
         #maybe auth.users or user_profiles or user_settings
         supabase.table("user_profiles").insert({
             "user_id": response.user.id,
-            "full_name": payload.full_name,
-            "preferred_language": "en",
-            "explanation_level": "plain",
         }).execute()
 
         #! added this for sessions that are not granted immediately(email confirmation is pending).
@@ -40,6 +40,16 @@ async def register(payload: RegisterRequest):
         )
     except HTTPException:
         raise
+    except AuthApiError as e:
+        if "rate limit" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Supabase signup rate limit exceeded.",
+            )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Registration failed. This email may already be registered.",
+        )
     except Exception as e:
         logger.exception(f"Registration error: {e}")
         raise HTTPException(
@@ -77,12 +87,17 @@ async def login(payload: LoginRequest):
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
-async def logout():
-    # Supabase JWTs are stateless; client discards the token.
-    # Server-side sign-out invalidates the refresh token.
+async def logout(
+    user: dict = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+):
+    """
+    Revoke refresh tokens for the authenticated user (global scope).
+    Access JWTs remain valid until expiry; the client must discard the token.
+    """
     supabase = get_supabase()
     try:
-        supabase.auth.sign_out()
-    except Exception:
-        pass  # Best-effort logout
+        supabase.auth.admin.sign_out(credentials.credentials, scope="global")
+    except Exception as e:
+        logger.warning("Supabase admin sign_out failed for user %s: %s", user["id"], e)
     return

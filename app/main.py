@@ -53,8 +53,8 @@ class PayloadAuditMiddleware(BaseHTTPMiddleware):
     """Logs request/response sizes to help audit cellular data usage."""
     async def dispatch(self, request: Request, call_next):
         start = time.perf_counter()
-        body = await request.body()
-        req_kb = len(body) / 1024
+        content_length = request.headers.get("content-length")
+        req_kb = int(content_length) / 1024 if content_length else 0.0
         response = await call_next(request)
         res_bytes = response.headers.get("content-length")
         res_kb = int(res_bytes) / 1024 if res_bytes else 0.0
