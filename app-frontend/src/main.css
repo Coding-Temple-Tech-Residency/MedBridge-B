@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap');
-
+/*Landing Page Styles*/
 .app-container {
   font-family: 'Didact Gothic', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
@@ -11,10 +11,18 @@
   padding: 20px;
 }
 
+.app-logo {
+  width: 180px;
+  margin-top: 12px;
+}
+
 .app-header {
   text-align: center;
   margin-bottom: 32px;
   max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .app-title {
@@ -171,4 +179,44 @@
   background-color: white;
   padding: 40px;
   border-radius: 12px;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background-color: #F7FAFC;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo {
+  height: 48px;
+  width: auto;
+}
+
+.nav-right {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-item {
+  color: #1B3A5C;
+  font-weight: 600;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.nav-item.active {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.layout-main {
+  padding: 2rem;
 }

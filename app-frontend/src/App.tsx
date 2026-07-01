@@ -3,7 +3,7 @@ import { AuthContainer } from "./components/AuthContainer";
 import { useModal } from "./context/ModalContext";
 import "./main.css";
 
-export default function App(): JSX.Element {
+export default function App(): ReactNode {
   const { openModal } = useModal();
 
   const handleOpenAuth = (): void => {
@@ -14,7 +14,8 @@ export default function App(): JSX.Element {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1 className="app-title">Welcome to MedBridge</h1>
+        <h1 className="app-title">Welcome to</h1>
+        <img src="/logo.png" alt="MedBridge logo" className="app-logo" />
       </header>
 
       <main className="action-row">
