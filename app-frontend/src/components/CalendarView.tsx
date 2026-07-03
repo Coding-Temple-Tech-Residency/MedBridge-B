@@ -16,18 +16,20 @@ const localizer = dateFnsLocalizer({
     locales
 });
 
+const today = new Date();
+
 const dummyEvents = [
     {
         id: 1,
-        title: "Meeting",
-        start: new Date(2023, 9, 15, 10, 0),
-        end: new Date(2023, 9, 15, 11, 0),
+        title: "Follow-up Appointment",
+        start: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 0),
+        end: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 11, 0),
     },
     {
         id: 2,
         title: "Lunch",
-        start: new Date(2023, 9, 15, 12, 0),
-        end: new Date(2023, 9, 15, 13, 0),
+        start: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0),
+        end: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 0),
     },
 ];
 

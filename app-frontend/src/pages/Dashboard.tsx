@@ -27,7 +27,7 @@ export const Dashboard = (): ReactNode => {
       <div style={{ flex: 1, minHeight: 0, width: '100%' }}>
         <CalendarView />
       </div>
-      <input placeholder="Additional Notes..." 
+      <textarea placeholder="Additional Notes..." 
       style={{ 
         border: '1px solid #ccc', 
         borderRadius: '4px', 
@@ -36,7 +36,8 @@ export const Dashboard = (): ReactNode => {
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden'
+        resize:'none',
+        overflow: 'scroll',
          }} />
     </div>
   );
