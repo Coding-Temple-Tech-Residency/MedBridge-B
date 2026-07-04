@@ -28,7 +28,7 @@ export const ProviderListView: React.FC = () => {
 
     // 2. Loading State: Prevent UI freezing
     if (isLoading) {
-        return <ProviderSkeleton count={4} />;
+        return <LoadingSpinner />;
     }
 
     // 3. Error State: Graceful fallback for 4xx/5xx exceptions
