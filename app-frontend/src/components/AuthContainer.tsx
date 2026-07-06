@@ -1,6 +1,6 @@
 import { FormFactory } from "./FormFactory";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { useLogout } from "../api/auth.queries";
 
 type AuthOption = "login" | "registration";

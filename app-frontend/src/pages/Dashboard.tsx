@@ -1,16 +1,6 @@
 // src/pages/Dashboard.tsx
 import type { ReactNode } from "react";
 import "../main.css";
-
-export const Dashboard = (): ReactNode => {
-  return (
-
-    <div className="page-container">
-      <h1 className="page-title">Dashboard</h1>
-      <p className="page-description">
-        Welcome to your dashboard. This is where high‑level summaries and quick
-        actions will eventually live.
-      </p>
 import CalendarView from "../components/CalendarView";
 
 export const Dashboard = (): ReactNode => {
