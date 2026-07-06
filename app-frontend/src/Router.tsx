@@ -2,7 +2,7 @@
 import { Routes, Route } from "react-router-dom";
 import App from "./App";
 import { AppLayout } from "./layout/AppLayout";
-import { ProtectedtedRoute } from "./components/ProtectedRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 import { Dashboard } from "./pages/Dashboard";
 import { MedicalHistory } from "./pages/MedicalHistory";
@@ -17,9 +17,9 @@ export const Router = () => {
       {/* Protected app pages */}
       <Route
         element={
-          <ProtectedtedRoute>
+          <ProtectedRoute>
             <AppLayout />
-          </ProtectedtedRoute>
+          </ProtectedRoute>
         }
       >
         <Route path="/dashboard" element={<Dashboard />} />

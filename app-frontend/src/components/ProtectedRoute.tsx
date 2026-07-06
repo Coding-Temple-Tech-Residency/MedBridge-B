@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 
-export const ProtectedtedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const { token, isLoading } = useAuth();
 
     if (isLoading) return <LoadingSpinner />
