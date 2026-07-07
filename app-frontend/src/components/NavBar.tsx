@@ -11,7 +11,7 @@ export const NavBar = (): ReactNode => {
   const logoutMutation = useLogout();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-
+We can actually remove this entire useEffect and the resize eventListener completely. Let's handle this responsibility in `NavBar.css` using a media query to hide the mobile menu on desktop screens instead. Doing it this way helps with performance. 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768 && isOpen) {
