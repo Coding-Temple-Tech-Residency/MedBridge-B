@@ -21,19 +21,21 @@ export const useTrustedContactsDomain = () => {
         mutate: updateMutation, 
         isPending: updatePending, 
         isError: isUpdateError, 
+        variables: updateVars,
         error: updateError 
     } = useUpdateTrustedContact();
 
     const { 
         mutate: deleteMutation, 
         isPending: deletePending, 
-        isError: isDeleteError, 
+        isError: isDeleteError,
+        variables: deletingId,
         error: deleteError 
     } = useRemoveTrustedContact();
 
 
 
-    const isPending = listPending || addPending || updatePending || deletePending;
+    const isPending = listPending;
 
   
     const hasError = isListError || isAddError || isUpdateError || isDeleteError;
@@ -86,8 +88,9 @@ export const useTrustedContactsDomain = () => {
             errorMessage,
             isContactListEmpty,
             isAdding: addPending,
-            isUpdating: updatePending,
-            isDeleting: deletePending,
+            isUpdating: updatePending ? updateVars?.contact_id : null,
+            isDeleting: deletePending ? deletingId : null,
+            isActionInFlight: addPending || updatePending || deletePending
         },
 
         actions: {

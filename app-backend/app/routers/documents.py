@@ -75,10 +75,11 @@ async def get_summary(document_id: str, user: dict = Depends(get_current_user)):
         .select("*")
         .eq("health_record_id", document_id)
         .eq("user_id", user["id"])
-        .single()
+        .maybe_single()
         .execute()
     )
-    if not result.data:
+    # added safety check to prevent server from crashing if no summary is present/available. 
+    if not result or result.data:
         current_status = doc.get("status", "unknown")
         if current_status in ("uploaded", "processing", "extracted"):
             raise HTTPException(status_code=202, detail=f"Summary still generating. Status: {current_status}")

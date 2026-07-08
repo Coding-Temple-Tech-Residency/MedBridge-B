@@ -1,0 +1,52 @@
+/* PAGE CONTAINER */
+.dashboard-page-container {
+  width: 90vw;
+  height: 100vh;
+  margin: 0;
+  padding: 34px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+  background-color: #F7FAFC; /* soft white */
+}
+
+/* TITLE + DESCRIPTION */
+.dashboard-header-title {
+  margin: 0;
+  color: #1B3A5C; /* deep navy */
+}
+
+.dashboard-header-description {
+  margin: 4px 0 0 0;
+  color: #1B3A5C;
+}
+
+/* CALENDAR WRAPPER */
+.dashboard-calendar-wrapper {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* NOTES TEXTAREA */
+.dashboard-notes {
+  width: 100%;
+  border: 1px solid #2D7DD2; /* blue */
+  border-radius: 8px;
+  padding: 24px;
+  margin: 0;
+  box-sizing: border-box;
+  resize: none;
+  overflow: scroll;
+  background-color: #E8F4FD; /* light blue */
+  color: #1B3A5C;
+  font-family: 'Didact Gothic', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+}
+
+.dashboard-notes::placeholder {
+  color: #71717A;
+  opacity: 0.8;
+}

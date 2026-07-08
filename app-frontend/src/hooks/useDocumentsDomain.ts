@@ -28,6 +28,7 @@ export const useDocumentsDomain = (document_id?: string) => {
     const {
         mutate: deleteDocument,
         isPending: deletePending,
+        variables: deletingId,
         isError: isDeleteError,
         error: deleteError
     } = useDeleteDocument();
@@ -65,11 +66,7 @@ export const useDocumentsDomain = (document_id?: string) => {
     const isPending =
         listPending ||
         dashboardPending ||
-        uploadPending ||
-        deletePending ||
-        (!!document_id && (detailPending || summaryPending)) ||
-        regeneratePending ||
-        prepPending;
+        (!!document_id && (detailPending || summaryPending))
 
 
     const hasError =
@@ -115,7 +112,7 @@ export const useDocumentsDomain = (document_id?: string) => {
         },
         emptyLibrary: {
             title: "Your Vault is Empty",
-            description: "Drag and drop medical documents or PDF records here to begin your automated analysis.",
+            description: "Click to add documents or PDF records here and begin your automated analysis.",
             icon: "📤",
         },
         documentSummary: {
@@ -150,7 +147,7 @@ export const useDocumentsDomain = (document_id?: string) => {
             isDocumentListEmpty,
             isSummaryEmpty,
             isProcessingFile: uploadPending || regeneratePending || prepPending,
-            isDeletingFile: deletePending
+            isDeletingFile: deletePending ? deletingId : null
         },
 
         actions: {

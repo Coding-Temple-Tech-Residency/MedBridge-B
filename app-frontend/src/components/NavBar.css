@@ -1,0 +1,114 @@
+/* NAVBAR */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background-color: #F7FAFC;
+  position: relative;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo {
+  height: 48px;
+  width: auto;
+}
+
+.nav-right {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-item {
+  color: #1B3A5C;
+  font-weight: 600;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.nav-item.active {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.layout-main {
+  padding: 2rem;
+}
+
+.logout-link {
+  color: #1B3A5C;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.logout-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Hide desktop nav on mobile */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+}
+
+/* Hamburger icon */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.bar {
+  width: 28px;
+  height: 3px;
+  background-color: #1B3A5C;
+  transition: 0.3s ease;
+}
+
+/* Show hamburger on mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+}
+
+/* Mobile menu container */
+.mobile-menu {
+  position: absolute;
+  top: 72px;
+  left: 0;
+  right: 0;
+  background-color: #F7FAFC;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px;
+  gap: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Mobile nav items */
+.mobile-item {
+  color: #1B3A5C;
+  font-weight: 600;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.mobile-item:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Logout link matches nav items */
+.logout-link {
+  cursor: pointer;
+}

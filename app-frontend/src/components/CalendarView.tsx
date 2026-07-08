@@ -1,7 +1,7 @@
-import {useState} from 'react';
-import {Calendar, dateFnsLocalizer, Views, type View} from 'react-big-calendar';
-import {format, parse, startOfWeek, getDay} from 'date-fns';
-import {enUS} from 'date-fns/locale/en-US';
+import { useState } from 'react';
+import { Calendar, dateFnsLocalizer, Views, type View } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const locales = {
@@ -38,7 +38,7 @@ export default function CalendarView() {
     const [currentView, setCurrentView] = useState<View>(Views.MONTH);
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     return (
-        <div style={{ height: '100%', width: '100%'}}>
+        <div style={{ height: '100%', width: '100%' }}>
             <Calendar
                 localizer={localizer}
                 events={dummyEvents}

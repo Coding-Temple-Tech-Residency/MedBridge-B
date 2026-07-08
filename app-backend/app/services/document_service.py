@@ -130,6 +130,9 @@ def upload_document(
         logger.exception(f"Storage upload failed: {e}")
         return {"success": False, "error": "File storage failed. Please try again."}
 
+    # added to fix upload and relplace file_type mime_type to file_extension value in dictionary below. 
+    file_extension = filename.split(".")[-1].lower() if "." in filename else "unknown"
+
     # Create health_records row using ACTUAL column names
     try:
         supabase.table("health_records").insert({
@@ -137,7 +140,7 @@ def upload_document(
             "user_id": user_id,
             "filename": filename,
             "storage_path": file_path,
-            "file_type": mime_type,
+            "file_type": file_extension,
             "file_size_bytes": len(file_bytes),
             "source_type": "upload",
             "status": "uploaded",

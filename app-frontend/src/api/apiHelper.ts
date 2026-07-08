@@ -41,8 +41,11 @@ export const apiHelper = async ({ url, method, body }: apiHelper) => {
     try {
 
         const token = getAuthCookie();
-        const headers: Record<string, string> = {
-            "Content-Type": "application/json",
+        const isFormData = body instanceof FormData;
+        const headers: Record<string, string> = {}
+
+        if(!isFormData){
+            headers["Content-Type"] = "application/json";
         }
 
         if (token) {
@@ -54,7 +57,7 @@ export const apiHelper = async ({ url, method, body }: apiHelper) => {
         };
 
         if (body && method !== "GET" && method !== "HEAD") {
-            options.body = JSON.stringify(body);
+            options.body = isFormData ? body : JSON.stringify(body);
         }
         const response = await fetch(url, options);
 

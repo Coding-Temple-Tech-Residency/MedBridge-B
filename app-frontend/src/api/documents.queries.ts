@@ -87,7 +87,8 @@ export const useGetSummary = (document_id: string) => {
                 method: "GET",
                 body: null,
             })
-        }
+        },
+        enabled: !!document_id
     })
 }
 

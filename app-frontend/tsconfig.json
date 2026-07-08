@@ -3,7 +3,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
   "files": [],
   "references": [

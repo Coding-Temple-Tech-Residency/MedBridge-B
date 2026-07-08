@@ -21,6 +21,7 @@ export const useFollowUpDomain = (document_id: string) => {
     const {
         mutate: updateMutation,
         isPending: updatePending,
+        variables: updateVars,
         isError: isUpdateError,
         error: updateError
     } = useUpdateFollowUp();
@@ -28,6 +29,7 @@ export const useFollowUpDomain = (document_id: string) => {
     const {
         mutate: deleteMutation,
         isPending: deletePending,
+        variables: deletingId,
         isError: isDeleteError,
         error: deleteError
     } = useDeleteFollowUp();
@@ -35,17 +37,14 @@ export const useFollowUpDomain = (document_id: string) => {
     const {
         mutate: completeMutation,
         isPending: completePending,
+        variables: completingId,
         isError: isCompleteError,
         error: completeError
     } = useCompleteFollowUp();
 
 
     const isPending =
-        listPending ||
-        createPending ||
-        updatePending ||
-        deletePending ||
-        completePending;
+        listPending
 
     const hasError =
         isListError ||
@@ -60,7 +59,7 @@ export const useFollowUpDomain = (document_id: string) => {
         updateError?.message ||
         deleteError?.message ||
         completeError?.message ||
-        "An unexpected error occured in teh follow-up management domain.";
+        "An unexpected error occurred in teh follow-up management domain.";
 
 
     const isFollowUpListEmpty =
@@ -99,8 +98,10 @@ export const useFollowUpDomain = (document_id: string) => {
             errorMessage,
             isFollowUpListEmpty,
             isCreating: createPending,
-            isUpdating: updatePending,
-            iscompleting: completePending,
+            isUpdating: updatePending ? updateVars?.followup_id: null,
+            isCompleting: completePending ? completingId : null,
+            isDeleting: deletePending ? deletingId : null,
+            isActionInFlight: createPending || updatePending || deletePending || completePending
 
         },
 

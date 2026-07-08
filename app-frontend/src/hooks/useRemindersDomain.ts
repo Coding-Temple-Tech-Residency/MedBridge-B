@@ -20,6 +20,7 @@ export const useRemindersDomain = () => {
     const {
         mutate: updateMutation,
         isPending: updatePending,
+        variables: updateVars,
         isError: isUpdateError,
         error: updateError
     } = useUpdateReminder();
@@ -28,6 +29,7 @@ export const useRemindersDomain = () => {
         mutate: deleteMutation,
         isPending: deletePending,
         isError: isDeleteError,
+        variables: deletingId,
         error: deleteError
     } = useDeleteReminder();
 
@@ -35,16 +37,12 @@ export const useRemindersDomain = () => {
         mutate: completeMutation,
         isPending: completePending,
         isError: isCompleteError,
+        variables: completingId,
         error: completeError
     } = useCompleteReminder();
 
 
-    const isPending =
-        listPending ||
-        createPending ||
-        updatePending ||
-        deletePending ||
-        completePending;
+    const isPending = listPending
 
 
     const hasError =
@@ -105,9 +103,10 @@ export const useRemindersDomain = () => {
             errorMessage,
             isReminderListEmpty,
             isCreating: createPending,
-            isUpdating: updatePending,
-            isDeleting: deletePending,
-            isCompleting: completePending,
+            isUpdating: updatePending ? updateVars?.reminder_id : null,
+            isDeleting: deletePending ? deletingId : null,
+            isCompleting: completePending ? completingId : null,
+            isActionInFlight: createPending || updatePending || deletePending || completePending,
         },
 
         actions: {

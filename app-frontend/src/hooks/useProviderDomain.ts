@@ -20,6 +20,7 @@ export const useProvidersDomain = () => {
     const {
         mutate: updateMutation,
         isPending: updatePending,
+        variables: updateVars,
         isError: isUpdateError,
         error: updateError
     } = useUpdateProvider();
@@ -27,13 +28,14 @@ export const useProvidersDomain = () => {
     const {
         mutate: deleteMutation,
         isPending: deletePending,
+        variables: deletingId,
         isError: isDeleteError,
         error: deleteError
     } = useDeleteProvider();
 
 
 
-    const isPending = listPending || addPending || updatePending || deletePending;
+    const isPending = listPending;
 
 
     const hasError = isListError || isAddError || isUpdateError || isDeleteError;
@@ -86,8 +88,9 @@ export const useProvidersDomain = () => {
             errorMessage,
             isProviderListEmpty,
             isAdding: addPending,
-            isUpdating: updatePending,
-            isDeleting: deletePending,
+            isUpdating: updatePending ? updateVars?.provider_id : null,
+            isDeleting: deletePending ? deletingId : null,
+            isActionInFlight: addPending || updatePending || deletePending
         },
 
         actions: {

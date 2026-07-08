@@ -30,6 +30,7 @@ export const useDocumentChatDomain = (document_id: string) => {
 
     const {
         mutate: rateMessage,
+        variables: ratingMessageId,
         isPending: ratePending,
         isError: isRateError,
         error: rateError
@@ -39,16 +40,14 @@ export const useDocumentChatDomain = (document_id: string) => {
     const {
         mutate: rateUnderstanding,
         isPending: understandingPending,
+        variables: ratingSummaryId,
         isError: isUnderstandingError,
         error: understandingError
     } = useRateUnderstanding();
 
 
-    const isPending =
-        historyPending ||
-        askPending ||
-        ratePending ||
-        understandingPending;
+    const isPending = historyPending
+        
 
 
     const hasError =
@@ -64,7 +63,7 @@ export const useDocumentChatDomain = (document_id: string) => {
         rateError?.message ||
         understandingError?.message ||
         streamError ||
-        "An unexpected error occured in the chat domain.";
+        "An unexpected error occurred in the chat domain.";
 
     const isChatHistoryEmpty =
         !historyPending &&
@@ -103,6 +102,10 @@ export const useDocumentChatDomain = (document_id: string) => {
             errorMessage,
             isChatHistoryEmpty,
             isAiStreaming,
+            isSendingQuestion:askPending,
+            isRatingMessage: ratePending ? ratingMessageId: null,
+            IsRatingUnderstanding: understandingPending ? ratingSummaryId : null,
+
             isActionInFlight: askPending || ratePending || understandingPending,
         },
 

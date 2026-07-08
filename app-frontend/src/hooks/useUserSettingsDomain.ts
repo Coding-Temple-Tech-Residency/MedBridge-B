@@ -19,7 +19,7 @@ export const useUserSettingsDomain = (user_id: string) => {
 
 
 
-    const isPending = fetchPending || updatePending;
+    const isPending = fetchPending;
 
 
     const hasError = isFetchError || isUpdateError;
@@ -61,6 +61,7 @@ export const useUserSettingsDomain = (user_id: string) => {
             errorMessage,
             isSettingsEmpty,
             isUpdating: updatePending,
+            isActionInFlight: updatePending,
         },
         actions: {
             saveSettings: (body: any) => updateMutation(body),

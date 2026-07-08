@@ -19,14 +19,14 @@ export const useAppConfigDomain = () => {
 
     const features = configData?.features || {
         document_upload: false,
-        ocr_exrraction: false,
-        ai_summarizaiton: false,
+        ocr_extraction: false,
+        ai_summarization: false,
         document_chat: false,
         summary_feedback: false,
         analytics_dashboard: false,
         appointment_prep: false,
         reminders: false,
-        multiplanguage: false,
+        multilanguage: false,
     };
 
 

@@ -6,17 +6,15 @@ export const useAnalyticsDomain = () => {
     const { mutate: submitFeedback, data: submitData, isPending: submitPending, isError: isSubmitError, error: submitError } = useSubmitFeedback();
     const { mutate: logEvent, data: eventData, isPending: eventPending, isError: isEventError, error: eventError } = useLogEvent();
     const { data: userSettingsData, isPending: userSettingsPending, isError: isUserSettingsError, error: userSettingsError } = useGetUserSettings();
-    const { mutate: updateSettings, isPending: updateUserSettingsPending, isError: isUpdateUserSettingsError, error: updateUserSettingsError } = useUpdateUserSettings();
+    const { mutate: updateSettings, variables: updatingSettingField, isPending: updateUserSettingsPending, isError: isUpdateUserSettingsError, error: updateUserSettingsError } = useUpdateUserSettings();
     const { data: patientDashboardData, isPending: patientDashboardPending, isError: isPatientDashboardError, error: patientDashboardError } = usePatientDashboard();
     const { data: stakeholderDashboardData, isPending: stakeholderDashboardPending, isError: isStakeholderDashboardError, error: stakeholderDashboardError } = useStakeholderDashboard();
     const { data: teamDashboardData, isPending: teamDashboardPending, isError: isTeamDashboardError, error: teamDashboardError } = useTeamDashboard();
     const { data: providerReadinessData, isPending: providerReadinessPending, isError: isProviderReadinessError, error: providerReadinessError } = useProviderReadinessDashboard();
 
 
-    const isPending = submitPending
-        || eventPending
-        || userSettingsPending
-        || updateUserSettingsPending
+    const isPending =
+        userSettingsPending
         || patientDashboardPending
         || stakeholderDashboardPending
         || teamDashboardPending
@@ -122,6 +120,9 @@ export const useAnalyticsDomain = () => {
             isStakeholderDashboardEmpty,
             isTeamDashboardEmpty,
             isProviderReadinessEmpty,
+            isSubmittingFeedback: submitPending,
+            isLoggingEvent: eventPending,
+            isUpdatingSettings: updateUserSettingsPending ? updatingSettingField : null
         },
 
         // 3. Semantic Action Handlers (Clean execution triggers for the UI)

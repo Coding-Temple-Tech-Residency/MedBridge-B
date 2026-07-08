@@ -1,21 +1,28 @@
 import { FormFactory } from "./FormFactory";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
-import { useLogout } from "../api/auth.queries";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
+import { useState, type JSX } from "react";
 
 type AuthOption = "login" | "registration";
 
 export const AuthContainer = (): JSX.Element => {
   const [authOption, setAuthOption] = useState<AuthOption>("login");
-  const { token, logout } = useAuth();
+  const { token } = useAuth();
+  const navigate = useNavigate();
 
-  if (token !== null) {
+  useEffect(() => {
+    if (token !== null) {
+      navigate("/dashboard");
+    }
+  }, [token, navigate]);
+
+  // If user is already logged in and manually visits /login,
+  // show the logout option instead of redirecting again.
+  if (token) {
     return (
       <div className="auth-success">
-        <h1 className="auth-success-title">Login Successful</h1>
-        <button className="logout-btn" onClick={logout}>
-          Logout
-        </button>
+        <h1 className="auth-success-title">You’re signed in</h1>
       </div>
     );
   }
@@ -48,4 +55,4 @@ export const AuthContainer = (): JSX.Element => {
       </div>
     </div>
   );
-};
+};;

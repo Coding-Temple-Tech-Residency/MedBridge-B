@@ -1,19 +1,17 @@
 
-export type EmptyStateProps<T> = {
-    data: T[];
-    itemName?: string;
+export interface EmptyStateProps {
+    title: string;
+    description: string;
+    icon?: string;
+    onAction?: () => void
 }
 
 
-export function EmptyState<T>({ data, itemName = "items" }: EmptyStateProps<T>) {
-
-    if (data.length > 0) {
-        return null;
-    }
-
+export function EmptyState({ title, description, icon="🫙" }: EmptyStateProps) {
     return (
         <div className="empty-state">
-            No {itemName} found.
+           <h1 className='empty-title'> {title} {icon} </h1>
+           <p>{description}</p>
         </div>
     );
 }

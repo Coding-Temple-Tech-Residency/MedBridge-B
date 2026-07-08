@@ -7,7 +7,7 @@
     env_file: .env
 
   frontend:
-    build: ./app-backend/app-frontend
+    build: ./app-frontend
     ports: 
       - "5173:5173"
     depends_on: 

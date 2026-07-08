@@ -33,6 +33,7 @@ export const useResourcesDomain = (config: {
     const {
         mutate: generateScoreMutation,
         isPending: generatePending,
+        variables: generatingDocId,
         isError: isGenerateError,
         error: generateError
     } = useGenerateHealthScore();
@@ -42,7 +43,6 @@ export const useResourcesDomain = (config: {
     const isPending =
         resourcesPending ||
         scoresPending ||
-        generatePending ||
         (!!resource_id && detailPending);
 
 
@@ -107,7 +107,8 @@ export const useResourcesDomain = (config: {
             errorMessage,
             isResourceListEmpty,
             isHealthScoresEmpty,
-            isGeneratingScore: generatePending,
+            isGeneratingScore: generatePending ? generatingDocId : null,
+            isActionInFlight: generatePending
         },
 
 
