@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useLogout } from "../api/auth.queries";
 import { useAuth } from "../context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./NavBar.css";
 
 export const NavBar = (): ReactNode => {
@@ -11,18 +11,12 @@ export const NavBar = (): ReactNode => {
   const logoutMutation = useLogout();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-      }
-    };
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, [isOpen]);
-
 
   const handleLogout = () => {
     logoutMutation.mutate();
-        setIsOpen(false); // Close the mobile menu on logout
-        navigate("/");
-      };
+    setIsOpen(false);
+    navigate("/");
+  };
 
   return (
     <nav className="navbar">
@@ -58,7 +52,6 @@ export const NavBar = (): ReactNode => {
           Upload Docs
         </NavLink>
 
-        {/* Only show logout if user is logged in */}
         {token && (
           <span className="nav-item logout-link" onClick={handleLogout}>
             Logout
@@ -101,12 +94,7 @@ export const NavBar = (): ReactNode => {
           </NavLink>
 
           {token && (
-            <span
-              className="mobile-item logout-link"
-              onClick={() => {
-                handleLogout();
-              }}
-            >
+            <span className="mobile-item logout-link" onClick={handleLogout}>
               Logout
             </span>
           )}
