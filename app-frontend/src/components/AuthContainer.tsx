@@ -1,7 +1,7 @@
 import { FormFactory } from "./FormFactory";
 import { useAuth } from "../context/AuthContext";
-import { useState, useEffect,type JSX } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useState, useEffect, type JSX } from "react";
+import { useNavigate } from "react-router-dom";
 
 type AuthOption = "login" | "registration";
 

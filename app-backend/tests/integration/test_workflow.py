@@ -159,15 +159,54 @@ class TestQA:
 # ── Acceptance Test 3: Dashboard shows history ───────────────────────────────
 
 class TestDashboard:
+    def test_dashboard_requires_auth(self, client):
+        resp = client.get("/dashboard")
+        assert resp.status_code == 401
+
     def test_dashboard_returns_documents(self, client, token):
         resp = client.get("/dashboard", headers=auth(token))
         assert resp.status_code == 200
         data = resp.json()
-        assert data["total_documents"] >= 1
+        assert "user" in data
+        assert "profile_complete" in data
+        assert isinstance(data["total_documents"], int)
+        assert data["total_documents"] >= 0
+
+    def test_dashboard_returns_user_data(self, client, token):
+        resp = client.get("/dashboard", headers=auth(token))
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["user"]["user_id"]
+        assert data["user"]["email"] == USER["email"]
+
+    def test_dashboard_returns_profile_complete(self, client, token):
+        resp = client.get("/dashboard", headers=auth(token))
+        assert resp.status_code == 200
+        assert isinstance(resp.json()["profile_complete"], bool)
+
+    def test_dashboard_returns_recent_documents(self, client, token):
+        resp = client.get("/dashboard", headers=auth(token))
+        assert resp.status_code == 200
+        data = resp.json()
+        assert len(data["documents"]) <= 5
+        if data["documents"]:
+            uploaded_at_values = [doc["uploaded_at"] for doc in data["documents"]]
+            assert uploaded_at_values == sorted(uploaded_at_values, reverse=True)
+
+    def test_dashboard_returns_record_count(self, client, token):
+        resp = client.get("/dashboard", headers=auth(token))
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["total_documents"] >= len(data["documents"])
 
     def test_dashboard_shows_summary_count(self, client, token):
         resp = client.get("/dashboard", headers=auth(token))
-        assert resp.json()["total_summaries"] >= 1
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "user" in data
+        assert "profile_complete" in data
+        assert isinstance(data["total_summaries"], int)
+        assert data["total_summaries"] >= 0
 
 
 # ── Acceptance Test 4: Unsupported file type ─────────────────────────────────

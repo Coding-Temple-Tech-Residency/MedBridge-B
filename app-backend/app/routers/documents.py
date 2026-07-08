@@ -11,6 +11,7 @@ from app.schemas.documents import (
 from app.middleware.auth import get_current_user, get_current_user_sse
 # schemas imported above
 from app.services import document_service, chat_service
+from app.services.profile_service import get_profile_row, to_profile_response
 from app.database import get_supabase
 import logging
 import uuid
@@ -18,6 +19,7 @@ from datetime import datetime, timezone
 
 router = APIRouter(tags=["Documents"])
 logger = logging.getLogger(__name__)
+RECENT_DOCUMENTS_LIMIT = 5
 
 
 @router.post("/documents/upload", response_model=UploadResponse, status_code=201)
@@ -403,7 +405,23 @@ async def get_appointment_prep(document_id: str, user: dict = Depends(get_curren
 async def get_dashboard(user: dict = Depends(get_current_user)):
     supabase = get_supabase()
     uid = user["id"]
-    docs = document_service.get_documents(uid)
+    all_docs = document_service.get_documents(uid)
+    recent_docs = all_docs[:RECENT_DOCUMENTS_LIMIT]
+    profile_row = get_profile_row(supabase, uid)
+    profile_complete = bool(profile_row and profile_row.get("full_name"))
+
+    if profile_row:
+        dashboard_user = to_profile_response(profile_row, user["email"])
+    else:
+        dashboard_user = to_profile_response(
+            {
+                "user_id": uid,
+                "full_name": None,
+                "preferred_language": "en",
+                "explanation_level": "plain",
+            },
+            user["email"],
+        )
 
     summary_count = (
         supabase.table("summaries").select("id", count="exact").eq("user_id", uid).execute()
@@ -466,8 +484,10 @@ async def get_dashboard(user: dict = Depends(get_current_user)):
         logger.warning("kpi_processing_time query failed — non-fatal")
 
     return DashboardResponse(
-        documents=docs,
-        total_documents=len(docs),
+        user=dashboard_user,
+        profile_complete=profile_complete,
+        documents=recent_docs,
+        total_documents=len(all_docs),
         total_summaries=summary_count.count or 0,
         total_questions_asked=chat_count.count or 0,
         avg_seconds_to_summary=avg_seconds,

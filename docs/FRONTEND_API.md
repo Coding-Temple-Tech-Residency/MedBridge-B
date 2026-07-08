@@ -333,12 +333,23 @@ Response:
 
 ```json
 {
-  "documents": [...],
-  "total_documents": 3,
-  "total_summaries": 3,
-  "total_questions_asked": 12
+  "user": {
+    "user_id": "uuid",
+    "email": "patient@example.com",
+    "full_name": "Jane Doe",
+    "preferred_language": "en",
+    "explanation_level": "plain"
+  },
+  "profile_complete": true,
+  "documents": [],
+  "total_documents": 12,
+  "total_summaries": 8,
+  "total_questions_asked": 3
 }
 ```
+
+`documents` is a recent subset (maximum 5 items), while `total_documents` is
+the full count for the authenticated user.
 
 ---
 
