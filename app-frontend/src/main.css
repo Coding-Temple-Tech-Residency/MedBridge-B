@@ -2,6 +2,7 @@
 
 html, body {
   font-family: 'Didact Gothic', system-ui, -apple-system, sans-serif;
+ 
 }
 
 /*Landing Page Styles*/
@@ -17,7 +18,7 @@ html, body {
 
 .app-logo {
   width: 180px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .app-header {
@@ -185,3 +186,116 @@ html, body {
   border-radius: 12px;
 }
 
+/* Landing Page css */
+
+
+
+/* Update your existing app-container class to allow scrolling */
+.app-container {
+  min-height: 100vh;
+  background-color: #F7FAFC;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px; /* Increased top/bottom padding for breathing room */
+  box-sizing: border-box;
+}
+
+/* App Hero Text Styling */
+.app-content {
+  text-align: center;
+  max-width: 680px;
+  margin-bottom: 48px;
+}
+
+.app-subtitle {
+  font-size: 24px;
+  color: #1B3A5C;
+  margin-bottom: 12px;
+}
+
+.app-description {
+  font-size: 16px;
+  color: #4A5568;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Landing Page Cards Layout */
+.landing-section {
+  width: 100%;
+  max-width: 1100px;
+  margin-bottom: 48px;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  justify-content: center;
+}
+
+.features-card {
+  background-color: #2D7DD2;
+  border: 2px solid #1B3A5C;
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  color: #ffffff; /* Make all card text white for perfect readability */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+              border-color 0.3s ease;
+  cursor: pointer;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+}
+
+.features-card:hover {
+  transform: translateY(-8px); /* Lifts the card up slightly */
+  border-color: #3ABFBF;       /* Changes the border color to match your accent teal */
+  box-shadow: 0 20px 25px -5px rgba(27, 58, 92, 0.2), 
+              0 10px 10px -5px rgba(27, 58, 92, 0.1); /* Deep soft shadow drop */
+}
+
+.features-card:hover .card-icon {
+  transform: scale(1.15) rotate(3deg);
+}
+
+.card-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #ffffff;
+}
+
+.card-text {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  color: #EBF8FF; /* Soft light blue tint for body text readability */
+}
+
+.features-card:nth-child(1) { animation-delay: 0.1s; }
+.features-card:nth-child(2) { animation-delay: 0.2s; }
+.features-card:nth-child(3) { animation-delay: 0.3s; }

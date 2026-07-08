@@ -11,18 +11,25 @@ export const NavBar = (): ReactNode => {
   const logoutMutation = useLogout();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Reconstructed the missing useEffect hook
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsOpen(false); // Closes mobile menu when shifting to desktop view
       }
     };
 
+    window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [isOpen]);
+  }, []); // Only run on mount; no need to depend on isOpen unless logic requires it
 
 
   const handleLogout = () => {
     logoutMutation.mutate();
-        setIsOpen(false); // Close the mobile menu on logout
-        navigate("/");
-      };
+    setIsOpen(false); // Close the mobile menu on logout
+    navigate("/");
+  };
 
   return (
     <nav className="navbar">
