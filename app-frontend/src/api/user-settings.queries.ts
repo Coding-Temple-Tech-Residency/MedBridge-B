@@ -28,7 +28,8 @@ export const useGetUserSettings = (user_id: string) => {
                 method: "GET",
                 body: null
             })
-        }
+        },
+        enabled: !!user_id
     })
 
 }

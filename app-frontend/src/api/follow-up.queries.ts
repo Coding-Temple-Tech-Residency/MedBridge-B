@@ -23,7 +23,10 @@ export const useCreateFollowUp = () => {
             return apiHelper({
                 url: `http://localhost:8000/documents/${document_id}/follow-ups`,
                 method: "POST",
-                body: body
+                body: {
+                    ...body,
+                    health_record_id: document_id
+                }
             })
         },
         onSuccess: (data, { document_id }) => {

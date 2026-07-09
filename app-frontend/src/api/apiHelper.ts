@@ -2,7 +2,8 @@
 export interface apiHelper<T = unknown> {
     url: string;
     method: 'POST' | 'GET' | 'DELETE' | 'PATCH' | "HEAD";
-    body: T
+    body: T,
+    tokenOverride?: string;
 }
 
 export const setAuthCookie = (token: string, days: number = 7): void => {
@@ -37,10 +38,10 @@ export const clearAuthCookie = (): void => {
 
 
 
-export const apiHelper = async ({ url, method, body }: apiHelper) => {
+export const apiHelper = async ({ url, method, body, tokenOverride }: apiHelper) => {
     try {
 
-        const token = getAuthCookie();
+        const token = tokenOverride || getAuthCookie();
         const isFormData = body instanceof FormData;
         const headers: Record<string, string> = {}
 
@@ -63,7 +64,7 @@ export const apiHelper = async ({ url, method, body }: apiHelper) => {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || "Error with response");
+            throw new Error(errorData.detail || errorData.message || "Error with response");
         }
 
         if (response.status === 204) {

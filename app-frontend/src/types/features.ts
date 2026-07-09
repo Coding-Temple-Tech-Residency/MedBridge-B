@@ -60,7 +60,7 @@ export interface TrustedContactCreate {
 
 export interface TrustedContactUpdate {
     contact_name?: string;
-    contact_level?: string;
+    access_level?: string;
     status?: string;
 }
 
@@ -137,8 +137,8 @@ export interface ResourceResponse{
     description?: string;
     url?: string;
     resource_type?: string;
-    tags?: string;
-    condition_codes?: string;
+    tags?: string[];
+    condition_codes?: string[];
     created_at: string;
 }
 

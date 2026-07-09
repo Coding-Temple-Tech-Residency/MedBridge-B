@@ -16,7 +16,7 @@ export const useListResources = (filters: { resource_type?: string; tag?: string
     if (tag) params.append("tag", tag);
 
     const queryString = params.toString();
-    const url = queryString ? `http://localhost:8000/resources?${queryString}` : "/resources";
+    const url = `http://localhost:8000/resources${queryString ? `?${queryString}` : ""}`;
 
     return useQuery<ResourceResponse[]>({
         // Tracking filters in the queryKey ensures the cache separates different filter views automatically

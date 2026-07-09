@@ -25,8 +25,7 @@ export interface UserSettingsUpdate {
 }
 
 
-
-export const useSubmitFeedback = () => {
+export const useSubmitFeedback = (userId: string) => {
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, FeedbackSubmit>({
@@ -35,24 +34,20 @@ export const useSubmitFeedback = () => {
                 url: "http://localhost:8000/analytics/feedback",
                 method: "POST",
                 body: body,
+                tokenOverride: userId 
             });
-
         },
         onSuccess: (data) => {
             console.log("Feedback successful:", data);
-            queryClient.invalidateQueries({ queryKey: ["analytics", "feedback"] })
+            queryClient.invalidateQueries({ queryKey: ["analytics", "feedback", userId] });
         },
-
         onError: (error) => {
-            console.error("Feedback failed:", error)
+            console.error("Feedback failed:", error);
         },
-
     });
-
 };
 
-
-export const useLogEvent = () => {
+export const useLogEvent = (userId: string) => {
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, EventLog>({
@@ -61,36 +56,20 @@ export const useLogEvent = () => {
                 url: "http://localhost:8000/analytics/events",
                 method: "POST",
                 body: body,
+                tokenOverride: userId 
             });
         },
-
         onSuccess: (data) => {
             console.log("Event successfully set:", data);
-            queryClient.invalidateQueries({ queryKey: ["analytics", "events"] })
+            queryClient.invalidateQueries({ queryKey: ["analytics", "events", userId] });
         },
-
         onError: (error) => {
-            console.error("Event Post failed:", error)
+            console.error("Event Post failed:", error);
         }
-    })
-}
+    });
+};
 
-
-export const useGetUserSettings = () => {
-    return useQuery({
-        queryKey: ["analytics", "settings"],
-        queryFn: () => {
-            return apiHelper({
-                url: "http://localhost:8000/analytics/settings",
-                method: "GET",
-                body: null,
-            })
-        },
-    })
-}
-
-
-export const useUpdateUserSettings = () => {
+export const useUpdateUserSettings = (userId: string) => {
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, UserSettingsUpdate>({
@@ -99,73 +78,94 @@ export const useUpdateUserSettings = () => {
                 url: "http://localhost:8000/analytics/settings",
                 method: "PATCH",
                 body: body,
+                tokenOverride: userId 
             });
         },
         onSuccess: (data) => {
-            console.log("User settings successfully changed:", data)
-            queryClient.invalidateQueries({ queryKey: ["analytics", "settings"] })
-
+            console.log("User settings successfully changed:", data);
+            queryClient.invalidateQueries({ queryKey: ["analytics", "settings", userId] });
         },
-
         onError: (error) => {
             console.error("Error updating user settings:", error);
         }
+    });
+};
 
-    })
-}
 
 
-export const usePatientDashboard = () => {
+
+export const useGetUserSettings = (userId: string) => {
     return useQuery({
-        queryKey: ["analytics", "dashboard", "patient"],
+       
+        queryKey: ["analytics", "settings", userId],
+        queryFn: () => {
+            return apiHelper({
+                url: "http://localhost:8000/analytics/settings",
+                method: "GET",
+                body: null,
+                tokenOverride: userId 
+            });
+        },
+        enabled: !!userId 
+    });
+};
+
+export const usePatientDashboard = (userId: string) => {
+    return useQuery({
+        queryKey: ["analytics", "dashboard", "patient", userId],
         queryFn: () => {
             return apiHelper({
                 url: "http://localhost:8000/analytics/dashboard/patient",
                 method: "GET",
                 body: null,
-            })
-        }
-    })
-}
+                tokenOverride: userId 
+            });
+        },
+        enabled: !!userId
+    });
+};
 
-
-export const useStakeholderDashboard = () => {
+export const useStakeholderDashboard = (userId: string) => {
     return useQuery({
-        queryKey: ["analytics", "dashboard", "stakeholder"],
+        queryKey: ["analytics", "dashboard", "stakeholder", userId],
         queryFn: () => {
             return apiHelper({
                 url: "http://localhost:8000/analytics/dashboard/stakeholder",
                 method: "GET",
                 body: null,
-            })
-        }
-    })
-}
+                tokenOverride: userId
+            });
+        },
+        enabled: !!userId
+    });
+};
 
-
-export const useTeamDashboard = () => {
+export const useTeamDashboard = (userId: string) => {
     return useQuery({
-        queryKey: ["analytics", "dashboard", "team"],
+        queryKey: ["analytics", "dashboard", "team", userId],
         queryFn: () => {
             return apiHelper({
                 url: "http://localhost:8000/analytics/dashboard/team",
                 method: "GET",
                 body: null,
-            })
-        }
-    })
-}
+                tokenOverride: userId 
+            });
+        },
+        enabled: !!userId
+    });
+};
 
-
-export const useProviderReadinessDashboard = () => {
+export const useProviderReadinessDashboard = (userId: string) => {
     return useQuery({
-        queryKey: ["analytics", "dashboard", "provider-readiness"],
+        queryKey: ["analytics", "dashboard", "provider-readiness", userId],
         queryFn: () => {
             return apiHelper({
                 url: "http://localhost:8000/analytics/dashboard/provider-readiness",
                 method: "GET",
                 body: null,
-            })
-        }
-    })
-}
+                tokenOverride: userId 
+            });
+        },
+        enabled: !!userId
+    });
+};
