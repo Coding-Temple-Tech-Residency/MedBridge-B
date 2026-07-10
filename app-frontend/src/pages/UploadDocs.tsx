@@ -2,7 +2,7 @@
 import { useState, type ReactNode } from "react";
 import "../main.css";
 import { localPdfCache, UploadDocuments } from "../components/UploadDocument";
-import { DocumentContentPanel } from "../components/DocumentSummaryPanel";
+import { DocumentContentPanel } from "../components/DocumentContentPanel";
 import { useDocumentsDomain } from "../hooks/useDocumentsDomain";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
