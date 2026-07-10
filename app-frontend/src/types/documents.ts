@@ -15,6 +15,8 @@ export interface DocumentResponse {
     user_id: string;
     file_name: string;
     mime_type: string;
+    extracted_text?: string;
+    raw_text?:string;
     file_size_bytes: number;
     status: DocumentStatus;
     uploaded_at: string;

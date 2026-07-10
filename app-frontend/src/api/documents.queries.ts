@@ -3,7 +3,7 @@ import { apiHelper } from "./apiHelper";
 import { type SummaryResponse, type DocumentListResponse, type DocumentResponse, type UploadResponse, type PrepResponse, type DashboardResponse } from "../types/documents";
 
 
-export const useUploadDocument = () => {
+export const useUploadDocument = (onUploadComplete: (document_id: string) => void) => {
     const queryClient = useQueryClient();
     return useMutation<UploadResponse, Error, FormData>({
         mutationFn: (body: FormData) => {
@@ -15,7 +15,9 @@ export const useUploadDocument = () => {
         },
         onSuccess: (data) => {
             console.log("File uploaded successfully:", data);
-            queryClient.invalidateQueries({ queryKey: ["documents"] })
+            queryClient.invalidateQueries({ queryKey: ["documents"] });
+            onUploadComplete(data.document_id);
+
         },
 
         onError: (error) => {
@@ -43,12 +45,19 @@ export const useListDocuments = () => {
 export const useGetDocument = (document_id: string) => {
     return useQuery<DocumentResponse>({
         queryKey: ["documents", document_id],
-        queryFn: () => {
-            return apiHelper({
-                url: `http://localhost:8000/documents/${document_id}`,
-                method: "GET",
-                body: null,
-            })
+        queryFn: async () => {
+                return apiHelper({
+                    url: `http://localhost:8000/documents/${document_id}`,
+                    method: "GET",
+                    body: null,
+                })
+        },
+        enabled: !!document_id,
+        refetchInterval: (query) => {
+            if (!document_id) return false;
+            const docData = query.state.data;
+            const hasExtractedText = !!docData?.extracted_text || !!docData?.raw_text || (docData as any)?.content ;
+            return hasExtractedText ? false : 3000
         }
     })
 }
@@ -88,7 +97,12 @@ export const useGetSummary = (document_id: string) => {
                 body: null,
             })
         },
-        enabled: !!document_id
+        enabled: !!document_id,
+        refetchInterval: (query) => {
+            if (!document_id) return false;
+            const summaryData = query.state.data;
+            return !summaryData?.summary_text ? 2000 : false;
+        }
     })
 }
 

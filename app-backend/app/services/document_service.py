@@ -160,54 +160,50 @@ def upload_document(
 # ── Processing pipeline ───────────────────────────────────────────────────────
 
 def _process_document(document_id: str, user_id: str, file_bytes: bytes, mime_type: str) -> None:
-    from app.services.quality_service import check_summary_quality
     supabase = get_supabase()
-    _update_status(document_id, "processing")
-
-    # Extraction
-    extraction: ExtractionResult = extract_text(file_bytes, mime_type)
-    if not extraction.success:
-        _update_status(document_id, "failed", extraction.error_message)
-        return
 
     try:
+        from app.services.quality_service import check_summary_quality  
+        _update_status(document_id, "processing")
+
+        # Extraction
+        extraction: ExtractionResult = extract_text(file_bytes, mime_type)
+        if not extraction.success:
+            _update_status(document_id, "failed", extraction.error_message)
+            return
+
         supabase.table("health_records").update({
             "raw_text": extraction.text,
             "extraction_method": extraction.method,
             "ocr_confidence": extraction.confidence,
             "status": "extracted",
         }).eq("id", document_id).execute()
-    except Exception as e:
-        logger.exception(f"Extraction storage failed: {e}")
-        _update_status(document_id, "failed", "Failed to store extracted text.")
-        return
 
-    # Chunking
-    chunks = chunk_document(extraction.text)
-    if len(chunks) > 1:
-        try:
-            supabase.table("document_chunks").insert([
-                {
-                    "document_id": document_id,
-                    "user_id": user_id,
-                    "chunk_index": c.index,
-                    "chunk_text": c.text,
-                    "token_count": c.token_count,
-                }
-                for c in chunks
-            ]).execute()
-        except Exception as e:
-            logger.warning(f"Chunk storage failed (non-fatal): {e}")
+        # Chunking
+        chunks = chunk_document(extraction.text)
+        if len(chunks) > 1:
+            try:
+                supabase.table("document_chunks").insert([
+                    {
+                        "document_id": document_id,
+                        "user_id": user_id,
+                        "chunk_index": c.index,
+                        "chunk_text": c.text,
+                        "token_count": c.token_count,
+                    }
+                    for c in chunks
+                ]).execute()
+            except Exception as e:
+                logger.warning(f"Chunk storage failed (non-fatal): {e}")
 
-    # Summary
-    summary_result = generate_summary(extraction.text)
-    if not summary_result.success:
-        _update_status(document_id, "failed", summary_result.error_message)
-        return
+        # Summary
+        summary_result = generate_summary(extraction.text)
+        if not summary_result.success:
+            _update_status(document_id, "failed", summary_result.error_message)
+            return
 
-    quality = check_summary_quality(summary_result.text)
+        quality = check_summary_quality(summary_result.text)
 
-    try:
         summary_id = str(uuid.uuid4())
         supabase.table("summaries").insert({
             "id": summary_id,
@@ -218,10 +214,10 @@ def _process_document(document_id: str, user_id: str, file_bytes: bytes, mime_ty
             "quality_passed": quality.passed,
         }).execute()
         _update_status(document_id, "summarized")
-    except Exception as e:
-        logger.exception(f"Summary storage failed: {e}")
-        _update_status(document_id, "failed", "Failed to store summary.")
 
+    except Exception as e:
+        logger.exception(f"Processing pipeline failed for {document_id}: {e}")
+        _update_status(document_id, "failed", str(e))
 
 # ── Read helpers ──────────────────────────────────────────────────────────────
 

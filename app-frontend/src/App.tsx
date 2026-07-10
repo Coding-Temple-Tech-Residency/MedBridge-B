@@ -1,10 +1,7 @@
 import { type ReactNode } from "react";
 import { AuthContainer } from "./components/AuthContainer";
 import { useModal } from "./context/ModalContext";
-import "./main.css";
-import { ApiSandbox } from "./components/ApiSandbox";
-import { UploadDocuments } from "./components/UploadDocument";
-import { UploadDocs } from "./pages/UploadDocs";
+import "./main.css"
 import { LandingPage } from "./pages/LandingPage";
 
 export default function App(): ReactNode {

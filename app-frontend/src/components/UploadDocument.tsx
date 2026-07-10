@@ -9,50 +9,53 @@ interface UploadDocumentsProps {
     onSelectDocument: (id: string) => void;
 }
 
-export const UploadDocuments = ({ selectedDocumentId, onSelectDocument }: UploadDocumentsProps) => {
+export const localPdfCache: Record<string, string> = {};
 
-    const { data: documents, actions, flags, viewConfigs } = useDocumentsDomain(selectedDocumentId || undefined);
+export const UploadDocuments = ({ selectedDocumentId, onSelectDocument }: UploadDocumentsProps) => {
+    const { data: documents, actions, flags, viewConfigs } = useDocumentsDomain(selectedDocumentId || undefined, onSelectDocument);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    if (flags.isPending) return <LoadingSpinner />
-    if (flags.hasError) return <ErrorComponent error={flags.errorMessage} />
+    if (flags.isPending) return <LoadingSpinner />;
+    if (flags.hasError) return <ErrorComponent error={flags.errorMessage} />;
 
     const handleContainerClick = () => {
         fileInputRef.current?.click();
-    }
+    };
 
     const processFiles = (files: FileList | null) => {
         if (files && files.length > 0) {
             const selectedFile = files[0];
+            
+            // ✅ Intercept and cache file locally using object URLs
+            const localBlobUrl = URL.createObjectURL(selectedFile);
+            localPdfCache[selectedFile.name] = localBlobUrl;
+
             const formData = new FormData();
             formData.append("file", selectedFile);
             actions.uploadFile(formData);
         }
-    }
+    };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         processFiles(event.target.files);
-    }
+    };
 
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
-    }
+    };
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         processFiles(event.dataTransfer.files);
-    }
+    };
 
     return (
         <div className="upload-document-container" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            
-          
             <div className="upload-header">
                 <h2>{viewConfigs.documentLibrary.icon} {viewConfigs.documentLibrary.title}</h2>
                 <p>{viewConfigs.documentLibrary.description}</p>
             </div>
 
-           
             <div className="upload-background-container"
                 onClick={handleContainerClick}
                 onDragOver={handleDragOver}
@@ -88,7 +91,6 @@ export const UploadDocuments = ({ selectedDocumentId, onSelectDocument }: Upload
             ) : (
                 <div className="documents-grid" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                     {documents.documentList?.map((doc) => {
-                        
                         const isSelected = selectedDocumentId === doc.document_id;
 
                         return (
@@ -110,12 +112,14 @@ export const UploadDocuments = ({ selectedDocumentId, onSelectDocument }: Upload
                             >
                                 <div className="document-info">
                                     <h4 style={{ margin: 0 }}>{doc.file_name}</h4>
-                                    <p style={{ margin: "4px 0 0 0", fontSize: "0.85rem", color: "#718096" }}>{doc.uploaded_at}</p>
+                                    <p style={{ margin: "4px 0 0 0", fontSize: "0.85rem", color: "#718096" }}>
+                                        {new Date(doc.uploaded_at).toLocaleDateString()}
+                                    </p>
                                 </div>
                                 <button
                                     className="delete-document-btn"
                                     onClick={(event) => {
-                                        event.stopPropagation(); // Prevents selection collision
+                                        event.stopPropagation();
                                         actions.deleteFile(doc.document_id);
                                     }}
                                     disabled={flags.isDeletingFile === doc.document_id}
