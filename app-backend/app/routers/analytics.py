@@ -5,16 +5,17 @@ Analytics and dashboard endpoints for MedBridge.
 All endpoints require authentication via Bearer token.
 """
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 import os
 import psycopg2
+import psycopg2.extras
 from app.analytics.scores import compute_all_scores
+from app.database import get_supabase
+from app.middleware.auth import get_current_user
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
-security = HTTPBearer()
 
 DB_URL = os.getenv("DATABASE_URL")
 
@@ -49,39 +50,15 @@ class UserSettingsUpdate(BaseModel):
     notification_enabled: Optional[bool] = None
 
 
-# ---------- Helpers ----------
-
-def get_user_id(credentials: HTTPAuthorizationCredentials) -> str:
-    """Extract user_id from token via Supabase auth.users lookup."""
-    token = credentials.credentials
-    try:
-        conn = get_db()
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT id FROM auth.users WHERE id::text = %s LIMIT 1",
-            (token,)
-        )
-        row = cur.fetchone()
-        cur.close()
-        conn.close()
-        if not row:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return str(row[0])
-    except HTTPException:
-        raise
-    except Exception:
-        raise HTTPException(status_code=401, detail="Auth error")
-
-
 # ---------- Endpoints ----------
 
 @router.post("/feedback", status_code=201)
 async def submit_feedback(
     body: FeedbackSubmit,
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: dict = Depends(get_current_user),
 ):
     """Submit a feedback rating for a summary. Feeds Confidence Score KPI."""
-    user_id = get_user_id(credentials)
+    user_id = user["id"]
     try:
         conn = get_db()
         cur = conn.cursor()
@@ -104,45 +81,32 @@ async def submit_feedback(
 @router.post("/events", status_code=201)
 async def log_event(
     body: EventLog,
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: dict = Depends(get_current_user),
 ):
     """Log a user interaction event. Powers all KPI calculations."""
-    user_id = get_user_id(credentials)
+    supabase = get_supabase()
     try:
-        conn = get_db()
-        cur = conn.cursor()
-        cur.execute(
-            """
-            INSERT INTO app_events
-                (user_id, event_type, event_category, event_data,
-                 session_id, response_time_ms, success, created_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
-            RETURNING id
-            """,
-            (
-                user_id,
-                body.event_type,
-                body.event_category,
-                psycopg2.extras.Json(body.event_data),
-                body.session_id,
-                body.response_time_ms,
-                body.success,
-            ),
-        )
-        row = cur.fetchone()
-        cur.close()
-        conn.close()
-        return {"id": str(row[0]), "status": "logged"}
+        result = supabase.table("app_events").insert({
+            "user_id": user["id"],
+            "event_type": body.event_type,
+            "event_category": body.event_category,
+            "event_data": body.event_data or {},
+            "session_id": body.session_id,
+            "response_time_ms": body.response_time_ms,
+            "success": body.success,
+        }).execute()
+        row = result.data[0] if result.data else {}
+        return {"id": row.get("id"), "status": "logged"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/settings")
 async def get_user_settings(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: dict = Depends(get_current_user),
 ):
     """Get current user settings."""
-    user_id = get_user_id(credentials)
+    user_id = user["id"]
     try:
         conn = get_db()
         cur = conn.cursor()
@@ -164,10 +128,10 @@ async def get_user_settings(
 @router.patch("/settings")
 async def update_user_settings(
     body: UserSettingsUpdate,
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: dict = Depends(get_current_user),
 ):
     """Update user settings. Creates record if none exists."""
-    user_id = get_user_id(credentials)
+    user_id = user["id"]
     updates = {k: v for k, v in body.model_dump().items() if v is not None}
     if not updates:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -194,10 +158,10 @@ async def update_user_settings(
 
 @router.get("/dashboard/patient")
 async def patient_dashboard(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: dict = Depends(get_current_user),
 ):
     """Patient-facing KPI dashboard. Returns personal engagement scores."""
-    user_id = get_user_id(credentials)
+    user_id = user["id"]
     try:
         conn = get_db()
         cur = conn.cursor()
@@ -252,7 +216,7 @@ async def patient_dashboard(
 
 @router.get("/dashboard/stakeholder")
 async def stakeholder_dashboard(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: dict = Depends(get_current_user),
 ):
     """Aggregate metrics across all users. For Ellijah/admin view."""
     try:
@@ -284,7 +248,7 @@ async def stakeholder_dashboard(
 
 @router.get("/dashboard/team")
 async def team_dashboard(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: dict = Depends(get_current_user),
 ):
     """Team-facing metrics: feature usage breakdown and error rates."""
     try:
@@ -321,7 +285,7 @@ async def team_dashboard(
 
 @router.get("/dashboard/provider-readiness")
 async def provider_readiness_dashboard(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    user: dict = Depends(get_current_user),
 ):
     """Provider-readiness metrics: appointment prep and follow-up rates."""
     try:

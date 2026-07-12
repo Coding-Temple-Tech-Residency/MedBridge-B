@@ -9,7 +9,7 @@ Run: pytest tests/unit/test_prompts.py -v
 
 import pytest
 from app.services.summary_service import SYSTEM_PROMPT as SUMMARY_PROMPT, DISCLAIMER as SUMMARY_DISCLAIMER
-from app.services.chat_service import QA_SYSTEM_PROMPT, DISCLAIMER as CHAT_DISCLAIMER
+from app.services.chat_service import QA_SYSTEM_PROMPT, DISCLAIMER as CHAT_DISCLAIMER, _wants_more, DEFAULT_MAX_TOKENS, EXTENDED_MAX_TOKENS
 
 
 # ── Summary prompt ────────────────────────────────────────────────────────────
@@ -96,6 +96,18 @@ class TestChatDisclaimer:
 
     def test_chat_disclaimer_no_medical_advice(self):
         assert "medical advice" in CHAT_DISCLAIMER.lower()
+
+
+class TestChatTokenHelpers:
+    def test_wants_more_detects_follow_up_phrases(self):
+        assert _wants_more("Can you explain more about my results?")
+        assert _wants_more("Tell me more about the LDL value")
+
+    def test_wants_more_ignores_normal_questions(self):
+        assert not _wants_more("What is my cholesterol level?")
+
+    def test_token_constants(self):
+        assert DEFAULT_MAX_TOKENS < EXTENDED_MAX_TOKENS
 
 
 # ── Prep prompt ───────────────────────────────────────────────────────────────

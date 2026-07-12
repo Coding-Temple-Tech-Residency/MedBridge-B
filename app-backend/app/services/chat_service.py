@@ -21,6 +21,9 @@ from app.services.chunking_service import (
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_MAX_TOKENS = 800
+EXTENDED_MAX_TOKENS = 1500
+
 DISCLAIMER = (
     "This answer is based only on your uploaded document. "
     "MedBridge does not provide medical advice. "
@@ -51,6 +54,23 @@ Rules you MUST follow:
 Do NOT add a disclaimer at the end — that is added programmatically."""
 
 
+def _wants_more(question: str) -> bool:
+    """Return True when the patient is asking for a longer or deeper answer."""
+    q = question.lower()
+    return any(
+        phrase in q
+        for phrase in (
+            "more detail",
+            "explain more",
+            "explain further",
+            "tell me more",
+            "go deeper",
+            "elaborate",
+            "in more depth",
+        )
+    )
+
+
 @dataclass
 class ChatResult:
     answer: str
@@ -65,11 +85,16 @@ class ChatResult:
     wait=wait_exponential(multiplier=1, min=2, max=10),
     reraise=True,
 )
-def _call_groq(client: Groq, model: str, messages: list[dict]) -> tuple[str, int]:
+def _call_groq(
+    client: Groq,
+    model: str,
+    messages: list[dict],
+    max_tokens: int = DEFAULT_MAX_TOKENS,
+) -> tuple[str, int]:
     response = client.chat.completions.create(
         model=model,
         messages=messages,
-        max_tokens=800,
+        max_tokens=max_tokens,
         temperature=0.2,
     )
     text = response.choices[0].message.content.strip()

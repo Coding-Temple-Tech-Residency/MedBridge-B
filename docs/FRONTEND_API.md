@@ -15,21 +15,22 @@ Sprint 2 API contracts for frontend integration. Backend is the source of truth 
 3. [Health & App Config](#health--app-config)
 4. [Auth Endpoints](#auth-endpoints)
 5. [Patient Profile](#patient-profile)
-6. [Documents](#documents)
-7. [Document Status Flow](#document-status-flow)
-8. [Summaries](#summaries)
-9. [Chat](#chat)
-10. [Appointment Prep](#appointment-prep)
-11. [Dashboard](#dashboard)
-12. [Reminders](#reminders)
-13. [Trusted Contacts](#trusted-contacts)
-14. [Follow-ups](#follow-ups)
-15. [Providers](#providers)
-16. [Resources (Discover)](#resources-discover)
-17. [Health Scores](#health-scores)
-18. [User Settings (Feature Toggles)](#user-settings-feature-toggles)
-19. [Analytics](#analytics)
-20. [Contract Review Notes](#contract-review-notes)
+6. [Medications](#medications)
+7. [Documents](#documents)
+8. [Document Status Flow](#document-status-flow)
+9. [Summaries](#summaries)
+10. [Chat](#chat)
+11. [Appointment Prep](#appointment-prep)
+12. [Dashboard](#dashboard)
+13. [Reminders](#reminders)
+14. [Trusted Contacts](#trusted-contacts)
+15. [Follow-ups](#follow-ups)
+16. [Providers](#providers)
+17. [Resources (Discover)](#resources-discover)
+18. [Health Scores](#health-scores)
+19. [User Settings (Feature Toggles)](#user-settings-feature-toggles)
+20. [Analytics](#analytics)
+21. [Contract Review Notes](#contract-review-notes)
 
 ---
 
@@ -382,6 +383,160 @@ Completes a stub profile created at registration if one exists.
 | 404 | `{"detail": "Patient profile not found."}` | No profile row |
 | 422 | Validation detail array | Invalid field values |
 | 500 | `{"detail": "Failed to update patient profile."}` | Database error |
+
+---
+
+## Medications
+
+Medications are scoped to the authenticated user via JWT. `user_id` is never sent in the request body — it is set server-side from the token. Medications are independent of uploaded documents; document linkage uses `health_record_id` only on the documents/summaries APIs.
+
+### List Medications
+
+`GET /medications`
+
+**Auth:** Bearer JWT
+
+**Query params (all optional):**
+
+| Param | Type | Notes |
+|---|---|---|
+| `status` | string | Filter by status: `active`, `stopped`, `on-hold`, `unknown` |
+
+**Success (200):**
+
+```json
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440020",
+    "user_id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Lisinopril",
+    "code": "314076",
+    "code_system": "RxNorm",
+    "dose": "10 mg",
+    "frequency": "once daily",
+    "status": "active",
+    "created_at": "2026-06-08T10:00:00Z"
+  }
+]
+```
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 500 | `{"detail": "Failed to ..."}` | Database error |
+
+---
+
+### Get Medication
+
+`GET /medications/{medication_id}`
+
+**Auth:** Bearer JWT
+
+**Request body:** None
+
+**Success (200):** Same shape as a single item in the list response above.
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 404 | `{"detail": "Medication not found."}` | Not found or belongs to another user |
+| 500 | `{"detail": "Failed to ..."}` | Database error |
+
+---
+
+### Create Medication
+
+`POST /medications`
+
+**Auth:** Bearer JWT
+
+**Request body:**
+
+```json
+{
+  "name": "Lisinopril",
+  "code": "314076",
+  "code_system": "RxNorm",
+  "dose": "10 mg",
+  "frequency": "once daily",
+  "status": "active"
+}
+```
+
+| Field | Required | Notes |
+|---|---|---|
+| `name` | Yes | Minimum 1 character |
+| `code` | No | RxNorm or other code |
+| `code_system` | No | |
+| `dose` | No | |
+| `frequency` | No | |
+| `status` | No | `active` (default), `stopped`, `on-hold`, `unknown` |
+
+**Success (201):** `MedicationResponse` (same shape as list item).
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 422 | Validation detail array | Missing/invalid fields |
+| 500 | `{"detail": "Failed to create medication."}` | Database error |
+
+---
+
+### Update Medication
+
+`PATCH /medications/{medication_id}`
+
+**Auth:** Bearer JWT
+
+**Request body:** (all fields optional)
+
+```json
+{
+  "name": "Lisinopril",
+  "dose": "20 mg",
+  "frequency": "once daily",
+  "status": "stopped"
+}
+```
+
+**Success (200):** Updated `MedicationResponse`.
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 400 | `{"detail": "No fields provided to update."}` | Empty PATCH body |
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 404 | `{"detail": "Medication not found."}` | Not found or belongs to another user |
+| 422 | Validation detail array | Invalid field values |
+| 500 | `{"detail": "Failed to update medication."}` | Database error |
+
+---
+
+### Delete Medication
+
+`DELETE /medications/{medication_id}`
+
+**Auth:** Bearer JWT
+
+**Request body:** None
+
+**Success (204):** No body.
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 404 | `{"detail": "Medication not found."}` | Not found or belongs to another user |
+| 500 | `{"detail": "Failed to ..."}` | Database error |
 
 ---
 

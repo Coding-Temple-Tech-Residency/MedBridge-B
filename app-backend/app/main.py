@@ -14,7 +14,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 import time
 from app.config import get_settings
-from app.routers import auth, documents, features, user_settings, app_router, analytics, patient_profile
+from app.routers import auth, documents, features, user_settings, app_router, analytics, patient_profile, medications
 import logging
 
 logging.basicConfig(
@@ -68,6 +68,7 @@ app.add_middleware(PayloadAuditMiddleware)
 
 app.include_router(auth.router)
 app.include_router(patient_profile.router)
+app.include_router(medications.router)
 app.include_router(documents.router)
 app.include_router(features.router)
 app.include_router(user_settings.router)
