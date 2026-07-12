@@ -135,8 +135,8 @@ def generate_summary(extracted_text: str) -> SummaryResult:
         err = str(e).lower()
         if "model_decommissioned" in err or "decommissioned" in err:
             message = (
-                "The configured AI model is no longer supported by Groq. "
-                "Set GROQ_MODEL=llama-3.1-8b-instant in your .env and restart the server."
+                f"The configured AI model ({settings.groq_model}) is no longer supported by Groq. "
+                "Update GROQ_MODEL in your .env to a supported model and restart the server."
             )
         else:
             message = (

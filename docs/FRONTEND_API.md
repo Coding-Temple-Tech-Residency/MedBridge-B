@@ -392,6 +392,8 @@ Medications are scoped to the authenticated user via JWT. `user_id` is never sen
 
 **Only `name` is required** on create and replace (POST/PUT). All other fields are optional.
 
+**Timestamps:** `created_at` and `updated_at` are ISO 8601 datetimes in UTC with a `Z` suffix (e.g. `2026-06-08T10:00:00Z`). The backend stores and returns all timestamps in UTC; clients should convert to the user's local timezone for display. `start_date` and `end_date` are date-only values (`YYYY-MM-DD`) with no time or timezone component.
+
 ### List Medications
 
 `GET /medications`

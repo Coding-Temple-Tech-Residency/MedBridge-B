@@ -10,9 +10,11 @@ Endpoints:
   DELETE /medications/{id}         — delete medication
 """
 
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from postgrest.exceptions import APIError
 
 from app.database import get_supabase
 from app.middleware.auth import get_current_user
@@ -23,17 +25,26 @@ from app.schemas.medications import (
 )
 
 router = APIRouter(prefix="/medications", tags=["Medications"])
+logger = logging.getLogger(__name__)
 
 
 def _get_owned_medication(supabase, medication_id: str, user_id: str) -> dict:
-    result = (
-        supabase.table("medications")
-        .select("*")
-        .eq("id", medication_id)
-        .eq("user_id", user_id)
-        .maybe_single()
-        .execute()
-    )
+    try:
+        result = (
+            supabase.table("medications")
+            .select("*")
+            .eq("id", medication_id)
+            .eq("user_id", user_id)
+            .maybe_single()
+            .execute()
+        )
+    except (APIError, Exception) as e:
+        logger.exception("Failed to retrieve medication from database: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve medication.",
+        ) from e
+
     if result is None or not result.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Medication not found.")
     return result.data
