@@ -1,21 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiHelper } from "./apiHelper"
-
-
-export interface UserSettingsResponse {
-    id: string;
-    user_id: string;
-    allow_trusted_contacts: boolean;
-    allow_mychart_integration: boolean;
-    enable_reminders: boolean;
-    updated_at: string;
-}
-
-export interface UpdateUserSettings {
-    allow_trusted_contacts: boolean | null;
-    allow_mychart_integration: boolean | null;
-    enable_reminders: boolean | null;
-}
+import type { UserSettingsResponse, UpdateUserSettings } from "../types/userSettings"
 
 
 
