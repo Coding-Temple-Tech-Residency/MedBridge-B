@@ -1,14 +1,8 @@
 
 import { useState, type ReactNode } from "react";
 import "../main.css";
-<<<<<<< HEAD
-import "./UploadDocs.css";
-import { UploadDocuments } from "../components/UploadDocument";
-import { DocumentSummaryPanel } from "../components/DocumentSummaryPanel";
-=======
 import { localPdfCache, UploadDocuments } from "../components/UploadDocument";
 import { DocumentContentPanel } from "../components/DocumentContentPanel";
->>>>>>> main
 import { useDocumentsDomain } from "../hooks/useDocumentsDomain";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
