@@ -18,30 +18,9 @@ from app.schemas.patient_profile import (
     PatientProfileResponse,
     PatientProfileUpdate,
 )
+from app.services.profile_service import get_profile_row, to_profile_response
 
 router = APIRouter(prefix="/patient-profile", tags=["Patient Profile"])
-
-
-def _to_response(row: dict, email: str) -> PatientProfileResponse:
-    return PatientProfileResponse(
-        user_id=row["user_id"],
-        email=email,
-        full_name=row.get("full_name"),
-        preferred_language=row.get("preferred_language", "en"),
-        explanation_level=row.get("explanation_level", "plain"),
-    )
-
-
-def _get_profile_row(supabase, user_id: str) -> dict | None:
-    result = (
-        supabase.table("user_profiles")
-        .select("*")
-        .eq("user_id", user_id)
-        .maybe_single()
-        .execute()
-    )
-    return result.data
-
 
 @router.post("", response_model=PatientProfileResponse, status_code=status.HTTP_201_CREATED)
 async def create_patient_profile(
@@ -56,7 +35,7 @@ async def create_patient_profile(
     already exists.
     """
     supabase = get_supabase()
-    existing = _get_profile_row(supabase, user["id"])
+    existing = get_profile_row(supabase, user["id"])
 
     row_data = {
         "full_name": payload.full_name,
@@ -70,7 +49,7 @@ async def create_patient_profile(
         result = supabase.table("user_profiles").insert(row_data).execute()
         if not result.data:
             raise HTTPException(status_code=500, detail="Failed to create patient profile.")
-        return _to_response(result.data[0], user["email"])
+        return to_profile_response(result.data[0], user["email"])
 
     if existing.get("full_name"):
         raise HTTPException(
@@ -86,17 +65,17 @@ async def create_patient_profile(
     )
     if not result.data:
         raise HTTPException(status_code=500, detail="Failed to create patient profile.")
-    return _to_response(result.data[0], user["email"])
+    return to_profile_response(result.data[0], user["email"])
 
 
 @router.get("", response_model=PatientProfileResponse)
 async def get_patient_profile(user: dict = Depends(get_current_user)):
     """Retrieve the authenticated user's health profile."""
     supabase = get_supabase()
-    row = _get_profile_row(supabase, user["id"])
+    row = get_profile_row(supabase, user["id"])
     if row is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient profile not found.")
-    return _to_response(row, user["email"])
+    return to_profile_response(row, user["email"])
 
 
 @router.patch("", response_model=PatientProfileResponse)
@@ -106,7 +85,7 @@ async def update_patient_profile(
 ):
     """Update the authenticated user's health profile."""
     supabase = get_supabase()
-    existing = _get_profile_row(supabase, user["id"])
+    existing = get_profile_row(supabase, user["id"])
     if existing is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient profile not found.")
 
@@ -124,4 +103,4 @@ async def update_patient_profile(
     )
     if not result.data:
         raise HTTPException(status_code=500, detail="Failed to update patient profile.")
-    return _to_response(result.data[0], user["email"])
+    return to_profile_response(result.data[0], user["email"])

@@ -10,6 +10,7 @@ Column mapping (existing Supabase schema → our code):
 """
 
 import logging
+import re
 import uuid
 from typing import Optional
 
@@ -35,6 +36,46 @@ MAGIC_BYTES: dict[bytes, str] = {
     b"\x89PNG":      "image/png",
     b"\xff\xd8\xff": "image/jpeg",
 }
+
+_MIME_DEFAULT_FILENAME: dict[str, str] = {
+    "application/pdf": "upload.pdf",
+    "text/plain": "upload.txt",
+    "image/png": "upload.png",
+    "image/jpeg": "upload.jpg",
+}
+
+_MIME_DEFAULT_EXTENSION: dict[str, str] = {
+    "application/pdf": "pdf",
+    "text/plain": "txt",
+    "image/png": "png",
+    "image/jpeg": "jpg",
+}
+
+
+def _sanitize_storage_segment(name: str) -> str:
+    """Remove characters that break Supabase storage object paths."""
+    base, dot, ext = name.rpartition(".")
+    if dot:
+        stem = re.sub(r"[^\w\-]+", "_", base).strip("_") or "upload"
+        return f"{stem}.{ext.lower()}"
+    return re.sub(r"[^\w\-]+", "_", name).strip("_") or "upload"
+
+
+def _display_filename(filename: str) -> str:
+    """Basename for UI display (preserve original name)."""
+    name = (filename or "").strip().replace("\\", "/").split("/")[-1]
+    return name or "upload"
+
+
+def _safe_storage_filename(filename: str, mime_type: str) -> str:
+    """Ensure storage path always has a non-empty, storage-safe object name."""
+    name = (filename or "").strip().replace("\\", "/").split("/")[-1]
+    if not name:
+        name = _MIME_DEFAULT_FILENAME.get(mime_type, "upload.bin")
+    elif "." not in name:
+        ext = _MIME_DEFAULT_EXTENSION.get(mime_type, "bin")
+        name = f"{name}.{ext}"
+    return _sanitize_storage_segment(name)
 
 
 # ── Internal helpers ──────────────────────────────────────────────────────────
@@ -117,7 +158,18 @@ def upload_document(
         return {"success": False, "error": error_msg}
 
     document_id = str(uuid.uuid4())
-    file_path = f"{user_id}/{document_id}/{filename}"
+    display_name = _display_filename(filename)
+    safe_name = _safe_storage_filename(filename, mime_type)
+    file_path = f"{user_id}/{document_id}/{safe_name}"
+
+    logger.info(
+        "Uploading to storage: display=%s storage=%s bytes=%d mime=%s path=%s",
+        display_name,
+        safe_name,
+        len(file_bytes),
+        mime_type,
+        file_path,
+    )
 
     # Store file
     try:
@@ -127,18 +179,23 @@ def upload_document(
             file_options={"content-type": mime_type},
         )
     except Exception as e:
-        logger.exception(f"Storage upload failed: {e}")
+        logger.exception(
+            "Storage upload failed for name=%s bytes=%d mime=%s: %s",
+            safe_name,
+            len(file_bytes),
+            mime_type,
+            e,
+        )
         return {"success": False, "error": "File storage failed. Please try again."}
 
-    # added to fix upload and relplace file_type mime_type to file_extension value in dictionary below. 
-    file_extension = filename.split(".")[-1].lower() if "." in filename else "unknown"
+    file_extension = safe_name.split(".")[-1].lower() if "." in safe_name else "unknown"
 
     # Create health_records row using ACTUAL column names
     try:
         supabase.table("health_records").insert({
             "id": document_id,
             "user_id": user_id,
-            "filename": filename,
+            "filename": display_name,
             "storage_path": file_path,
             "file_type": file_extension,
             "file_size_bytes": len(file_bytes),
@@ -231,10 +288,13 @@ def get_document(document_id: str, user_id: str) -> Optional[dict]:
         .maybe_single()
         .execute()
     )
-    return _normalize(result.data) if result else None
+    if result is None or not result.data:
+        return None
+    return _normalize(result.data)
 
 
 def get_documents(user_id: str) -> list[dict]:
+    """Return all documents for a user, ordered by created_at descending (newest first)."""
     supabase = get_supabase()
     result = (
         supabase.table("health_records")
@@ -244,6 +304,11 @@ def get_documents(user_id: str) -> list[dict]:
         .execute()
     )
     return [_normalize(row) for row in (result.data or [])]
+
+
+def get_recent_documents(user_id: str, limit: int = 5) -> list[dict]:
+    """Return up to `limit` documents, newest first."""
+    return get_documents(user_id)[:limit]
 
 
 def delete_document(document_id: str, user_id: str) -> bool:

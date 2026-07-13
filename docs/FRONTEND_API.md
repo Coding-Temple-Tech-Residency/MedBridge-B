@@ -15,21 +15,22 @@ Sprint 2 API contracts for frontend integration. Backend is the source of truth 
 3. [Health & App Config](#health--app-config)
 4. [Auth Endpoints](#auth-endpoints)
 5. [Patient Profile](#patient-profile)
-6. [Documents](#documents)
-7. [Document Status Flow](#document-status-flow)
-8. [Summaries](#summaries)
-9. [Chat](#chat)
-10. [Appointment Prep](#appointment-prep)
-11. [Dashboard](#dashboard)
-12. [Reminders](#reminders)
-13. [Trusted Contacts](#trusted-contacts)
-14. [Follow-ups](#follow-ups)
-15. [Providers](#providers)
-16. [Resources (Discover)](#resources-discover)
-17. [Health Scores](#health-scores)
-18. [User Settings (Feature Toggles)](#user-settings-feature-toggles)
-19. [Analytics](#analytics)
-20. [Contract Review Notes](#contract-review-notes)
+6. [Medications](#medications)
+7. [Documents](#documents)
+8. [Document Status Flow](#document-status-flow)
+9. [Summaries](#summaries)
+10. [Chat](#chat)
+11. [Appointment Prep](#appointment-prep)
+12. [Dashboard](#dashboard)
+13. [Reminders](#reminders)
+14. [Trusted Contacts](#trusted-contacts)
+15. [Follow-ups](#follow-ups)
+16. [Providers](#providers)
+17. [Resources (Discover)](#resources-discover)
+18. [Health Scores](#health-scores)
+19. [User Settings (Feature Toggles)](#user-settings-feature-toggles)
+20. [Analytics](#analytics)
+21. [Contract Review Notes](#contract-review-notes)
 
 ---
 
@@ -385,6 +386,222 @@ Completes a stub profile created at registration if one exists.
 
 ---
 
+## Medications
+
+Medications are scoped to the authenticated user via JWT. `user_id` is never sent in the request body — it is set server-side from the token. Medications are independent of uploaded documents.
+
+**Only `name` is required** on create and replace (POST/PUT). All other fields are optional.
+
+**Timestamps:** `created_at` and `updated_at` are ISO 8601 datetimes in UTC with a `Z` suffix (e.g. `2026-06-08T10:00:00Z`). The backend stores and returns all timestamps in UTC; clients should convert to the user's local timezone for display. `start_date` and `end_date` are date-only values (`YYYY-MM-DD`) with no time or timezone component.
+
+### List Medications
+
+`GET /medications`
+
+**Auth:** Bearer JWT
+
+**Query params (all optional):**
+
+| Param | Type | Notes |
+|---|---|---|
+| `status` | string | Filter by status: `active`, `stopped`, `on-hold`, `unknown` |
+| `is_active` | boolean | Shorthand filter: `true` → active, `false` → stopped. Ignored when `status` is also provided |
+
+**Success (200):**
+
+```json
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440020",
+    "user_id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Lisinopril",
+    "code": "314076",
+    "code_system": "RxNorm",
+    "dose": "10 mg",
+    "dosage": "10 mg",
+    "frequency": "once daily",
+    "route": "oral",
+    "status": "active",
+    "is_active": true,
+    "start_date": "2026-01-01",
+    "end_date": null,
+    "prescribing_provider": "Dr. Smith",
+    "reason": "Hypertension",
+    "notes": "Take with food",
+    "created_at": "2026-06-08T10:00:00Z",
+    "updated_at": "2026-06-08T10:00:00Z"
+  }
+]
+```
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 500 | `{"detail": "Failed to ..."}` | Database error |
+
+---
+
+### Get Medication
+
+`GET /medications/{medication_id}`
+
+**Auth:** Bearer JWT
+
+**Request body:** None
+
+**Success (200):** Same shape as a single item in the list response above.
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 404 | `{"detail": "Medication not found."}` | Not found or belongs to another user |
+| 500 | `{"detail": "Failed to ..."}` | Database error |
+
+---
+
+### Create Medication
+
+`POST /medications`
+
+**Auth:** Bearer JWT
+
+**Request body:**
+
+```json
+{
+  "name": "Lisinopril",
+  "code": "314076",
+  "code_system": "RxNorm",
+  "dosage": "10 mg",
+  "frequency": "once daily",
+  "route": "oral",
+  "status": "active",
+  "is_active": true,
+  "start_date": "2026-01-01",
+  "end_date": "2026-12-31",
+  "prescribing_provider": "Dr. Smith",
+  "reason": "Hypertension",
+  "notes": "Take with food"
+}
+```
+
+| Field | Required | Notes |
+|---|---|---|
+| `name` | Yes | Minimum 1 character |
+| `code` | No | RxNorm or other code |
+| `code_system` | No | |
+| `dose` / `dosage` | No | `dosage` is an alias for `dose` |
+| `frequency` | No | |
+| `route` | No | e.g. oral, topical |
+| `status` | No | `active` (default), `stopped`, `on-hold`, `unknown` |
+| `is_active` | No | Boolean shorthand; maps to `status` unless `status` is also sent |
+| `start_date` | No | ISO date (`YYYY-MM-DD`) |
+| `end_date` | No | ISO date; must be on or after `start_date` when both provided |
+| `prescribing_provider` | No | |
+| `reason` | No | |
+| `notes` | No | |
+
+Minimal valid body: `{"name": "Lisinopril"}`
+
+**Success (201):** `MedicationResponse` (same shape as list item).
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 422 | Validation detail array | Missing/invalid fields |
+| 500 | `{"detail": "Failed to create medication."}` | Database error |
+
+---
+
+### Replace Medication
+
+`PUT /medications/{medication_id}`
+
+**Auth:** Bearer JWT
+
+**Request body:** Same fields as create. Only `name` is required; omitted optional fields are cleared (set to `null` or defaults). `status` defaults to `active` when omitted.
+
+```json
+{
+  "name": "Lisinopril",
+  "dosage": "20 mg",
+  "frequency": "once daily",
+  "status": "active"
+}
+```
+
+**Success (200):** Updated `MedicationResponse`.
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 404 | `{"detail": "Medication not found."}` | Not found or belongs to another user |
+| 422 | Validation detail array | Invalid field values |
+| 500 | `{"detail": "Failed to update medication."}` | Database error |
+
+---
+
+### Update Medication (partial)
+
+`PATCH /medications/{medication_id}`
+
+**Auth:** Bearer JWT
+
+**Request body:** (all fields optional)
+
+```json
+{
+  "name": "Lisinopril",
+  "dose": "20 mg",
+  "frequency": "once daily",
+  "status": "stopped",
+  "is_active": false,
+  "notes": "Discontinued per provider"
+}
+```
+
+**Success (200):** Updated `MedicationResponse`.
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 400 | `{"detail": "No fields provided to update."}` | Empty PATCH body |
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 404 | `{"detail": "Medication not found."}` | Not found or belongs to another user |
+| 422 | Validation detail array | Invalid field values |
+| 500 | `{"detail": "Failed to update medication."}` | Database error |
+
+---
+
+### Delete Medication
+
+`DELETE /medications/{medication_id}`
+
+**Auth:** Bearer JWT
+
+**Request body:** None
+
+**Success (204):** No body.
+
+**Errors:**
+
+| Status | Body | When |
+|---|---|---|
+| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
+| 404 | `{"detail": "Medication not found."}` | Not found or belongs to another user |
+| 500 | `{"detail": "Failed to ..."}` | Database error |
+
+---
+
 ## Documents
 
 ### Upload
@@ -403,21 +620,23 @@ Completes a stub profile created at registration if one exists.
 
 ```json
 {
-  "document_id": "550e8400-e29b-41d4-a716-446655440001",
-  "status": "uploaded",
-  "message": "Document uploaded successfully. Processing has started."
+  "user": {
+    "user_id": "uuid",
+    "email": "patient@example.com",
+    "full_name": "Jane Doe",
+    "preferred_language": "en",
+    "explanation_level": "plain"
+  },
+  "profile_complete": true,
+  "documents": [],
+  "total_documents": 12,
+  "total_summaries": 8,
+  "total_questions_asked": 3
 }
 ```
 
-Processing is async — poll `GET /documents/{document_id}` until `status` is `"summarized"`.
-
-**Errors:**
-
-| Status | Body | When |
-|---|---|---|
-| 400 | `{"detail": "<validation message>"}` | Invalid file type or upload error |
-| 401 | `{"detail": "Invalid or expired token"}` | Missing or bad JWT |
-| 413 | `{"detail": "File exceeds maximum size..."}` | File too large |
+`documents` is a recent subset (maximum 5 items), while `total_documents` is
+the full count for the authenticated user.
 
 ---
 

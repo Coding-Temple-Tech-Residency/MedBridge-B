@@ -84,7 +84,25 @@ def test_other_user_cannot_delete_document(client: httpx.Client):
     doc_id = _upload_doc(client, token_a)
 
     resp = client.delete(f"/documents/{doc_id}", headers=auth_headers(token_b))
-    assert resp.status_code in (404, 403)
+    assert resp.status_code == 404
+    assert resp.json() == {"detail": "Document not found."}
 
     owner_resp = client.get(f"/documents/{doc_id}", headers=auth_headers(token_a))
+    assert owner_resp.status_code == 200
+
+
+def test_delete_nonexistent_matches_foreign_document_response(client: httpx.Client):
+    token_a = login(client, USER_A)
+    token_b = login(client, USER_B)
+    foreign_id = _upload_doc(client, token_a)
+    missing_id = "00000000-0000-0000-0000-000000000002"
+
+    foreign_resp = client.delete(f"/documents/{foreign_id}", headers=auth_headers(token_b))
+    missing_resp = client.delete(f"/documents/{missing_id}", headers=auth_headers(token_b))
+
+    assert foreign_resp.status_code == 404
+    assert missing_resp.status_code == 404
+    assert foreign_resp.json() == missing_resp.json()
+
+    owner_resp = client.get(f"/documents/{foreign_id}", headers=auth_headers(token_a))
     assert owner_resp.status_code == 200

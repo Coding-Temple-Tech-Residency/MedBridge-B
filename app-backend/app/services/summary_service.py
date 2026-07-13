@@ -132,13 +132,21 @@ def generate_summary(extracted_text: str) -> SummaryResult:
         return SummaryResult(text=full_text, tokens_used=tokens_used)
     except Exception as e:
         logger.exception(f"Summary generation failed: {e}")
+        err = str(e).lower()
+        if "model_decommissioned" in err or "decommissioned" in err:
+            message = (
+                f"The configured AI model ({settings.groq_model}) is no longer supported by Groq. "
+                "Update GROQ_MODEL in your .env to a supported model and restart the server."
+            )
+        else:
+            message = (
+                "We were unable to generate a summary at this time. "
+                "Please try again in a few moments."
+            )
         return SummaryResult(
             text="",
             success=False,
-            error_message=(
-                "We were unable to generate a summary at this time. "
-                "Please try again in a few moments."
-            ),
+            error_message=message,
         )
 
 

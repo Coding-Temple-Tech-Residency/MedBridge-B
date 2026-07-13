@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 from enum import Enum
+from app.schemas.patient_profile import PatientProfileResponse
 
 
 class DocumentStatus(str, Enum):
@@ -139,6 +140,8 @@ class KpiSatisfaction(BaseModel):
     negative: int = 0
 
 class DashboardResponse(BaseModel):
+    user: PatientProfileResponse
+    profile_complete: bool
     documents: list[DocumentResponse]
     total_documents: int
     total_summaries: int

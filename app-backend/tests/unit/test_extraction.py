@@ -13,6 +13,7 @@ from app.services.extraction_service import (
 from app.services.document_service import (
     detect_mime_type,
     validate_upload,
+    _safe_storage_filename,
 )
 
 
@@ -64,6 +65,33 @@ def test_valid_pdf_passes():
     is_valid, error, mime = validate_upload(pdf_bytes, "test.pdf")
     assert is_valid
     assert mime == "application/pdf"
+
+
+def test_valid_txt_passes():
+    is_valid, error, mime = validate_upload(b"Patient LDL 120 mg/dL\n", "lab_result.txt")
+    assert is_valid
+    assert mime == "text/plain"
+
+
+# ── Safe storage filename ─────────────────────────────────────────────────────
+
+def test_safe_storage_filename_empty_defaults_to_txt():
+    assert _safe_storage_filename("", "text/plain") == "upload.txt"
+
+
+def test_safe_storage_filename_strips_windows_path():
+    assert _safe_storage_filename(r"C:\Users\me\notes.txt", "text/plain") == "notes.txt"
+
+
+def test_safe_storage_filename_adds_extension_when_missing():
+    assert _safe_storage_filename("notes", "text/plain") == "notes.txt"
+
+
+def test_safe_storage_filename_sanitizes_special_chars():
+    assert (
+        _safe_storage_filename("## 1. Primary Care Visit Report.txt", "text/plain")
+        == "1_Primary_Care_Visit_Report.txt"
+    )
 
 
 # ── Text cleaning ─────────────────────────────────────────────────────────────

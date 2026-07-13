@@ -11,6 +11,7 @@ from app.schemas.documents import (
 from app.middleware.auth import get_current_user, get_current_user_sse
 # schemas imported above
 from app.services import document_service, chat_service
+from app.services.profile_service import get_profile_row, dashboard_user
 from app.database import get_supabase
 import logging
 import uuid
@@ -18,6 +19,7 @@ from datetime import datetime, timezone
 
 router = APIRouter(tags=["Documents"])
 logger = logging.getLogger(__name__)
+RECENT_DOCUMENTS_LIMIT = 5
 
 
 @router.post("/documents/upload", response_model=UploadResponse, status_code=201)
@@ -83,6 +85,12 @@ async def get_summary(document_id: str, user: dict = Depends(get_current_user)):
         current_status = doc.get("status", "unknown")
         if current_status in ("uploaded", "processing", "extracted"):
             raise HTTPException(status_code=202, detail=f"Summary still generating. Status: {current_status}")
+        if current_status == "failed":
+            detail = doc.get("error_message") or "Summary generation failed."
+            raise HTTPException(
+                status_code=502,
+                detail=f"{detail} Use POST /documents/{document_id}/summary to retry.",
+            )
         raise HTTPException(status_code=404, detail="Summary not found.")
 
     row = result.data
@@ -403,15 +411,24 @@ async def get_appointment_prep(document_id: str, user: dict = Depends(get_curren
 async def get_dashboard(user: dict = Depends(get_current_user)):
     supabase = get_supabase()
     uid = user["id"]
-    docs = document_service.get_documents(uid)
+    all_docs = document_service.get_documents(uid)
+    recent_docs = document_service.get_recent_documents(uid, RECENT_DOCUMENTS_LIMIT)
+    profile_row = get_profile_row(supabase, uid)
+    profile_complete = bool(profile_row and profile_row.get("full_name"))
+    user_profile = dashboard_user(profile_row, uid, user["email"])
 
     summary_count = (
         supabase.table("summaries").select("id", count="exact").eq("user_id", uid).execute()
     )
-    chat_count = (
-        supabase.table("chat_messages").select("id", count="exact")
-        .eq("user_id", uid).eq("role", "user").execute()
-    )
+    questions_asked = 0
+    try:
+        chat_count = (
+            supabase.table("chat_messages").select("id", count="exact")
+            .eq("user_id", uid).eq("role", "user").execute()
+        )
+        questions_asked = chat_count.count or 0
+    except Exception:
+        logger.warning("chat_messages query failed — non-fatal (MVP schema)")
 
     # ── KPI views (global — not filtered by user, admin-level analytics) ──
     reading_level_kpi = None
@@ -466,10 +483,12 @@ async def get_dashboard(user: dict = Depends(get_current_user)):
         logger.warning("kpi_processing_time query failed — non-fatal")
 
     return DashboardResponse(
-        documents=docs,
-        total_documents=len(docs),
+        user=user_profile,
+        profile_complete=profile_complete,
+        documents=recent_docs,
+        total_documents=len(all_docs),
         total_summaries=summary_count.count or 0,
-        total_questions_asked=chat_count.count or 0,
+        total_questions_asked=questions_asked,
         avg_seconds_to_summary=avg_seconds,
         reading_level=reading_level_kpi,
         quality=quality_kpi,
