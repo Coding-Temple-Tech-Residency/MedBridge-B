@@ -8,18 +8,20 @@ import "./NavBar.css";
 
 export const NavBar = (): ReactNode => {
   const { token } = useAuth();
-  const { openModal } = useModal();
   const logoutMutation = useLogout();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     logoutMutation.mutate();
-    setIsOpen(false); 
+    setIsOpen(false);
     navigate("/");
   };
 
-
+  const handleLogin = () => {
+    setIsOpen(false);
+    navigate("/signin");
+  };
 
   return (
     <nav className="navbar">

@@ -1,6 +1,6 @@
 .medical-history-page, .medical-history-container {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 25% 1fr;
   gap: 2rem;
   padding: 2rem;
   background: #F7FAFC; /* soft white background */
@@ -16,6 +16,7 @@
 
   .sidebar {
     order: 2;
+    min-width: 250px;
   }
 
   .main-content {
@@ -25,7 +26,6 @@
 
 /* LEFT SIDEBAR */
 .sidebar {
-  width: 30%;
   background: #E8F4FD; /* light blue */
   padding: 1.5rem;
   border-radius: 8px;
@@ -48,9 +48,6 @@
 }
 
 /* RIGHT MAIN CONTENT */
-.main-content {
-  width: 70%;
-}
 
 .main-title {
   margin-bottom: 0.5rem;

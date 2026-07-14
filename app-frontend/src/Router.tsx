@@ -7,12 +7,14 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Dashboard } from "./pages/Dashboard";
 import { MedicalHistory } from "./pages/MedicalHistory";
 import { UploadDocs } from "./pages/UploadDocs";
+import { AuthContainer } from "./components/AuthContainer";
 
 export const Router = () => {
   return (
     <Routes>
       {/* Public landing page */}
       <Route path="/" element={<App />} />
+      <Route path="/signin" element={<AuthContainer />} />
 
       {/* Protected app pages */}
       <Route
