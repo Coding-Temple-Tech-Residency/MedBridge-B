@@ -3,22 +3,19 @@ import type { LoginRequest, AuthResponse, RegisterRequest } from "../types/auth"
 import { useAuth } from "../context/AuthContext";
 import { apiHelper } from "./apiHelper";
 
-async function loginUser(credentials: LoginRequest): Promise<AuthResponse> {
 
-    return apiHelper({
-        url: "http://localhost:8000/auth/login",
-        method: "POST",
-        body: credentials
-    })
-}
 
 export function useLogin() {
     const { login } = useAuth();
 
     return useMutation({
-        mutationFn: (credentials: LoginRequest) => loginUser(credentials),
-
-
+        mutationFn: (credentials: LoginRequest) => {
+            return apiHelper({
+                url: "http://localhost:8000/auth/login",
+                method: "POST",
+                body: credentials
+            })
+        },
         onSuccess: (response: AuthResponse) => {
             if (response.access_token) {
                 login(response.access_token, response.email)
@@ -32,22 +29,19 @@ export function useLogin() {
     })
 }
 
-async function registerUser(credentials: RegisterRequest): Promise<AuthResponse> {
-
-    return apiHelper({
-        url: "http://localhost:8000/auth/register",
-        method: "POST",
-        body: credentials
-    })
-}
-
 
 
 export function useRegister() {
     const { login } = useAuth();
 
     return useMutation({
-        mutationFn: (credentials: RegisterRequest) => registerUser(credentials),
+        mutationFn: (credentials: RegisterRequest) => {
+            return apiHelper({
+                url: "http://localhost:8000/auth/register",
+                method: "POST",
+                body: credentials
+            })
+        },
 
         onSuccess: (response: AuthResponse) => {
             if (response.access_token) {
@@ -61,21 +55,19 @@ export function useRegister() {
 }
 
 
-export const logoutUser = (): Promise<null> => {
-    return apiHelper({
-        url: "http://localhost:8000/auth/logout",
-        method: "POST",
-        body: null
-
-    })
-}
-
 export function useLogout() {
     const { logout } = useAuth();
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: logoutUser,
+        mutationFn: () => {
+            return apiHelper({
+                url: "http://localhost:8000/auth/logout",
+                method: "POST",
+                body: null
+
+            })
+        },
 
         onSettled: () => {
             logout();

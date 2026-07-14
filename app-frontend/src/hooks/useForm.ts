@@ -4,8 +4,8 @@ import type { FormField } from "../types/form";
 
 
 // helper function to initalize a empty slate for form config fields. 
-const createInitialValues = (fields: FormField[]) =>
-    fields.reduce((acc, f) => ({ ...acc, [f.name]: "" }), {} as Record<string, string>);
+const createInitialValues = (fields: FormField[], initialData?: Record<string, string> ) =>
+    fields.reduce((acc, f) => ({ ...acc, [f.name]: initialData && f.name in initialData ? initialData[f.name] : "" }), {} as Record<string, string>);
 
 
 
@@ -17,9 +17,9 @@ const createInitialTouched = (fields: FormField[]) =>
 // Universal, configuration-driven state engine that dynamically tracks 
 // input values,user interactions and validation errors from any form
 // in the application without hardcoding specific fields. 
-export const useForm = (fieldList: FormField[]) => {
+export const useForm = (fieldList: FormField[], initialData?: Record<string, string>) => {
 
-    const [values, setValues] = useState(() => createInitialValues(fieldList))
+    const [values, setValues] = useState(() => createInitialValues(fieldList, initialData))
     const [touched, setTouched] = useState(() => createInitialTouched(fieldList))
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -45,7 +45,7 @@ export const useForm = (fieldList: FormField[]) => {
 
     //handler that resets all form field states. 
     const resetHandler = () => {
-        setValues(createInitialValues(fieldList))
+        setValues(createInitialValues(fieldList, initialData))
         setTouched(createInitialTouched(fieldList))
         setErrors({})
     }
