@@ -278,8 +278,26 @@ def _process_document(document_id: str, user_id: str, file_bytes: bytes, mime_ty
 
 # ── Read helpers ──────────────────────────────────────────────────────────────
 
+def _fetch_related_rows(
+    supabase,
+    table_name: str,
+    document_id: str,
+    user_id: str,
+) -> list[dict]:
+    """Return clinical rows belonging to this document and user."""
+    result = (
+        supabase.table(table_name)
+        .select("*")
+        .eq("health_record_id", document_id)
+        .eq("user_id", user_id)
+        .execute()
+    )
+    return result.data or []
+
+
 def get_document(document_id: str, user_id: str) -> Optional[dict]:
     supabase = get_supabase()
+
     result = (
         supabase.table("health_records")
         .select("*")
@@ -288,9 +306,32 @@ def get_document(document_id: str, user_id: str) -> Optional[dict]:
         .maybe_single()
         .execute()
     )
+
     if result is None or not result.data:
         return None
-    return _normalize(result.data)
+
+    document = _normalize(result.data)
+
+    document["conditions"] = _fetch_related_rows(
+        supabase, "conditions", document_id, user_id
+    )
+    document["medications"] = _fetch_related_rows(
+        supabase, "medications", document_id, user_id
+    )
+    document["lab_results"] = _fetch_related_rows(
+        supabase, "lab_results", document_id, user_id
+    )
+    document["encounters"] = _fetch_related_rows(
+        supabase, "encounters", document_id, user_id
+    )
+    document["follow_ups"] = _fetch_related_rows(
+        supabase, "follow_ups", document_id, user_id
+    )
+    document["allergies"] = _fetch_related_rows(
+        supabase, "allergies", document_id, user_id
+    )
+
+    return document
 
 
 def get_documents(user_id: str) -> list[dict]:

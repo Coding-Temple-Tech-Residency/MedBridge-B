@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import Optional
-from datetime import datetime
+from typing import Optional, Literal
+from datetime import date, datetime
 from enum import Enum
 from app.schemas.patient_profile import PatientProfileResponse
 
@@ -14,6 +14,59 @@ class DocumentStatus(str, Enum):
     FAILED = "failed"
 
 
+class ConditionResponse(BaseModel):
+    name: str
+    code: Optional[str] = None
+    code_system: Optional[str] = None
+    status: Optional[str] = None
+    onset_date: Optional[date] = None
+
+
+class MedicationClinicalResponse(BaseModel):
+    name: str
+    code: Optional[str] = None
+    code_system: Optional[str] = None
+    dose: Optional[str] = None
+    frequency: Optional[str] = None
+    status: Optional[str] = None
+
+
+class LabResultResponse(BaseModel):
+    name: str
+    code: Optional[str] = None
+    code_system: Optional[str] = None
+    value_quantity: Optional[float] = None
+    value_text: Optional[str] = None
+    unit: Optional[str] = None
+    reference_range_low: Optional[float] = None
+    reference_range_high: Optional[float] = None
+    reference_range_text: Optional[str] = None
+    flag: Optional[str] = None
+    observed_at: Optional[datetime] = None
+
+
+class EncounterResponse(BaseModel):
+    encounter_type: Optional[str] = None
+    description: Optional[str] = None
+    provider: Optional[str] = None
+    facility: Optional[str] = None
+    occurred_at: Optional[datetime] = None
+
+
+class FollowUpResponse(BaseModel):
+    what: str
+    when_text: Optional[str] = None
+    due_date: Optional[date] = None
+    completed: bool = False
+
+
+class AllergyResponse(BaseModel):
+    substance: str
+    reaction: Optional[str] = None
+    severity: Optional[str] = None
+    status: Optional[str] = None
+
+
 class DocumentResponse(BaseModel):
     document_id: str
     user_id: str
@@ -23,6 +76,12 @@ class DocumentResponse(BaseModel):
     status: DocumentStatus
     uploaded_at: datetime
     error_message: Optional[str] = None
+    conditions: list[ConditionResponse] = Field(default_factory=list)
+    medications: list[MedicationClinicalResponse] = Field(default_factory=list)
+    lab_results: list[LabResultResponse] = Field(default_factory=list)
+    encounters: list[EncounterResponse] = Field(default_factory=list)
+    follow_ups: list[FollowUpResponse] = Field(default_factory=list)
+    allergies: list[AllergyResponse] = Field(default_factory=list)
 
 
 class DocumentListResponse(BaseModel):
@@ -127,17 +186,20 @@ class KpiReadingLevel(BaseModel):
     at_or_below_grade_6: int = 0
     pct_on_target: Optional[float] = None
 
+
 class KpiQuality(BaseModel):
     total_summaries: int = 0
     passed: int = 0
     failed: int = 0
     pass_rate_pct: Optional[float] = None
 
+
 class KpiSatisfaction(BaseModel):
     rated_messages: int = 0
     avg_rating: Optional[float] = None
     positive: int = 0
     negative: int = 0
+
 
 class DashboardResponse(BaseModel):
     user: PatientProfileResponse
@@ -151,11 +213,12 @@ class DashboardResponse(BaseModel):
     quality: Optional[KpiQuality] = None
     satisfaction: Optional[KpiSatisfaction] = None
 
+
 # ── Digital Equity: Structured Error Envelope ────────────────────────────────
-from typing import Optional, Literal
 
 class ErrorEnvelope(BaseModel):
     """Standard error response returned by all MedBridge API endpoints."""
+
     success: Literal[False] = False
     error_code: str
     message: str
@@ -169,6 +232,7 @@ def groq_timeout_error() -> ErrorEnvelope:
         retry_after=5,
     )
 
+
 def groq_unavailable_error() -> ErrorEnvelope:
     return ErrorEnvelope(
         error_code="GROQ_UNAVAILABLE",
@@ -176,21 +240,29 @@ def groq_unavailable_error() -> ErrorEnvelope:
         retry_after=10,
     )
 
+
 def document_not_found_error() -> ErrorEnvelope:
     return ErrorEnvelope(
         error_code="DOC_NOT_FOUND",
         message="We could not find that document. It may have been removed.",
     )
 
+
 def extraction_failed_error() -> ErrorEnvelope:
     return ErrorEnvelope(
         error_code="EXTRACTION_FAILED",
-        message="We had trouble reading that file. Try uploading a clearer photo or a different file format.",
+        message=(
+            "We had trouble reading that file. "
+            "Try uploading a clearer photo or a different file format."
+        ),
     )
+
 
 def unauthorized_error() -> ErrorEnvelope:
     return ErrorEnvelope(
         error_code="UNAUTHORIZED",
         message="Your session has expired. Please sign in again.",
     )
+
+
 # ── End Digital Equity patch ─────────────────────────────────────────────────
