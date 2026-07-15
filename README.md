@@ -26,7 +26,9 @@ MedBridge helps patients understand their health records through AI-powered summ
 - **API documentation:** Run `cd app-backend && uvicorn app.main:app --reload` and open `http://localhost:8000/docs`, or see [docs/FRONTEND_API.md](docs/FRONTEND_API.md)
 - **Postman:** Import `app-backend/postman/MedBridge-API.postman_collection.json` and `app-backend/postman/MedBridge-Local.postman_environment.json`
 - **Migrations:** Run SQL files in `app-backend/migrations/` in order (001 through 008; note two files share the `006` prefix: `006_user_settings.sql` and `006_app_events.sql`) in the Supabase SQL Editor
-- **Deployment:** Render (free tier) — link TBD
+
+- ## Deployment
+This project is deployed on Vercel and Render (free tier) — link TBD. Pushes to `main` trigger production deployments.
 
 ## Project Structure
 
