@@ -1,22 +1,34 @@
-﻿from pydantic_settings import BaseSettings
-from pydantic import ConfigDict
-from pydantic_settings import BaseSettings
 from functools import lru_cache
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = ConfigDict(env_file=(".env", "../.env"), env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=(".env", "../.env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+        case_sensitive=False,
+    )
 
     supabase_url: str = ""
     supabase_anon_key: str = ""
     supabase_service_role_key: str = ""
     supabase_storage_bucket: str = "medical-documents"
+
     groq_api_key: str = ""
     groq_model: str = "llama-3.1-8b-instant"
+
     app_env: str = "development"
     secret_key: str = "dev-secret-key-change-in-production"
     max_file_size_mb: int = 10
-    allowed_origins: str = "http://localhost:3000, http://localhost:5173, http://localhost:8000"
+
+    allowed_origins: str = (
+        "http://localhost:3000,"
+        "http://localhost:5173,"
+        "http://localhost:8000"
+    )
+
     ocr_confidence_threshold: int = 60
     tesseract_cmd: str = "tesseract"
     chunk_size_tokens: int = 500
@@ -29,7 +41,11 @@ class Settings(BaseSettings):
 
     @property
     def origins_list(self) -> list[str]:
-        return [o.strip() for o in self.allowed_origins.split(",")]
+        return [
+            origin.strip()
+            for origin in self.allowed_origins.split(",")
+            if origin.strip()
+        ]
 
 
 @lru_cache

@@ -75,3 +75,127 @@
   border-radius: 8px;
   border: 1px solid #E8F4FD;
 }
+.lab-results-visualization {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.lab-results-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.lab-results-heading h2 {
+  margin: 0;
+}
+
+.lab-results-heading p {
+  margin: 6px 0 0;
+  color: #5f6b7a;
+}
+
+.lab-results-heading > span {
+  white-space: nowrap;
+  border-radius: 999px;
+  background: #eef4ff;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.lab-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.lab-trend-card {
+  border: 1px solid #dfe5ec;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.lab-trend-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.lab-trend-card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.lab-trend-card-header p {
+  margin: 5px 0 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.lab-latest-value {
+  text-align: right;
+}
+
+.lab-latest-value strong {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.lab-latest-value span {
+  display: block;
+  margin-top: 5px;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.lab-result-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0 10px;
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+
+.lab-chart {
+  width: 100%;
+  color: #2458a6;
+}
+
+.lab-single-result-state,
+.lab-results-empty {
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 24px;
+  background: #f8fafc;
+  color: #475569;
+}
+
+.lab-results-disclaimer {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .lab-results-heading,
+  .lab-trend-card-header {
+    flex-direction: column;
+  }
+
+  .lab-latest-value {
+    text-align: left;
+  }
+
+  .lab-results-grid {
+    grid-template-columns: 1fr;
+  }
+}
