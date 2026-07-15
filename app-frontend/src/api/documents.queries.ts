@@ -53,11 +53,14 @@ export const useGetDocument = (document_id: string) => {
                 })
         },
         enabled: !!document_id,
+        refetchOnWindowFocus:false,
         refetchInterval: (query) => {
             if (!document_id) return false;
             const docData = query.state.data;
-            const hasExtractedText = !!docData?.extracted_text || !!docData?.raw_text || (docData as any)?.content ;
-            return hasExtractedText ? false : 3000
+            const isFinished = 
+                docData?.status === "summarized" ||
+                docData?.status === "failed";
+            return isFinished ? false : 3000;
         }
     })
 }

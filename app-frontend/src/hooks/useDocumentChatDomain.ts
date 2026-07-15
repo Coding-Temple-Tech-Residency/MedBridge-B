@@ -1,9 +1,11 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useAskQuestion, useGetChatHistory, useRateMessage, useRateUnderstanding, useStreamChat } from "../api/chat.queries"
 
 
 
 
-export const useDocumentChatDomain = (document_id: string) => {
+export const useDocumentChatDomain = (document_id?: string) => {
+    const queryClient = useQueryClient();
 
     const {
         aiText,
@@ -91,7 +93,9 @@ export const useDocumentChatDomain = (document_id: string) => {
 
     return {
         data: {
-            history: chatHistoryData?.answer || [],
+            history: Array.isArray(chatHistoryData)
+                ? chatHistoryData
+                : (chatHistoryData as any)?.message || [], 
             rawChatResponse: chatHistoryData,
             streamingAiText: aiText,
         },
@@ -110,8 +114,14 @@ export const useDocumentChatDomain = (document_id: string) => {
         },
 
         actions: {
-            askQuestion: (body: any) => askQuestion({ document_id, body }),
-            startAiStream: (message: string) => streamTrigger(document_id, message),
+            askQuestion: (body: any) => {
+                if(document_id) askQuestion({ document_id, body });
+            },
+            startAiStream: (message: string) => {
+                if(document_id) streamTrigger(document_id, message, () => {
+                    queryClient.invalidateQueries({ queryKey: ["chat", document_id]})
+                })
+                },
             cancelAiStream: stopStream,
             submitMessageRating: (message_id: string, body: any) => rateMessage({ message_id, body }),
             submitUnderstandingScore: (summary_id: string, body: any) => rateUnderstanding({ summary_id, body }),

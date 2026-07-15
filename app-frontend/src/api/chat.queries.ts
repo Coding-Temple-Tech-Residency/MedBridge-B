@@ -14,7 +14,7 @@ export const useStreamChat = () => {
     const eventSourceRef = useRef<EventSource | null>(null)
 
 
-    const streamTrigger = (document_id: string, message: string) => {
+    const streamTrigger = (document_id: string, message: string, onComplete?: () => void) => {
         if (eventSourceRef.current) {
             eventSourceRef.current.close();
         }
@@ -31,9 +31,17 @@ export const useStreamChat = () => {
         eventSource.onmessage = (event) => {
             if (event.data === "[DONE]") {
                 stopStream();
+                if(onComplete) onComplete();
                 return;
             }
-            setAiText((prev) => prev + event.data);
+            try {
+                const parsed = JSON.parse(event.data);
+                const textChunk = parsed.token || parsed.text || parsed.chunk || "";
+
+                setAiText((prev) => prev + textChunk)
+            } catch (error) {
+                setAiText((prev) => prev + event.data);
+            }
         }
 
         eventSource.onerror = (error) => {
@@ -47,6 +55,7 @@ export const useStreamChat = () => {
             eventSource.close();
             eventSourceRef.current = null;
             setAiActive(false);
+            if(onComplete) onComplete();
 
 
         }
@@ -105,10 +114,11 @@ export const useRateMessage = () => {
 }
 
 
-export const useGetChatHistory = (document_id: string) => {
+export const useGetChatHistory = (document_id?: string) => {
     return useQuery<ChatResponse>({
         queryKey: ["chat", document_id],
         queryFn: () => {
+            if(!document_id) throw new Error("Document ID is required.");
             return apiHelper({
                 url: `http://localhost:8000/documents/${document_id}/chat`,
                 method: "GET",

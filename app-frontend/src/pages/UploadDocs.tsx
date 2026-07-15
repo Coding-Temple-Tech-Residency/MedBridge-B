@@ -4,6 +4,7 @@ import { localPdfCache, UploadDocuments } from "../components/UploadDocument";
 import { DocumentContentPanel } from "../components/DocumentContentPanel";
 import { useDocumentsDomain } from "../hooks/useDocumentsDomain";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { ChatbotWidget } from "../components/ChatbotWidget";
 
 export const UploadDocs = (): ReactNode => {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(
@@ -210,6 +211,9 @@ export const UploadDocs = (): ReactNode => {
             )}
           </div>
         )}
+      </div>
+      <div className="chat-widget-container">
+        <ChatbotWidget document_id={selectedDocumentId ?? undefined} />
       </div>
     </div>
   );
