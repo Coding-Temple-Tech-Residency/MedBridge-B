@@ -83,8 +83,13 @@ export const ChatboxUI = ({
 
                     </div>
                 )}
-                {history.map((round) => (
-                    <ChatRoundRow key={round.message_id} chatRound={round} />
+              {history.map((message: any) => (
+                    <div 
+                        key={message.id || message.created_at} 
+                        className={`chat-bubble ${message.role === 'user' ? 'chat-question' : 'chat-answer'}`}
+                    >
+                        {message.content}
+                    </div>
                 ))}
 
                 {isStreaming && streamingText && (

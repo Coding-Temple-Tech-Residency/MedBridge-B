@@ -5,12 +5,15 @@ import { useLogout } from "../api/auth.queries";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import "./NavBar.css";
+import { useModal } from "../context/ModalContext";
+import { AuthContainer } from "./AuthContainer";
 
 export const NavBar = (): ReactNode => {
   const { token } = useAuth();
   const logoutMutation = useLogout();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { openModal } = useModal()
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -20,7 +23,7 @@ export const NavBar = (): ReactNode => {
 
   const handleLogin = () => {
     setIsOpen(false);
-    navigate("/signin");
+   openModal(<AuthContainer />);
   };
 
 
