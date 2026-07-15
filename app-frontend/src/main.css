@@ -23,7 +23,8 @@ html, body {
 
 .app-header {
   text-align: center;
-  margin-bottom: 32px;
+  padding-top: 2rem;
+  margin-bottom: 1px;
   max-width: 500px;
   display: flex;
   flex-direction: column;
@@ -31,6 +32,7 @@ html, body {
 }
 
 .app-title {
+  padding-top: 5rem;
   font-size: 28px;
   color: #1B3A5C; /* deep navy */
   margin: 0 0 12px 0;
