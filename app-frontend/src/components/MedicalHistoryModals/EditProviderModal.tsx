@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useProvidersDomain } from "../../hooks/useProviderDomain";
 import "./Modal.css";
+import "../../main.css";
 
 interface ProviderModalProps {
   isOpen: boolean;
@@ -27,14 +28,6 @@ export default function ProviderModal({
   const [specialty, setSpecialty] = useState(provider?.specialty || "");
   const [phone, setPhone] = useState(provider?.phone || "");
   const [email, setEmail] = useState(provider?.email || "");
-
-  // ❗ Hooks must be above any conditional return
-  useEffect(() => {
-    // Close modal only after a successful mutation
-    if (isOpen && !flags.isUpdating && !flags.hasError) {
-      onClose();
-    }
-  }, [flags.isUpdating, flags.hasError, isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -117,7 +110,7 @@ export default function ProviderModal({
           )}
         </form>
 
-        <button className="modal-close" onClick={onClose}>
+        <button className="modal-cancel" onClick={onClose}>
           Close
         </button>
       </div>

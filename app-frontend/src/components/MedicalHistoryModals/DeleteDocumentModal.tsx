@@ -1,5 +1,7 @@
 // src/components/MedicalHistoryModals/DeleteDocumentModal.tsx
 import type { ReactNode } from "react";
+import "./Modal.css";
+import "../../main.css";
 
 interface DeleteDocumentModalProps {
   documentName: string;

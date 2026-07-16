@@ -45,6 +45,7 @@
   margin-bottom: 0.5rem;
   font-size: 1rem;
   color: #2D7DD2; /* blue section headers */
+  overflow: visible;
 }
 
 /* RIGHT MAIN CONTENT */
@@ -89,4 +90,29 @@
   background: #F7FAFC;
   border-radius: 8px;
   border: 1px solid #E8F4FD;
+}
+/* Ensure rows show the edit link */
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 6px 0;
+  gap: 8px;
+}
+
+/* Make the text take available space */
+.list-row span {
+  flex: 1;
+}
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #1B3A5C;
 }

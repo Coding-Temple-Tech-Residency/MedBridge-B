@@ -3,6 +3,8 @@ import type {
   TrustedContactResponse,
   ProviderResponse,
 } from "../types/features";
+import "./MedicalHistoryModals/Modal.css";
+import "../main.css";
 
 export interface UserSettings {
   allow_trusted_contacts: boolean;
@@ -17,8 +19,8 @@ interface ProfileSidebarProps {
   settings?: UserSettings;
 
   onEditProfile: () => void;
-  onEditContact: (contact: TrustedContactResponse) => void;
-  onEditProvider: (provider: ProviderResponse) => void;
+  onEditContact: (contact: TrustedContactResponse | null) => void;
+  onEditProvider: (provider: ProviderResponse | null) => void;
   onEditSettings: () => void;
 }
 
@@ -38,10 +40,12 @@ export default function ProfileSidebar({
 
       {/* USER INFO */}
       <div className="sidebar-section">
-        <h2>User Information</h2>
-        <button className="edit-button" onClick={onEditProfile}>
-          Edit Profile
-        </button>
+        <div className="sidebar-header">
+          <h2>User Information</h2>
+          <button className="edit-button" onClick={onEditProfile}>
+            edit
+          </button>
+        </div>
 
         <p>
           Name: {profile?.full_name ?? "Unknown"} <br />
@@ -53,16 +57,19 @@ export default function ProfileSidebar({
 
       {/* TRUSTED CONTACTS */}
       <div className="sidebar-section">
-        <h2>Trusted Contacts</h2>
+        <div className="sidebar-header">
+          <h2>Trusted Contacts</h2>
+          <button className="edit-button" onClick={() => onEditContact(null)}>
+            edit
+          </button>
+        </div>
+
         {contacts.length ? (
           contacts.map((c) => (
             <div key={c.id} className="list-row">
               <span>
                 {c.contact_name} ({c.contact_email}) — {c.access_level}
               </span>
-              <button className="edit-button" onClick={() => onEditContact(c)}>
-                Edit
-              </button>
             </div>
           ))
         ) : (
@@ -72,15 +79,20 @@ export default function ProfileSidebar({
 
       {/* PROVIDERS */}
       <div className="sidebar-section">
-        <h2>Medical Contacts</h2>
+        <div className="sidebar-header">
+          <h2>Medical Contacts</h2>
+          <button className="edit-button" onClick={() => onEditProvider(null)}>
+            edit
+          </button>
+        </div>
         {providers.length ? (
           providers.map((p) => (
             <div key={p.id} className="list-row">
               <span>
                 {p.specialty ?? "General"}: {p.name}
               </span>
-              <button className="edit-button" onClick={() => onEditProvider(p)}>
-                Edit
+              <button className="edit-button" onClick={() => onEditProvider(null)}>
+                edit
               </button>
             </div>
           ))
@@ -91,10 +103,12 @@ export default function ProfileSidebar({
 
       {/* SETTINGS */}
       <div className="sidebar-section">
-        <h2>General Settings</h2>
-        <button className="edit-button" onClick={onEditSettings}>
-          Edit Settings
-        </button>
+        <div className="sidebar-header">
+          <h2>General Settings</h2>
+          <button className="edit-button" onClick={onEditSettings}>
+            edit
+          </button>
+        </div>
 
         <p>
           Notifications: {settings?.enable_reminders ? "Yes" : "No"} <br />

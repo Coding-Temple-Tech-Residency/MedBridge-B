@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM node:22-alpine 
-=======
 FROM node:22-alpine
->>>>>>> main
 FROM node:22-alpine
 
 WORKDIR /app-frontend

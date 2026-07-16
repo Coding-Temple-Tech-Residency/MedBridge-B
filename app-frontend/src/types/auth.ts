@@ -28,6 +28,13 @@ export interface UserProfile {
     explanation_level: string;
 }
 
+export interface UserProfileUpdate {
+  full_name?: string;
+  email?: string;
+  preferred_language?: string;
+  explanation_level?: string;
+}
+
 export interface AuthContextInterface {
     isLoading?: boolean;
     token: string | null;

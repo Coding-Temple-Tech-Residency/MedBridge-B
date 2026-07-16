@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useMedicationDomain } from "../../hooks/useMedicationDomain";
 import "./Modal.css";
+import "../../main.css";
 
 interface MedicationModalProps {
   isOpen: boolean;

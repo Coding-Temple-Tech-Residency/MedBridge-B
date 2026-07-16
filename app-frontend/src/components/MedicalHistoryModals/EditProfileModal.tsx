@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { useUserProfileDomain } from "../../hooks/useUserProfileDomain";
+import "./Modal.css";
+import "../../main.css";
 
 interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  profile: {
-    user_id: string;
-    full_name: string;
-    email: string;
-    preferred_language: string;
-    explanation_level: string;
+  profile?: {
+    full_name?: string;
+    email?: string;
+    preferred_language?: string;
+    explanation_level?: string;
   };
 }
 
@@ -18,16 +19,16 @@ export default function EditProfileModal({
   onClose,
   profile,
 }: EditProfileModalProps) {
+  // ✔ No user_id argument — backend extracts user from JWT
+  const { actions, flags } = useUserProfileDomain();
 
-  const { actions, flags } = useUserProfileDomain(profile.user_id);
-
-  const [fullName, setFullName] = useState(profile.full_name || "");
-  const [email, setEmail] = useState(profile.email || "");
+  const [fullName, setFullName] = useState(profile?.full_name ?? "");
+  const [email, setEmail] = useState(profile?.email ?? "");
   const [preferredLanguage, setPreferredLanguage] = useState(
-    profile.preferred_language || "",
+    profile?.preferred_language ?? "English",
   );
   const [explanationLevel, setExplanationLevel] = useState(
-    profile.explanation_level || "",
+    profile?.explanation_level ?? "simple",
   );
 
   if (!isOpen) return null;
@@ -40,11 +41,8 @@ export default function EditProfileModal({
         full_name: fullName,
         email,
         preferred_language: preferredLanguage,
-        explanation_level: explanationLevel === "detailed" ? 1 : 0,
-      },
-      {
-        onSuccess: () => onClose(),
-      },
+        explanation_level: explanationLevel,
+      }
     );
   };
 
@@ -93,8 +91,7 @@ export default function EditProfileModal({
               value={explanationLevel}
               onChange={(e) => setExplanationLevel(e.target.value)}
             >
-              <option value="simple">Simple</option>
-              <option value="standard">Standard</option>
+              <option value="simple">Plain</option>
               <option value="detailed">Detailed</option>
             </select>
           </label>
@@ -108,7 +105,7 @@ export default function EditProfileModal({
           )}
         </form>
 
-        <button className="modal-close" onClick={onClose}>
+        <button className="modal-cancel" onClick={onClose}>
           Close
         </button>
       </div>

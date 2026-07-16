@@ -29,16 +29,15 @@ import type { DocumentResponse } from "../types/documents";
 import type { MedicationResponse } from "../types/medication";
 
 export const MedicalHistory = () => {
-  const user_id = "demo-user-id";
 
   // DOMAIN HOOKS
-  const { data: profileDomain } = useUserProfileDomain(user_id);
+  const { data: profileDomain } = useUserProfileDomain();
   const { data: documentsDomain, actions: documentActions } =
     useDocumentsDomain();
-  const { data: medicationsDomain } = useMedicationDomain(user_id);
+  const { data: medicationsDomain } = useMedicationDomain();
   const { data: contactsDomain } = useTrustedContactsDomain();
   const { data: providersDomain } = useProvidersDomain();
-  const { data: settingsDomain } = useUserSettingsDomain(user_id);
+  const { data: settingsDomain } = useUserSettingsDomain();
 
   // DATA
   const profile = profileDomain?.profile;
@@ -87,8 +86,8 @@ export const MedicalHistory = () => {
           setEditingContact(c);
           setShowContactModal(true);
         }}
-        onEditProvider={(p) => {
-          setEditingProvider(p);
+        onEditProvider={() => {
+          setEditingProvider(null);
           setShowProviderModal(true);
         }}
         onEditSettings={() => setShowSettingsModal(true)}
@@ -198,7 +197,6 @@ export const MedicalHistory = () => {
         <UserSettingsModal
           isOpen={showSettingsModal}
           onClose={() => setShowSettingsModal(false)}
-          user_id={user_id}
           settings={settings}
         />
       )}

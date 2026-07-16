@@ -1,54 +1,58 @@
-import { useGetUserProfile, useUpdateUserProfile } from "../api/user-profile.queries";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiHelper } from "../api/apiHelper";
+import type { UserProfile, UserProfileUpdate } from "../types/auth";
 
-export const useUserProfileDomain = (user_id: string) => {
+export const useUserProfileDomain = () => {
+  const queryClient = useQueryClient();
+
+  // 1️⃣ Load profile (backend extracts user_id from JWT)
   const {
     data: profileData,
-    isPending: isLoadingProfile,
-    isError:isProfileError,
+    isPending: isProfilePending,
+    isError: isProfileError,
     error: profileError,
-  } = useGetUserProfile(user_id);
+  } = useQuery<UserProfile>({
+    queryKey: ["user-profile"],
+    queryFn: () =>
+      apiHelper({
+        url: "http://localhost:8000/user/profile",
+        method: "GET",
+      }),
+  });
 
-  const isProfileEmpty =
-    !isLoadingProfile &&
-    !isProfileError &&
-    (!profileData || Object.keys(profileData).length === 0);
-
-  // UPDATE PROFILE
+  // 2️⃣ Update profile (PATCH /user/profile)
   const {
-    mutate: updateProfile,
-    isPending: isUpdating,
+    mutate: updateProfileMutation,
+    isPending: isUpdatePending,
     isError: isUpdateError,
     error: updateError,
-  } = useUpdateUserProfile(user_id);
-
-  // COMBINED ERROR FLAGS
-  const hasError = isProfileError || isUpdateError;
-  const errorMessage =
-    profileError?.message ||
-    updateError?.message ||
-    "Failed to load or update user profile information.";
+  } = useMutation<UserProfile, Error, UserProfileUpdate>({
+    mutationFn: (body) =>
+      apiHelper({
+        url: "http://localhost:8000/user/profile",
+        method: "PATCH",
+        body,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+    },
+  });
 
   return {
     data: {
-      profile: profileData || {},
-      rawResponse: profileData,
+      profile: profileData,
     },
     flags: {
-      isLoadingProfile,
-      isUpdating,
-      hasError,
-      errorMessage,
-      isProfileEmpty,
+      isPending: isProfilePending,
+      hasError: isProfileError || isUpdateError,
+      errorMessage:
+        profileError?.message ||
+        updateError?.message ||
+        "An unexpected error occurred while loading your profile.",
+      isUpdating: isUpdatePending,
     },
     actions: {
-      updateProfile,
-      },
-    viewConfigs: {
-      profileSection: {
-        title: "User Profile",
-        description: "Your personal account details.",
-        icon: "👤",
-      },
+      updateProfile: (body: UserProfileUpdate) => updateProfileMutation(body),
     },
   };
 };

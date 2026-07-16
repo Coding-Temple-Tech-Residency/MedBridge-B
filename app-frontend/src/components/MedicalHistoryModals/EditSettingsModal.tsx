@@ -1,12 +1,12 @@
 // src/components/MedicalHistoryModals/EditSettingsModal.tsx
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useUserSettingsDomain } from "../../hooks/useUserSettingsDomain";
 import "./Modal.css";
+import "../../main.css";
 
 interface UserSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user_id: string;
   settings?: {
     allow_trusted_contacts: boolean;
     allow_mychart_integration: boolean;
@@ -17,10 +17,9 @@ interface UserSettingsModalProps {
 export default function UserSettingsModal({
   isOpen,
   onClose,
-  user_id,
   settings,
 }: UserSettingsModalProps) {
-  const { actions, flags } = useUserSettingsDomain(user_id);
+  const { actions, flags } = useUserSettingsDomain();
 
   const [allowTrustedContacts, setAllowTrustedContacts] = useState(
     settings?.allow_trusted_contacts ?? false,
@@ -31,12 +30,6 @@ export default function UserSettingsModal({
   const [enableReminders, setEnableReminders] = useState(
     settings?.enable_reminders ?? false,
   );
-
-  useEffect(() => {
-    if (isOpen && !flags.isUpdating && !flags.hasError) {
-      onClose();
-    }
-  }, [flags.isUpdating, flags.hasError, isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -92,7 +85,7 @@ export default function UserSettingsModal({
           )}
         </form>
 
-        <button className="modal-close" onClick={onClose}>
+        <button className="modal-cancel" onClick={onClose}>
           Close
         </button>
       </div>

@@ -1,7 +1,8 @@
 // src/components/MedicalHistoryModals/EditContactModal.tsx
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTrustedContactsDomain } from "../../hooks/useTrustedContactsDomain";
 import "./Modal.css";
+import "../../main.css";
 
 interface TrustedContactModalProps {
   isOpen: boolean;
@@ -28,13 +29,6 @@ export default function TrustedContactModal({
   const [accessLevel, setAccessLevel] = useState(
     contact?.access_level?.toString() || "0",
   );
-
-  // Close modal after successful mutation
-  useEffect(() => {
-    if (isOpen && !flags.isUpdating && !flags.hasError) {
-      onClose();
-    }
-  }, [flags.isUpdating, flags.hasError, isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -106,7 +100,7 @@ export default function TrustedContactModal({
           )}
         </form>
 
-        <button className="modal-close" onClick={onClose}>
+        <button className="modal-cancel" onClick={onClose}>
           Close
         </button>
       </div>

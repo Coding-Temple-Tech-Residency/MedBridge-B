@@ -6,27 +6,26 @@ import {
 
 const emptySettings: UserSettingsResponse = {
   id: "",
-  user_id: "",
   allow_trusted_contacts: false,
   allow_mychart_integration: false,
   enable_reminders: false,
   updated_at: "",
 };
 
-export const useUserSettingsDomain = (user_id: string) => {
+export const useUserSettingsDomain = () => {
   const {
     data: settingsData,
     isPending: fetchPending,
     isError: isFetchError,
     error: fetchError,
-  } = useGetUserSettings(user_id);
+  } = useGetUserSettings();
 
   const {
     mutate: updateMutation,
     isPending: updatePending,
     isError: isUpdateError,
     error: updateError,
-  } = useUpdateUserSettings(user_id);
+  } = useUpdateUserSettings();
 
   const isPending = fetchPending;
 
