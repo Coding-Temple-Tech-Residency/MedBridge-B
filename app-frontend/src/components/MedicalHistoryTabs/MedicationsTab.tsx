@@ -20,7 +20,7 @@ export default function MedicationsTab({
         <h2>Medication History</h2>
 
         <button className="add-meds-button" onClick={onAddMedication}>
-          + Add Medication
+          <span className="pill-icon">💊</span> Add Medication
         </button>
       </div>
 
