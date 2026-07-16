@@ -90,6 +90,7 @@
   background: #F7FAFC;
   border-radius: 8px;
   border: 1px solid #E8F4FD;
+  overflow: visible;
 }
 /* Ensure rows show the edit link */
 .list-row {
@@ -103,6 +104,8 @@
 /* Make the text take available space */
 .list-row span {
   flex: 1;
+  min-width: 0;
+  white-space: normal;
 }
 .sidebar-header {
   display: flex;
@@ -116,3 +119,4 @@
   font-size: 18px;
   color: #1B3A5C;
 }
+

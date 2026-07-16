@@ -20,6 +20,7 @@ import ProviderModal from "../components/MedicalHistoryModals/EditProviderModal"
 import UserSettingsModal from "../components/MedicalHistoryModals/EditSettingsModal";
 import { DeleteDocumentModal } from "../components/MedicalHistoryModals/DeleteDocumentModal";
 import MedicationModal from "../components/MedicalHistoryModals/EditMedicationModal";
+import AddMedicationModal from "../components/MedicalHistoryModals/AddMedicationModal";
 
 import type {
   ProviderResponse,
@@ -66,9 +67,21 @@ export const MedicalHistory = () => {
   const [editingDocument, setEditingDocument] =
     useState<DocumentResponse | null>(null);
 
-  const [showMedicationModal, setShowMedicationModal] = useState(false);
+const [showAddModal, setShowAddModal] = useState(false);
+const [showEditModal, setShowEditModal] = useState(false);
   const [editingMedication, setEditingMedication] =
     useState<MedicationResponse | null>(null);
+
+const handleAddMedication = () => {
+  setShowAddModal(true);
+};
+
+const handleEditMedication = (med: MedicationResponse | null) => {
+  if (!med) return; // safety
+  setEditingMedication(med);
+  setShowEditModal(true);
+};
+
 
   const [activeTab, setActiveTab] = useState<
     "documents" | "charts" | "medications"
@@ -138,10 +151,8 @@ export const MedicalHistory = () => {
             <MedicationsTab
               current={currentMedications}
               past={pastMedications}
-              onEditMedication={(med) => {
-                setEditingMedication(med);
-                setShowMedicationModal(true);
-              }}
+              onEditMedication={handleEditMedication}
+              onAddMedication={handleAddMedication}
             />
           )}
         </div>
@@ -213,23 +224,26 @@ export const MedicalHistory = () => {
         />
       )}
 
-      {showMedicationModal && (
+      {showAddModal && (
+        <AddMedicationModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+        />
+      )}
+
+      {showEditModal && editingMedication && (
         <MedicationModal
-          isOpen={showMedicationModal}
-          onClose={() => setShowMedicationModal(false)}
-          mode={editingMedication ? "edit" : "add"}
-          medication={
-            editingMedication
-              ? {
-                  med_id: editingMedication.id,
-                  name: editingMedication.name,
-                  dosage: editingMedication.dosage ?? "",
-                  frequency: editingMedication.frequency ?? "",
-                  start_date: editingMedication.start_date ?? "",
-                  is_active: editingMedication.is_active,
-                }
-              : undefined
-          }
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          mode="edit"
+          medication={{
+            med_id: editingMedication.id,
+            name: editingMedication.name,
+            dosage: editingMedication.dosage ?? "",
+            frequency: editingMedication.frequency ?? "",
+            start_date: editingMedication.start_date ?? "",
+            is_active: editingMedication.is_active,
+          }}
         />
       )}
     </div>

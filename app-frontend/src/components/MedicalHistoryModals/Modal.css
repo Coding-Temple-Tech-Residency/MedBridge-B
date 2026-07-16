@@ -179,6 +179,7 @@ button:disabled {
   cursor: pointer;
   text-decoration: none;
   transition: color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .edit-button:hover {
@@ -199,3 +200,41 @@ button:disabled {
   font-size: 12px;
   margin-left: 4px;
 }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0 6px;
+}
+.add-meds-button {
+  background: linear-gradient(135deg, #2A7DE1, #3ABFBF);
+  color: #ffffff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(27, 58, 92, 0.25);
+  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+  white-space: nowrap;
+}
+
+.add-meds-button:hover {
+  background: linear-gradient(135deg, #1F6BC4, #2D7DD2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(27, 58, 92, 0.28);
+}
+
+.add-meds-button:active {
+  transform: translateY(0px);
+  box-shadow: 0 3px 8px rgba(27, 58, 92, 0.25);
+}
+
+.add-meds-button:disabled {
+  background: #9bbce0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+
