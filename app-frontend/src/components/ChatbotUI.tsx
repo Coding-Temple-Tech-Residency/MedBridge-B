@@ -1,6 +1,5 @@
 import type { ChatResponse } from "../types/documents";
-
-
+import "./ChatbotUI.css"
 
 
 export interface FloatingTriggerProp {
@@ -13,6 +12,7 @@ export const FloatingTrigger = ({ onClick }: FloatingTriggerProp) => {
         <button
             onClick={onClick}
             aria-label="Open Chat"
+            className="floating-trigger-button"
         >
             💬
         </button>
@@ -119,3 +119,5 @@ export const ChatboxUI = ({
         </div>
     )
 }
+
+

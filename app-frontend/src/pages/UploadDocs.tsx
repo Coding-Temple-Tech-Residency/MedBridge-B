@@ -1,18 +1,20 @@
-import { useState, type ReactNode } from "react";
-import "../main.css";
-import { localPdfCache, UploadDocuments } from "../components/UploadDocument";
-import { DocumentContentPanel } from "../components/DocumentContentPanel";
-import { useDocumentsDomain } from "../hooks/useDocumentsDomain";
-import { LoadingSpinner } from "../components/LoadingSpinner";
+import  {  useState, type ReactNode } from "react";
 import { ChatbotWidget } from "../components/ChatbotWidget";
+import { DocumentContentPanel } from "../components/DocumentContentPanel";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { localPdfCache, UploadDocuments } from "../components/UploadDocument";
+import { useModal } from "../context/ModalContext";
+import { useDocumentsDomain } from "../hooks/useDocumentsDomain";
+import "./UploadDocs.css";
+
 
 export const UploadDocs = (): ReactNode => {
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(
-    null,
-  );
-  const [rightPanelTab, setRightPanelTab] = useState<"summary" | "pdf">(
-    "summary",
-  );
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [rightPanelTab, setRightPanelTab] = useState<"summary" | "pdf">("summary");
+  
+  // Connect to your global modal controller
+  const { openModal } = useModal();
+
   const { data, flags, actions, viewConfigs } = useDocumentsDomain(
     selectedDocumentId || undefined,
   );
@@ -22,11 +24,21 @@ export const UploadDocs = (): ReactNode => {
     setRightPanelTab("summary");
   };
 
+  const handleDocumentExport = () => {
+    openModal(
+      <div>
+        <h3>Export Document Package</h3>
+        <p>Document ID: {selectedDocumentId}</p>
+      </div>
+    );
+  };
+
   const activeFileName = data.activeDocument?.file_name;
   const documentFileUrl = activeFileName ? localPdfCache[activeFileName] : null;
 
   return (
-    <div className="grid-container">
+    <div className="upload-docs-container">
+      {/* LEFT: Upload / document list */}
       <div className="upload-side-column">
         <UploadDocuments
           selectedDocumentId={selectedDocumentId}
@@ -34,62 +46,35 @@ export const UploadDocs = (): ReactNode => {
         />
       </div>
 
-      <div className="summary-side-column">
+      {/* RIGHT: Summary/PDF viewer + chat, stacked together */}
+      <div className="display-side-column">
         {!selectedDocumentId ? (
-          <div
-            style={{
-              border: "1px dashed #e2e8f0",
-              padding: "40px",
-              textAlign: "center",
-              borderRadius: "12px",
-            }}
-          >
+          <div className="empty-workspace-state">
             <h3>No Document is Active</h3>
-            <p style={{ color: "#718096" }}>
-              Upload a brand new File or select an existing one from your vault.
-            </p>
+            <p>Upload a brand new File or select an existing one from your vault.</p>
           </div>
         ) : (
-          <div
-            className="active-workspace-wrapper"
-            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-          >
-            <div
-              className="tab-navigation"
-              style={{ display: "flex", gap: "8px" }}
-            >
+          <div className="active-workspace-wrapper">
+            <div className="tab-navigation">
               <button
                 onClick={() => setRightPanelTab("summary")}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  border: "1px solid #e2e8f0",
-                  backgroundColor:
-                    rightPanelTab === "summary" ? "#3182ce" : "#ffffff",
-                  color: rightPanelTab === "summary" ? "#ffffff" : "#2d3748",
-                  fontWeight: "600",
-                  transition: "all 0.2s",
-                }}
+                className={`tab-button ${rightPanelTab === "summary" ? "active" : ""}`}
               >
                 AI Summary
               </button>
               <button
                 onClick={() => setRightPanelTab("pdf")}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  border: "1px solid #e2e8f0",
-                  backgroundColor:
-                    rightPanelTab === "pdf" ? "#3182ce" : "#ffffff",
-                  color: rightPanelTab === "pdf" ? "#ffffff" : "#2d3748",
-                  fontWeight: "600",
-                  transition: "all 0.2s",
-                }}
+                className={`tab-button ${rightPanelTab === "pdf" ? "active" : ""}`}
               >
                 Original PDF
               </button>
+
+              <button 
+                className="export-button"
+                onClick={handleDocumentExport}
+              >
+                Export Summary & Document
+              </button> 
             </div>
 
             {rightPanelTab === "summary" ? (
@@ -105,102 +90,30 @@ export const UploadDocs = (): ReactNode => {
                 onRegenerate={actions.reconstructSummary}
               />
             ) : (
-              <div
-                className="pdf-viewer-container"
-                style={{
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "12px",
-                  padding: "16px",
-                  backgroundColor: "#ffffff",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
-                  height: "600px",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <div
-                  style={{
-                    borderBottom: "1px solid #e2e8f0",
-                    paddingBottom: "12px",
-                    marginBottom: "12px",
-                  }}
-                >
-                  <h2
-                    style={{
-                      margin: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      fontSize: "1.5rem",
-                    }}
-                  >
+              <div className="pdf-viewer-container">
+                <div className="pdf-viewer-header">
+                  <h2>
                     <span>📄</span>
                     Source Document Archive
                   </h2>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      color: "#718096",
-                      fontSize: "0.85rem",
-                    }}
-                  >
-                    Reviewing the original secure file transmission.
-                  </p>
+                  <p>Reviewing the original secure file transmission.</p>
                 </div>
 
                 {flags.isDocumentLoading ? (
-                  <div
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
+                  <div className="pdf-loading-container">
                     <LoadingSpinner />
                   </div>
                 ) : documentFileUrl ? (
                   <iframe
                     src={documentFileUrl}
                     title="Uploaded Document Preview"
-                    width="100%"
-                    height="100%"
-                    style={{
-                      border: "none",
-                      borderRadius: "6px",
-                      backgroundColor: "#f7fafc",
-                    }}
+                    className="pdf-iframe"
                   />
                 ) : (
-                  <div
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      color: "#4a5568",
-                      textAlign: "center",
-                      backgroundColor: "#f7fafc",
-                      borderRadius: "8px",
-                      padding: "24px",
-                    }}
-                  >
-                    <span style={{ fontSize: "2.2rem", marginBottom: "8px" }}>
-                      🔒
-                    </span>
-                    <h4 style={{ margin: "0 0 4px 0", color: "#2d3748" }}>
-                      Historical Medical Record Restricted
-                    </h4>
-                    <p
-                      style={{
-                        maxWidth: "340px",
-                        fontSize: "0.85rem",
-                        color: "#718096",
-                        margin: 0,
-                        lineHeight: "1.4",
-                      }}
-                    >
+                  <div className="pdf-restricted-container">
+                    <span className="restricted-icon">🔒</span>
+                    <h4>Historical Medical Record Restricted</h4>
+                    <p>
                       To strictly protect patient data privacy and ensure PHI
                       security standards, older files can only be accessed via
                       the authorized medical summary extraction.
@@ -211,9 +124,11 @@ export const UploadDocs = (): ReactNode => {
             )}
           </div>
         )}
-      </div>
-      <div className="chat-widget-container">
-        <ChatbotWidget document_id={selectedDocumentId ?? undefined} />
+
+        {/* Chat now lives inside the right column, so it stacks below the viewer */}
+        <div className="chat-widget-container">
+          <ChatbotWidget document_id={selectedDocumentId ?? undefined} />
+        </div>
       </div>
     </div>
   );

@@ -54,7 +54,7 @@ export const apiHelper = async ({ url, method, body, tokenOverride, params }: ap
             headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const parsedUrl = new URL(url);
+        const parsedUrl = new URL(url, window.location.origin);
         if(params){
             Object.entries(params).forEach(([key, value]) => {
                 if(value !== undefined && value !== null){

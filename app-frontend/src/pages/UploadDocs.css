@@ -1,30 +1,172 @@
-/* src/pages/UploadDocs.css */
-
+/* Parent Grid layout - Strictly 2 Columns */
 .upload-docs-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
   padding: 24px;
-
-  /* Center the entire grid on the page */
   max-width: 1400px;
   margin: 0 auto;
-
-  /* Center items within each column */
-  align-items: center;
-  justify-items: center;
+  align-items: start; /* Aligns both columns perfectly to the top */
 }
 
-/* Left column */
+/* Left Pillar: Document Uploading & List */
 .upload-side-column {
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
 }
 
-/* Right column */
-.summary-side-column {
+/* Right Pillar: Comprehensive Workspace Display */
+.display-side-column {
   width: 100%;
   display: flex;
+  flex-direction: column;
+  gap: 24px; /* Space between the document viewer and the chat widget */
+}
+
+/* Empty Workspace State */
+.empty-workspace-state {
+  border: 1px dashed #e2e8f0;
+  padding: 40px;
+  text-align: center;
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+.empty-workspace-state p {
+  color: #718096;
+}
+
+/* Workspace Wrapper & Navigation */
+.active-workspace-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #2d3748;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.tab-button.active {
+  background-color: #3182ce;
+  color: #ffffff;
+}
+
+.export-button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background-color: #edf2f7;
+  color: #2d3748;
+  font-weight: 600;
+  transition: all 0.2s;
+  margin-left: auto; /* Aligns button to the far right */
+}
+
+.export-button:hover {
+  background-color: #e2e8f0;
+}
+
+/* PDF Viewer Shell */
+.pdf-viewer-container {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-viewer-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.pdf-viewer-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+}
+
+.pdf-viewer-header p {
+  margin: 4px 0 0 0;
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.pdf-loading-container {
+  flex: 1;
+  display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.pdf-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 6px;
+  background-color: #f7fafc;
+}
+
+/* PHI Privacy / Restricted State */
+.pdf-restricted-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #4a5568;
+  text-align: center;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.pdf-restricted-container .restricted-icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.pdf-restricted-container h4 {
+  margin: 0 0 4px 0;
+  color: #2d3748;
+}
+
+.pdf-restricted-container p {
+  max-width: 340px;
+  font-size: 0.85rem;
+  color: #718096;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Chat Component Wrapper */
+.chat-widget-container {
+   position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
 }
