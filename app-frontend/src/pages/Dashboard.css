@@ -1,9 +1,9 @@
 /* PAGE CONTAINER */
 .dashboard-page-container {
   width: 90vw;
-  height: 100vh;
+  height: 90vh;
   margin: 0;
-  padding: 34px;
+  padding: 24px !important;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -27,23 +27,29 @@
 .dashboard-calendar-wrapper {
   flex: 1;
   min-height: 0;
-  width: 100%;
+  width: 100% !important;
+  box-sizing: border-box;
 }
 
 /* NOTES TEXTAREA */
-.dashboard-notes {
-  width: 100%;
-  border: 1px solid #2D7DD2; /* blue */
+textarea.dashboard-notes {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 120px;
+  flex-shrink: 0;
+  margin-left: 19px;
+
+  border: 1px solid #2D7DD2 !important; /* blue */
   border-radius: 8px;
-  padding: 24px;
-  margin: 0;
+  padding: 16px;
   box-sizing: border-box;
   resize: none;
-  overflow: scroll;
-  background-color: #E8F4FD; /* light blue */
+  overflow: auto;
+  background-color: #ffffff;
   color: #1B3A5C;
   font-family: 'Didact Gothic', system-ui, -apple-system, sans-serif;
   font-size: 14px;
+  z-index: 20000;
 }
 
 .dashboard-notes::placeholder {
