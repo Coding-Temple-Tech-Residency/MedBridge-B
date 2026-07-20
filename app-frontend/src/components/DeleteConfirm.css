@@ -1,0 +1,60 @@
+.delete-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  max-width: 360px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.delete-container p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  color: #1f2937;
+  line-height: 1.4;
+}
+
+.delete-button,
+.cancel-button {
+  width: 100%;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.delete-button {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.delete-button:hover {
+  background-color: #b91c1c;
+}
+
+.delete-button:active {
+  transform: scale(0.98);
+}
+
+.cancel-button {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.cancel-button:hover {
+  background-color: #e5e7eb;
+}
+
+.cancel-button:active {
+  transform: scale(0.98);
+}

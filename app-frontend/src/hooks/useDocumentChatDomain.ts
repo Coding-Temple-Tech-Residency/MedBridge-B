@@ -107,7 +107,7 @@ export const useDocumentChatDomain = (document_id?: string) => {
             isChatHistoryEmpty,
             isAiStreaming,
             isSendingQuestion:askPending,
-            isRatingMessage: ratePending ? ratingMessageId: null,
+            isRatingMessage: ratePending && ratingMessageId ? ratingMessageId.message_id : null,
             IsRatingUnderstanding: understandingPending ? ratingSummaryId : null,
 
             isActionInFlight: askPending || ratePending || understandingPending,

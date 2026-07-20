@@ -128,6 +128,7 @@ export const UploadDocuments = ({ selectedDocumentId, onSelectDocument }: Upload
                                         <DeleteConfirm
                                             id={doc.document_id}
                                             type="document"
+                                            name={doc.file_name}
                                             onCancel={() => setDeleteId(null)}
                                             onDeleteConfirm={(id) => {
                                                 actions.deleteFile(id)

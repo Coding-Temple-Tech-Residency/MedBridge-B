@@ -1,4 +1,4 @@
-import  {  useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { ChatbotWidget } from "../components/ChatbotWidget";
 import { DocumentContentPanel } from "../components/DocumentContentPanel";
 import { LoadingSpinner } from "../components/LoadingSpinner";
@@ -6,14 +6,15 @@ import { localPdfCache, UploadDocuments } from "../components/UploadDocument";
 import { useModal } from "../context/ModalContext";
 import { useDocumentsDomain } from "../hooks/useDocumentsDomain";
 import "./UploadDocs.css";
+import { ExportDocument } from "../components/ExportDocument";
 
 
 export const UploadDocs = (): ReactNode => {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [rightPanelTab, setRightPanelTab] = useState<"summary" | "pdf">("summary");
-  
-  // Connect to your global modal controller
-  const { openModal } = useModal();
+
+
+  const { openModal, closeModal } = useModal();
 
   const { data, flags, actions, viewConfigs } = useDocumentsDomain(
     selectedDocumentId || undefined,
@@ -25,13 +26,23 @@ export const UploadDocs = (): ReactNode => {
   };
 
   const handleDocumentExport = () => {
+    if (!selectedDocumentId) return;
+
     openModal(
-      <div>
-        <h3>Export Document Package</h3>
-        <p>Document ID: {selectedDocumentId}</p>
-      </div>
-    );
-  };
+      <ExportDocument
+        id={selectedDocumentId}
+        document_name={activeFileName || "Unnamed Document"}
+        ai_summary={data.activeSummary?.summary_text || ""}
+        document_file_url={documentFileUrl || ""} 
+        onClose={closeModal}
+        onSubmit={(payload) => {
+          console.log("Transmission Payload Compiled:", payload)
+          closeModal()
+        }}
+      />)
+  }
+
+
 
   const activeFileName = data.activeDocument?.file_name;
   const documentFileUrl = activeFileName ? localPdfCache[activeFileName] : null;
@@ -69,12 +80,12 @@ export const UploadDocs = (): ReactNode => {
                 Original PDF
               </button>
 
-              <button 
+              <button
                 className="export-button"
                 onClick={handleDocumentExport}
               >
                 Export Summary & Document
-              </button> 
+              </button>
             </div>
 
             {rightPanelTab === "summary" ? (

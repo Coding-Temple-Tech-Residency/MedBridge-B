@@ -46,6 +46,8 @@ export const ChatbotWidget = ({document_id}: ChatbotWidgetProp) => {
             inputText={inputText}
             isStreaming={flags.isAiStreaming}
             streamingText={data.streamingAiText}
+            ratingMessageId={flags.isRatingMessage}
+            response_rating={actions.submitMessageRating}
             onInputChange={handleInputChange}
             onSubmit={handleChatSubmit}
             onClose={toggleOpen}
