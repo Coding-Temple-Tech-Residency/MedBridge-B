@@ -184,10 +184,11 @@ def print_schema_analysis(resource: dict):
         if val is not None:
             if key in sensitive_fields:
                 val_str = "[REDACTED]"
+            elif isinstance(val, dict):
+                val_str = f"[OBJECT keys={len(val)}]"
             else:
-                val_str = json.dumps(val, indent=None)
-            if len(val_str) > 80:
-                val_str = val_str[:77] + "..."
+                val_str = f"[VALUE type={type(val).__name__}]"
+             
             print(f"    {key}: {val_str}")
 
     if rt in SCHEMA_MAPPING:

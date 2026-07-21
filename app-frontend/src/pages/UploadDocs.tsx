@@ -11,8 +11,10 @@ import { ExportDocument } from "../components/ExportDocument";
 
 
 
-const getSafeDocumentUrl = (url: string | null | undefined): string | null => {
-  if (!url) return null;
+const getSafeDocumentUrl = (url: string | null | undefined, expectedFileName: string | null | undefined,):string | null => {
+  if (!url || !expectedFileName) return null;
+  const expectedUrl = localPdfCache[expectedFileName];
+  if(!expectedUrl || expectedUrl !== url) return null;
   try {
     const parsed = new URL(url, window.location.origin);
     return parsed.protocol === "blob:" ? url : null;
@@ -59,7 +61,7 @@ export const UploadDocs = (): ReactNode => {
 
   const activeFileName = data.activeDocument?.file_name;
   const rawDocumentFileUrl = activeFileName ? localPdfCache[activeFileName] : null;
-  const documentFileUrl = getSafeDocumentUrl(rawDocumentFileUrl);
+  const documentFileUrl = getSafeDocumentUrl(rawDocumentFileUrl, activeFileName);
 
   return (
     <div className="upload-docs-container">
