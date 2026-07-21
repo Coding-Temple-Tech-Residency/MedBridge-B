@@ -442,7 +442,7 @@ def map_fhir_to_db(user_id: str, resources: list,
         patient_id = fhir_conn["fhir_patient_id"]
 
         patient_name = get_patient_name(base_url, patient_id, access_token)
-        print(f"\nPatient: {patient_name} (FHIR id: {patient_id})")
+        print("\nPatient context loaded.")
         print(f"Base URL: {base_url}")
         print(f"Resources to pull: {', '.join(resources)}\n")
 

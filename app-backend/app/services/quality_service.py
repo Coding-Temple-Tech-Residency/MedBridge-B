@@ -134,7 +134,7 @@ def check_summary_quality(summary_text: str) -> QualityResult:
 
     passed = len(issues) == 0
     if not passed:
-        logger.warning(f"Summary quality issues ({len(issues)}): {issues}")
+        logger.warning("Summary quality check failed with %d issue(s).", len(issues))
 
     return QualityResult(passed=passed, reading_level=grade, issues=issues)
 

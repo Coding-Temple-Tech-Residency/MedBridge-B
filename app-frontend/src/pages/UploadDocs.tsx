@@ -9,6 +9,19 @@ import "./UploadDocs.css";
 import { ExportDocument } from "../components/ExportDocument";
 
 
+
+
+const getSafeDocumentUrl = (url: string | null | undefined): string | null => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url, window.location.origin);
+    return parsed.protocol === "blob:" ? url : null;
+  } catch {
+    return null;
+  }
+};
+
+
 export const UploadDocs = (): ReactNode => {
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [rightPanelTab, setRightPanelTab] = useState<"summary" | "pdf">("summary");
@@ -45,7 +58,8 @@ export const UploadDocs = (): ReactNode => {
 
 
   const activeFileName = data.activeDocument?.file_name;
-  const documentFileUrl = activeFileName ? localPdfCache[activeFileName] : null;
+  const rawDocumentFileUrl = activeFileName ? localPdfCache[activeFileName] : null;
+  const documentFileUrl = getSafeDocumentUrl(rawDocumentFileUrl);
 
   return (
     <div className="upload-docs-container">

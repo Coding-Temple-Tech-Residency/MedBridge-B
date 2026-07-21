@@ -179,9 +179,13 @@ def print_schema_analysis(resource: dict):
     print(f"{'='*60}")
 
     print("\n  Raw fields (key data):")
+    sensitive_fields = {"birthDate", "gender"}
     for key, val in summary["fields"].items():
         if val is not None:
-            val_str = json.dumps(val, indent=None)
+            if key in sensitive_fields:
+                val_str = "[REDACTED]"
+            else:
+                val_str = json.dumps(val, indent=None)
             if len(val_str) > 80:
                 val_str = val_str[:77] + "..."
             print(f"    {key}: {val_str}")
@@ -254,8 +258,9 @@ def inspect_fhir_live(user_id: str, resources: list):
     access_token = refresh_token_if_needed(conn, fhir_conn)
     base_url = fhir_conn["fhir_base_url"]
     patient_id = fhir_conn["fhir_patient_id"]
+    patient_id_masked = (f"...{patient_id[-4:]}"
+    if isinstance(patient_id, str) and len(patient_id) >= 4 else "[redacted]")
 
-    print(f"\nEpic FHIR Sandbox — patient: {patient_id}")
     print(f"Base URL: {base_url}")
 
     for rt in resources:
