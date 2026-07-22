@@ -10,8 +10,7 @@ export const Dashboard = (): ReactNode => {
       <div>
         <h1 className="dashboard-header-title">Dashboard</h1>
         <p className="dashboard-header-description">
-          Welcome to your dashboard. This is where high‑level summaries and
-          quick actions will eventually live.
+          Welcome to your dashboard.
         </p>
       </div>
 

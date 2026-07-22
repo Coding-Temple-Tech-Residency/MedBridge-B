@@ -3,8 +3,7 @@ export default function ChartsTab() {
     <div>
       <h2>Medical Charts</h2>
       <p>
-        Charts are not yet available. This feature will be enabled once the
-        chart endpoints are ready.
+        Feature under development. This section will eventually display various medical charts and visualizations related to the patient's health history.
       </p>
     </div>
   );
