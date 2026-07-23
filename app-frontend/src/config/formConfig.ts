@@ -64,6 +64,63 @@ export const FORM_CONFIG: Record<string, FormField[]> = {
             required: false,
         },
     ],
+    
+    medication: [
+        {
+            name: "name",
+            type: "text",
+            label: "Medication Name",
+            required: true,
+        },
+        {
+            name: "dosage",
+            type: "text",
+            label: "Dosage (e.g., 500mg)",
+            required: false,
+        },
+        {
+            name: "frequency",
+            type: "text",
+            label: "Frequency (e.g., Once daily, Every 8 hours)",
+            required: false,
+        },
+        {
+            name: "route",
+            type: "text",
+            label: "Route (e.g., Oral, Topical)",
+            required: false,
+        },
+        {
+            name: "start_date",
+            type: "date",
+            label: "Start Date",
+            required: true,
+        },
+        {
+            name: "end_date",
+            type: "date",
+            label: "End Date",
+            required: false,
+        },
+        {
+            name: "prescribing_provider",
+            type: "text",
+            label: "Prescribing Provider",
+            required: false,
+        },
+        {
+            name: "reason",
+            type: "text",
+            label: "Reason / Condition",
+            required: false,
+        },
+        {
+            name: "notes",
+            type: "textarea",
+            label: "Instructions / Notes",
+            required: false,
+        },
+    ],
 
 
 }
