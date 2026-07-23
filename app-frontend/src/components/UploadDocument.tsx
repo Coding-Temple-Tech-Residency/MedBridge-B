@@ -1,11 +1,11 @@
 import { useModal } from "../context/ModalContext";
 import { useDocumentsDomain } from "../hooks/useDocumentsDomain"
-import { useMedicationDomain } from "../hooks/useMedicationDomain";
 import { DeleteConfirm } from "./DeleteConfirm";
 import { ErrorState } from "./ErrorState";
 import { FormFactory } from "./FormFactory";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { useRef, useState } from "react";
+import "./UploadDocument.css";
 
 
 interface UploadDocumentsProps {
@@ -15,12 +15,10 @@ interface UploadDocumentsProps {
 export const localPdfCache: Record<string, string> = {};
 
 export const UploadDocuments = ({ selectedDocumentId, onSelectDocument }: UploadDocumentsProps) => {
+
     const { data: documents, actions, flags, viewConfigs } = useDocumentsDomain(selectedDocumentId || undefined, onSelectDocument);
-    const { data: medication, actions: medicationActions, flags: medicationFlags } = useMedicationDomain();
     const { openModal, closeModal } = useModal();
-
     const fileInputRef = useRef<HTMLInputElement>(null);
-
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
     if (flags.isPending) return <LoadingSpinner />;
@@ -42,33 +40,45 @@ export const UploadDocuments = ({ selectedDocumentId, onSelectDocument }: Upload
             const uploadResult = await actions.uploadFile(formData);
             if (uploadResult?.is_prescription) {
 
-                const extracted = uploadResult.extracted_data || {};
+                const extracted: Record<string, any> = uploadResult.pending_medications?.[0] || uploadResult.extracted_data || {};
 
                 const initialData = {
                     name: extracted.name || selectedFile.name.replace(/\.[^/.]+$/, ""),
-                    dosage: extracted.dosage || "",
+                    dosage: extracted.dosage || extracted.dose || "",
                     frequency: extracted.frequency || "",
                     route: extracted.route || "",
                     start_date: extracted.start_date || new Date().toISOString().split("T")[0],
                     end_date: extracted.end_date || extracted.start_date || new Date().toISOString().split("T")[0],
                     prescribing_provider: extracted.prescribing_provider || "",
-                    reason: extracted.reason || "",
-                    notes: extracted.instructions || extracted.notes || "",
+                    reason: extracted.reason || "Not specified",
+                    notes: extracted.notes || (extracted as any).instructions || "",
                 };
+
+                const handleDismiss = () => {
+                    actions.dismissPrescription(uploadResult.document_id);
+                    closeModal();
+                }
 
                 openModal(
                     <div className="calendar-modal-content">
                         <h3 className="calendar-modal-title">Prescription Detected</h3>
+                        <button
+                            type="button"
+                            onClick={handleDismiss}
+                            title="Dismiss prescription"
+                        >
+                            ✕
+                        </button>
                         <p>Review the extracted details before adding to your medication schedule.</p>
 
                         <FormFactory
                             config="medication"
                             initialData={initialData}
-                            isPending={medicationFlags.isActionInFlight}
+                            isLoading={flags.isConfirmingPrescription}
                             activeError={null}
                             submitLabel="Confirm & Add Medication"
-                            onSubmit={(values) => {
-                                medicationActions.addMedication({
+                            onSubmit={async (values) => {
+                                await actions.confirmPrescription(uploadResult.document_id, [{
                                     name: values.name,
                                     dosage: values.dosage,
                                     frequency: values.frequency,
@@ -76,10 +86,11 @@ export const UploadDocuments = ({ selectedDocumentId, onSelectDocument }: Upload
                                     start_date: values.start_date,
                                     end_date: values.end_date || values.start_date,
                                     prescribing_provider: values.prescribing_provider,
-                                    reason: values.reason,
+                                    reason: values.reason?.trim() || "Not specified",
                                     notes: values.notes || "",
                                     is_active: true,
-                                });
+                                },
+                                ]);
                                 closeModal();
                             }}
                         />

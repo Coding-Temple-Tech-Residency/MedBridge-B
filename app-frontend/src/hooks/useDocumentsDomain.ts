@@ -1,8 +1,11 @@
 import { useRef, useEffect } from "react";
-import { useDashboard, useDeleteDocument, useGenerateAppointmentPrep, useGetDocument, useGetSummary, useListDocuments, useRegenerateSummary, useUploadDocument } from "../api/documents.queries";
+import { useConfirmPrescription, useDashboard, useDeleteDocument, useDismissPrescription, useGenerateAppointmentPrep, useGetDocument, useGetSummary, useListDocuments, useRegenerateSummary, useUploadDocument } from "../api/documents.queries";
+import type { ConfirmPrescriptionMedicationsRequest } from "../types/medication";
 
-
-export const useDocumentsDomain = (document_id?: string, onUploadComplete?: (document_id: string) => void) => {
+export const useDocumentsDomain = (
+    document_id?: string,
+    onUploadComplete?: (document_id: string) => void
+) => {
     const {
         data: documentListData,
         isPending: listPending,
@@ -17,8 +20,9 @@ export const useDocumentsDomain = (document_id?: string, onUploadComplete?: (doc
         error: dashboardError
     } = useDashboard();
 
+   
     const {
-        mutate: uploadDocument,
+        mutateAsync: uploadDocumentAsync,
         isPending: uploadPending,
         isError: isUploadError,
         error: uploadError
@@ -60,8 +64,22 @@ export const useDocumentsDomain = (document_id?: string, onUploadComplete?: (doc
         error: prepError
     } = useGenerateAppointmentPrep();
 
-    const triggeredDocuments = useRef<Record<string, boolean>>({});
+  
+    const {
+        mutateAsync: confirmPrescriptionAsync,
+        isPending: confirmPending,
+        isError: isConfirmError,
+        error: confirmError
+    } = useConfirmPrescription();
 
+    const {
+        mutateAsync: dismissPrescriptionAsync,
+        isPending: dismissPending,
+        isError: isDismissError,
+        error: dismissError
+    } = useDismissPrescription();
+
+    const triggeredDocuments = useRef<Record<string, boolean>>({});
 
     const hasRawText = !!(
         documentDetailData?.extracted_text ||
@@ -79,7 +97,6 @@ export const useDocumentsDomain = (document_id?: string, onUploadComplete?: (doc
         }
     }, [hasRawText, document_id, regenerateSummary]);
 
-
     const isBackendExtractingText = !!document_id && !hasRawText;
     const isBackendBuildingSummary = !!document_id && !summaryData?.summary_text;
 
@@ -88,12 +105,13 @@ export const useDocumentsDomain = (document_id?: string, onUploadComplete?: (doc
     const hasError =
         isListError || isDashboardError || isUploadError ||
         isDeleteError || isDetailError || isSummaryError ||
-        isRegenerateError || isPrepError;
+        isRegenerateError || isPrepError || isConfirmError || isDismissError;
 
     const errorMessage =
         listError?.message || dashboardError?.message || uploadError?.message ||
         deleteError?.message || detailError?.message || summaryError?.message ||
         regenerateError?.message || prepError?.message ||
+        confirmError?.message || dismissError?.message ||
         "An unexpected error occurred within the documents workspace.";
 
     const isDocumentListEmpty =
@@ -126,14 +144,23 @@ export const useDocumentsDomain = (document_id?: string, onUploadComplete?: (doc
             isSummaryLoading: detailPending || summaryPending || regeneratePending || isBackendBuildingSummary,
             isDocumentLoading: detailPending || uploadPending,
             isBackendExtractingText,
-            isProcessingFile: uploadPending || regeneratePending || prepPending,
-            isDeletingFile: deletePending ? deletingId : null
+            isProcessingFile: uploadPending || regeneratePending || prepPending || confirmPending || dismissPending,
+            isDeletingFile: deletePending ? deletingId : null,
+            isConfirmingPrescription: confirmPending,
+            isDismissingPrescription: dismissPending,
         },
         actions: {
-            uploadFile: (formData: FormData) => uploadDocument(formData),
+            uploadFile: (formData: FormData) => uploadDocumentAsync(formData),
             deleteFile: (id: string) => deleteDocument(id),
             reconstructSummary: () => { if (document_id) regenerateSummary(document_id); },
-            buildAppointmentBrief: () => { if (document_id) generateAppointmentPrep(document_id); }
+            buildAppointmentBrief: () => { if (document_id) generateAppointmentPrep(document_id); },
+          
+            confirmPrescription: (
+                documentId: string, 
+                medications: ConfirmPrescriptionMedicationsRequest["medications"]
+            ) => confirmPrescriptionAsync({ document_id: documentId, medications }),
+            
+            dismissPrescription: (documentId: string) => dismissPrescriptionAsync(documentId),
         },
         viewConfigs,
     };

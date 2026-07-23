@@ -1,3 +1,5 @@
+import type { PendingMedication } from "./medication";
+
 export const DocumentStatus = {
   UPLOADED: "uploaded",
   PROCESSING: "processing",
@@ -21,6 +23,10 @@ export interface DocumentResponse {
     status: DocumentStatus;
     uploaded_at: string;
     error_message?: string | null;
+    is_prescription?: boolean;
+    pending_medications?: PendingMedication[] | null;
+
+
 }
 
 
@@ -34,6 +40,9 @@ export interface UploadResponse {
     document_id: string;
     status: DocumentStatus;
     message?: string;
+    is_prescription?: boolean;
+    pending_medications?: PendingMedication[];
+    extracted_data?:PendingMedication;
 }
 
 export interface SummaryResponse {

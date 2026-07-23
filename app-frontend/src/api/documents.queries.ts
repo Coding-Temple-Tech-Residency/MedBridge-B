@@ -3,6 +3,7 @@ import { apiHelper } from "./apiHelper";
 import { type SummaryResponse, type DocumentListResponse, type DocumentResponse, type UploadResponse, type PrepResponse, type DashboardResponse } from "../types/documents";
 
 import { API_BASE_URL as BASE_URL } from "../config/env";
+import type { ConfirmPrescriptionMedicationsRequest, ConfirmPrescriptionMedicationsResponse } from "../types/medication";
 
 export const useUploadDocument = (onUploadComplete: (document_id: string) => void) => {
     const queryClient = useQueryClient();
@@ -180,7 +181,54 @@ export const useDashboard = () => {
 
 
 
+export const useConfirmPrescription = () => {
+    const queryClient = useQueryClient();
 
+    return useMutation<
+        ConfirmPrescriptionMedicationsResponse,
+        Error,
+        { document_id: string; medications: ConfirmPrescriptionMedicationsRequest["medications"] }
+    >({
+        mutationFn: ({ document_id, medications }) => {
+            return apiHelper({
+                url: `${BASE_URL}/documents/${document_id}/medications/confirm`,
+                method: "POST",
+                body: { medications },
+            });
+        },
+        onSuccess: (_, { document_id }) => {
+            console.log("Prescription confirmed successfully");
+            queryClient.invalidateQueries({ queryKey: ["documents"] });
+            queryClient.invalidateQueries({ queryKey: ["documents", document_id] });
+            queryClient.invalidateQueries({ queryKey: ["medications"] });
+        },
+        onError: (error) => {
+            console.error("Failed to confirm prescription:", error);
+        },
+    });
+};
+
+export const useDismissPrescription = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<DocumentResponse, Error, string>({
+        mutationFn: (document_id: string) => {
+            return apiHelper({
+                url: `${BASE_URL}/documents/${document_id}/medications/dismiss`,
+                method: "POST",
+                body: null,
+            });
+        },
+        onSuccess: (_, document_id) => {
+            console.log("Prescription candidates dismissed");
+            queryClient.invalidateQueries({ queryKey: ["documents"] });
+            queryClient.invalidateQueries({ queryKey: ["documents", document_id] });
+        },
+        onError: (error) => {
+            console.error("Failed to dismiss prescription candidates:", error);
+        },
+    });
+};
 
 
 
