@@ -1,11 +1,10 @@
 /* Landing Page css */
 
-
-
 /* Update your existing app-container class to allow scrolling */
 .app-container {
   min-height: 100vh;
-  background-color: #F7FAFC;
+  background-color: #F7FAFC; /* soft white background */
+  color: #1B3A5C; /* deep navy text */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,14 +20,15 @@
 }
 
 .app-subtitle {
-  font-size: 24px;
-  color: #1B3A5C;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1B3A5C; /* deep navy header */
   margin-bottom: 12px;
 }
 
 .app-description {
   font-size: 16px;
-  color: #4A5568;
+  color: #2D7DD2; /* primary blue secondary description */
   line-height: 1.6;
   margin: 0;
 }
@@ -48,30 +48,30 @@
 }
 
 .features-card {
-  background-color: #2D7DD2;
-  border: 2px solid #1B3A5C;
+  background-color: #2D7DD2; /* primary blue card fill */
+  border: 2px solid #2D7DD2;
   border-radius: 20px;
   padding: 32px 24px;
   text-align: center;
-  color: #ffffff; /* Make all card text white for perfect readability */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  color: #ffffff; /* Card text contrast */
+  box-shadow: 0 4px 6px -1px rgba(27, 58, 92, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
 
   transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
               box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-              border-color 0.3s ease;
+              border-color 0.3s ease,
+              background-color 0.3s ease;
   cursor: pointer;
   animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-
 }
 
 .features-card:hover {
   transform: translateY(-8px); /* Lifts the card up slightly */
-  border-color: #3ABFBF;       /* Changes the border color to match your accent teal */
-  box-shadow: 0 20px 25px -5px rgba(27, 58, 92, 0.2), 
-              0 10px 10px -5px rgba(27, 58, 92, 0.1); /* Deep soft shadow drop */
+  border-color: #3ABFBF;       /* Changes border to teal accent */
+  box-shadow: 0 20px 25px -5px rgba(27, 58, 92, 0.25), 
+              0 10px 10px -5px rgba(27, 58, 92, 0.15); /* Soft deep navy drop shadow */
 }
 
 .features-card:hover .card-icon {
@@ -81,6 +81,7 @@
 .card-icon {
   font-size: 40px;
   margin-bottom: 16px;
+  transition: transform 0.3s ease;
 }
 
 @keyframes fadeInUp {
@@ -105,7 +106,7 @@
   font-size: 14px;
   line-height: 1.6;
   margin: 0;
-  color: #EBF8FF; /* Soft light blue tint for body text readability */
+  color: #E8F4FD; /* Soft light blue tint matching theme palette */
 }
 
 .features-card:nth-child(1) { animation-delay: 0.1s; }

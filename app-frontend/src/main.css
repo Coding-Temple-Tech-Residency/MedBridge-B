@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap');
-
 html, body {
   font-family: 'Didact Gothic', system-ui, -apple-system, sans-serif;
- 
+  color: #1B3A5C;
+  background-color: #F7FAFC;
 }
 
-/*Landing Page Styles*/
+/* Landing Page Styles */
 .app-container {
   min-height: 100vh;
   background-color: #F7FAFC; /* soft neutral background */
@@ -49,15 +49,18 @@ html, body {
   font-weight: 600;
   background-color: #2D7DD2; /* bright blue */
   color: #ffffff;
-  border: none;
+  border: 1px solid #2D7DD2;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .login-btn:hover {
-  background-color: #1B3A5C; /* deep navy hover */
+  background-color: #3ABFBF; /* teal hover */
+  border-color: #3ABFBF;
+  color: #ffffff;
 }
+
 /* AUTH CONTAINER */
 .auth-container {
   padding: 10px;
@@ -73,26 +76,28 @@ html, body {
   width: 260px;
   height: 40px;
   background-color: #E8F4FD;
+  border: 1px solid #2D7DD2;
   border-radius: 20px;
   padding: 4px;
   margin-bottom: 32px;
   user-select: none;
+  box-sizing: border-box;
 }
 
 /* SLIDING PILL */
 .sliding-pill {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
+  top: 3px;
+  bottom: 3px;
   width: calc(50% - 4px);
-  background-color: #3ABFBF;
+  background-color: #2D7DD2;
   border-radius: 16px;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0px 2px 6px rgba(27, 58, 92, 0.15);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.pill-left { left: 4px; }
-.pill-right { left: calc(50%); }
+.pill-left { left: 3px; }
+.pill-right { left: calc(50% + 1px); }
 
 /* TOGGLE BUTTONS */
 .toggle-btn {
@@ -103,12 +108,12 @@ html, body {
   font-size: 14px;
   font-weight: 600;
   z-index: 1;
-  color: #71717A;
+  color: #1B3A5C;
   transition: color 0.25s ease;
 }
 
 .toggle-btn.active {
-  color: #1B3A5C;
+  color: #ffffff;
 }
 
 /* FORM */
@@ -125,8 +130,13 @@ html, body {
 
 .server-error-banner {
   color: #D9534F;
+  background-color: #FCE8E6;
+  border: 1px solid #D9534F;
+  padding: 10px 14px;
+  border-radius: 6px;
   margin-bottom: 16px;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
 .form-field {
@@ -141,41 +151,61 @@ html, body {
 }
 
 .form-input {
-  padding: 10px;
+  padding: 10px 12px;
   border: 1px solid #2D7DD2;
   border-radius: 6px;
   font-size: 14px;
+  color: #1B3A5C;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-input:focus {
+  border-color: #2D7DD2;
+  box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.2);
 }
 
 .form-input:disabled {
-  background-color: #E8F4FD;
+  background-color: #F7FAFC;
+  border-color: #E8F4FD;
+  color: #A0AEC0;
 }
 
 .form-error {
   color: #D9534F;
   font-size: 13px;
+  font-weight: 500;
 }
 
 /* SUBMIT BUTTON */
 .submit-button {
   padding: 12px 24px;
   background-color: #2D7DD2;
-  color: white;
-  border: none;
+  color: #ffffff;
+  border: 1px solid #2D7DD2;
   border-radius: 8px;
   font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.submit-button:hover {
-  background-color: #1B3A5C;
+.submit-button:hover:not(:disabled) {
+  background-color: #3ABFBF;
+  border-color: #3ABFBF;
+}
+
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* MODAL */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(27, 58, 92, 0.4); /* deep navy backdrop tint */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,16 +213,23 @@ html, body {
 }
 
 .modal-content {
-  background-color: white;
+  background-color: #ffffff;
   padding: 40px;
   border-radius: 12px;
+  border: 1px solid #E8F4FD;
+  box-shadow: 0 10px 25px -5px rgba(27, 58, 92, 0.15);
+  color: #1B3A5C;
 }
 
+/* SHIMMER */
 .shimmer-wrapper {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 1rem;
+  background-color: #F7FAFC;
+  border-radius: 12px;
+  border: 1px solid #E8F4FD;
 }
 
 .shimmer-block {
@@ -201,10 +238,10 @@ html, body {
   background: linear-gradient(
     90deg,
     #E8F4FD 0%,
-    #D6EAF8 50%,
+    rgba(58, 191, 191, 0.25) 50%,
     #E8F4FD 100%
   );
-  animation: shimmer 1.4s infinite linear;
+  animation: shimmer 1.6s infinite ease-in-out;
   background-size: 200% 100%;
 }
 
@@ -214,9 +251,9 @@ html, body {
 
 @keyframes shimmer {
   0% {
-    background-position: -200px 0;
+    background-position: 200% 0;
   }
   100% {
-    background-position: 200px 0;
+    background-position: -200% 0;
   }
 }

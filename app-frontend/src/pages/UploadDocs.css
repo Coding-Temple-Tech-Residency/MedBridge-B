@@ -7,6 +7,8 @@
   max-width: 1400px;
   margin: 0 auto;
   align-items: start; /* Aligns both columns perfectly to the top */
+  background: #F7FAFC; /* soft white background */
+  color: #1B3A5C; /* deep navy text */
 }
 
 /* Left Pillar: Document Uploading & List */
@@ -26,7 +28,7 @@
 
 /* Empty Workspace State */
 .empty-workspace-state {
-  border: 1px dashed #e2e8f0;
+  border: 1px dashed #2D7DD2;
   padding: 40px;
   text-align: center;
   border-radius: 12px;
@@ -34,7 +36,7 @@
 }
 
 .empty-workspace-state p {
-  color: #718096;
+  color: #1B3A5C;
 }
 
 /* Workspace Wrapper & Navigation */
@@ -54,37 +56,46 @@
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
-  border: 1px solid #e2e8f0;
-  background-color: #ffffff;
-  color: #2d3748;
+  border: 1px solid #2D7DD2;
+  background-color: #E8F4FD;
+  color: #1B3A5C;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background-color: #3ABFBF;
+  color: #ffffff;
+  border-color: #3ABFBF;
 }
 
 .tab-button.active {
-  background-color: #3182ce;
+  background-color: #2D7DD2;
   color: #ffffff;
+  border-color: #2D7DD2;
 }
 
 .export-button {
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
-  border: 1px solid #e2e8f0;
-  background-color: #edf2f7;
-  color: #2d3748;
+  border: 1px solid #2D7DD2;
+  background-color: #E8F4FD;
+  color: #1B3A5C;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   margin-left: auto; /* Aligns button to the far right */
 }
 
 .export-button:hover {
-  background-color: #e2e8f0;
+  background-color: #3ABFBF;
+  color: #ffffff;
+  border-color: #3ABFBF;
 }
 
 /* PDF Viewer Shell */
 .pdf-viewer-container {
-  border: 1px solid #e2e8f0;
+  border: 1px solid #2D7DD2;
   border-radius: 12px;
   padding: 16px;
   background-color: #ffffff;
@@ -95,7 +106,7 @@
 }
 
 .pdf-viewer-header {
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #E8F4FD;
   padding-bottom: 12px;
   margin-bottom: 12px;
 }
@@ -106,11 +117,12 @@
   align-items: center;
   gap: 10px;
   font-size: 1.5rem;
+  color: #1B3A5C;
 }
 
 .pdf-viewer-header p {
   margin: 4px 0 0 0;
-  color: #718096;
+  color: #2D7DD2;
   font-size: 0.85rem;
 }
 
@@ -136,9 +148,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #4a5568;
+  color: #1B3A5C;
   text-align: center;
-  background-color: #f7fafc;
+  background-color: #E8F4FD;
   border-radius: 8px;
   padding: 24px;
 }
@@ -150,20 +162,20 @@
 
 .pdf-restricted-container h4 {
   margin: 0 0 4px 0;
-  color: #2d3748;
+  color: #1B3A5C;
 }
 
 .pdf-restricted-container p {
   max-width: 340px;
   font-size: 0.85rem;
-  color: #718096;
+  color: #1B3A5C;
   margin: 0;
   line-height: 1.4;
 }
 
 /* Chat Component Wrapper */
 .chat-widget-container {
-   position: fixed;
+  position: fixed;
   bottom: 24px;
   right: 24px;
   z-index: 1000;

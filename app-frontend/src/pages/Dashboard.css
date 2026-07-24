@@ -1,4 +1,3 @@
-/* PAGE CONTAINER */
 .dashboard-page-container {
   width: 90vw;
   height: 90vh;
@@ -9,18 +8,22 @@
   flex-direction: column;
   gap: 16px;
   overflow: hidden;
-  background-color: #F7FAFC; /* soft white */
+  background-color: #F7FAFC; /* soft white background */
+  color: #1B3A5C; /* deep navy text */
 }
 
 /* TITLE + DESCRIPTION */
 .dashboard-header-title {
   margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: #1B3A5C; /* deep navy */
 }
 
 .dashboard-header-description {
   margin: 4px 0 0 0;
-  color: #1B3A5C;
+  font-size: 0.9rem;
+  color: #2D7DD2; /* blue subtext accent */
 }
 
 /* CALENDAR WRAPPER */
@@ -39,7 +42,7 @@ textarea.dashboard-notes {
   flex-shrink: 0;
   margin-left: 19px;
 
-  border: 1px solid #2D7DD2 !important; /* blue */
+  border: 1px solid #2D7DD2 !important; /* blue border */
   border-radius: 8px;
   padding: 16px;
   box-sizing: border-box;
@@ -50,9 +53,24 @@ textarea.dashboard-notes {
   font-family: 'Didact Gothic', system-ui, -apple-system, sans-serif;
   font-size: 14px;
   z-index: 20000;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Focus state matching theme input rings */
+textarea.dashboard-notes:focus {
+  border-color: #2D7DD2 !important;
+  box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.2);
+}
+
+/* Disabled state */
+textarea.dashboard-notes:disabled {
+  background-color: #F7FAFC;
+  border-color: #E8F4FD !important;
+  color: #A0AEC0;
 }
 
 .dashboard-notes::placeholder {
-  color: #71717A;
-  opacity: 0.8;
+  color: #2D7DD2;
+  opacity: 0.6;
 }

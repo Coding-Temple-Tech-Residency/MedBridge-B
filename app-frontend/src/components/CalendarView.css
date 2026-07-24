@@ -15,7 +15,7 @@
 }
 
 .calendar-status-message.error {
-  color: #2D7DD2;
+  color: #D9534F; /* Mapped error text to red error theme color */
 }
 
 /* Modal Overlay & Container */
@@ -25,7 +25,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(27, 58, 92, 0.4); /* Deep navy backdrop tint */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,14 +36,15 @@
 .calendar-modal-content {
   background: #ffffff;
   padding: 24px;
-  border-radius: 8px;
+  border-radius: 12px;
+  border: 1px solid #E8F4FD;
   width: 100%;
   max-width: 400px;
   max-height: 85vh;
   overflow-y: auto;
   box-sizing: border-box;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  color: #1f2937;
+  box-shadow: 0 10px 25px -5px rgba(27, 58, 92, 0.15);
+  color: #1B3A5C;
   font-family: sans-serif;
 }
 
@@ -59,80 +60,129 @@
 .calendar-form-label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #4b5563;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #1B3A5C;
 }
 
 .calendar-form-input {
   width: 100%;
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #2D7DD2;
   font-size: 0.95rem;
+  color: #1B3A5C;
+  background-color: #ffffff;
   box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calendar-form-input:focus {
+  border-color: #2D7DD2;
+  box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.2);
 }
 
 /* Modal Action Buttons */
 .calendar-modal-actions {
   display: flex;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 20px;
   justify-content: flex-start;
+  align-items: center;
 }
 
+/* Delete Button (Modal Delete Pattern) */
 .calendar-btn-delete {
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 6px;
-  border: none;
-  background-color: #ef4444;
-  color: #ffffff;
+  border: 1px solid #D9534F;
+  background-color: #FCE8E6;
+  color: #A94442;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
+.calendar-btn-delete:hover {
+  background-color: #D9534F;
+  color: #ffffff;
+  border-color: #D9534F;
+}
+
+/* Complete Button */
 .calendar-btn-complete {
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 6px;
-  border: none;
-  background-color: #10b981;
-  color: #ffffff;
+  border: 1px solid #3ABFBF;
+  background-color: #E8F4FD;
+  color: #1B3A5C;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
+.calendar-btn-complete:hover {
+  background-color: #3ABFBF;
+  color: #ffffff;
+  border-color: #3ABFBF;
+}
+
+/* Cancel Button */
 .calendar-btn-cancel {
   padding: 8px 16px;
   border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background-color: #ffffff;
-  color: #4b5563;
+  border: 1px solid #2D7DD2;
+  background-color: #E8F4FD;
+  color: #1B3A5C;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
+.calendar-btn-cancel:hover {
+  background-color: #3ABFBF;
+  color: #ffffff;
+  border-color: #3ABFBF;
+}
+
+/* Save / Primary Action Button */
 .calendar-btn-save {
   padding: 8px 16px;
   border-radius: 6px;
-  border: none;
-  background-color: #2563eb;
+  border: 1px solid #2D7DD2;
+  background-color: #2D7DD2;
   color: #ffffff;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.calendar-btn-save:hover {
+  background-color: #3ABFBF;
+  border-color: #3ABFBF;
 }
 
 /* Agenda Custom Views */
 .calendar-agenda-date-btn {
   background: none;
   border: none;
-  color: #2563eb;
+  color: #2D7DD2;
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
   font: inherit;
+  font-weight: 600;
   text-align: left;
+  transition: color 0.15s ease;
+}
+
+.calendar-agenda-date-btn:hover {
+  color: #3ABFBF;
 }
 
 .calendar-agenda-event {

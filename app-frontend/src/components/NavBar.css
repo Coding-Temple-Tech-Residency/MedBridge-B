@@ -1,10 +1,10 @@
-/* NAVBAR */
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
   background-color: #F7FAFC;
+  border-bottom: 1px solid #E8F4FD;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -22,19 +22,30 @@
 
 .nav-right {
   display: flex;
-  gap: 2rem;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .nav-item {
   color: #1B3A5C;
   font-weight: 600;
   text-decoration: none;
-  opacity: 0.8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  color: #3ABFBF;
+  background-color: #E8F4FD;
+  cursor: pointer;
 }
 
 .nav-item.active {
-  opacity: 1;
-  text-decoration: underline;
+  color: #2D7DD2;
+  background-color: #E8F4FD;
+  border-bottom: 2px solid #3ABFBF;
+  border-radius: 6px 6px 0 0;
 }
 
 .layout-main {
@@ -45,13 +56,15 @@
   color: #1B3A5C;
   font-weight: 600;
   text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
   cursor: pointer;
-  opacity: 0.8;
+  transition: all 0.2s ease;
 }
 
 .logout-link:hover {
-  opacity: 1;
-  text-decoration: underline;
+  color: #D9534F; /* Red highlight on hover for destructive logout action */
+  background-color: #FCE8E6;
 }
 
 /* Hide desktop nav on mobile */
@@ -66,14 +79,26 @@
   display: none;
   flex-direction: column;
   gap: 5px;
+  padding: 6px;
   cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.hamburger:hover {
+  background-color: #E8F4FD;
 }
 
 .bar {
   width: 28px;
   height: 3px;
   background-color: #1B3A5C;
+  border-radius: 2px;
   transition: 0.3s ease;
+}
+
+.hamburger:hover .bar {
+  background-color: #2D7DD2;
 }
 
 /* Show hamburger on mobile */
@@ -89,12 +114,13 @@
   top: 72px;
   left: 0;
   right: 0;
-  background-color: #F7FAFC;
+  background-color: #ffffff;
+  border-bottom: 1px solid #E8F4FD;
   display: flex;
   flex-direction: column;
   padding: 16px 24px;
-  gap: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  gap: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(27, 58, 92, 0.15);
 }
 
 /* Mobile nav items */
@@ -102,35 +128,32 @@
   color: #1B3A5C;
   font-weight: 600;
   text-decoration: none;
-  opacity: 0.9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .mobile-item:hover {
-  opacity: 1;
-  text-decoration: underline;
-}
-
-/* Logout link matches nav items */
-.logout-link {
+  color: #3ABFBF;
+  background-color: #E8F4FD;
   cursor: pointer;
 }
 
-
-/* Universal hover style for all navbar items */
-.nav-item:hover,
-.mobile-item:hover {
-  text-decoration: underline;
-  cursor: pointer;
+.mobile-item.active {
+  color: #2D7DD2;
+  background-color: #E8F4FD;
+  font-weight: 700;
 }
 
 /* Changes the Navbar view in the Landing Page */
 
-.app-container{
+.app-container {
   position: relative;
   margin: 0; 
   padding: 0; 
   width: 100%;
 }
+
 .app-container .nav-logo {
   height: 70px; 
   width: auto;
@@ -138,14 +161,16 @@
   padding: 0;
 }
 
-.app-container .navbar{
+.app-container .navbar {
   position: absolute;     /* Pins it to the top of the app-container */
   top: 0;
   left: 0;
   width: 100%;
   box-sizing: border-box; /* Prevents padding from breaking full-width layout */
-  padding: 20px 40px;     /* Removed height: 40% to keep it clean and tight to the top */
+  padding: 20px 40px;     
   margin: 0;
+  background-color: transparent;
+  border-bottom: none;
 }
 
 .app-container .nav-item {
