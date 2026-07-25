@@ -1,82 +1,149 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiHelper } from "../api/apiHelper";
-import { API_BASE_URL } from "../config/env";
-import type { UserProfile, UserProfileUpdate } from "../types/auth";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { useCreatePatientProfile, useGetUserProfile, useUpdatePatientProfile } from "../api/user-profile.queries";
 
 export const useUserProfileDomain = () => {
-  const queryClient = useQueryClient();
-
-  // 1️⃣ Load profile (backend extracts user_id from JWT)
   const {
     data: profileData,
     isPending: isProfilePending,
     isError: isProfileError,
     error: profileError,
-  } = useQuery<UserProfile>({
-    queryKey: ["user-profile"],
-    queryFn: () =>
-      apiHelper({
-        url: `${API_BASE_URL}/patient-profile`,
-        method: "GET",
-      }),
-  });
+  } = useGetUserProfile();
 
-  // 2️⃣ Update profile (PATCH /user/profile)
   const {
-    mutate: updateProfileMutation,
-    isPending: isUpdatePending,
-    isError: isUpdateError,
-    error: updateError,
-  } = useMutation<UserProfile, Error, UserProfileUpdate>({
-    mutationFn: (body) =>
-      apiHelper({
-        url: `${API_BASE_URL}/patient-profile`,
-        method: "PATCH",
-        body,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["patient-profile"] });
-    },
-  });
+    mutate: updateProfile,
+    isPending: isUpdateProfilePending,
+    isError: isUpdateProfileError,
+    error: updateProfileError,
+  } = useUpdatePatientProfile();
+
+  const {
+    mutate: createProfile,
+    isPending: isCreateProfilePending,
+    isError: isCreateProfileError,
+    error: createProfileError,
+  } = useCreatePatientProfile();
+
+  const isPending = isProfilePending;
+
+  const hasError =
+    isProfileError || isUpdateProfileError || isCreateProfileError;
+
+  const errorMessage = hasError
+    ? profileError?.message ||
+    updateProfileError?.message ||
+    createProfileError?.message ||
+    "An unexpected error occurred."
+    : null;
+
+  const isProfileEmpty =
+    !isProfilePending && !isProfileError && !profileData;
+
+  const isUpdating = isUpdateProfilePending;
+  const isCreating = isCreateProfilePending;
+  const isActionInFlight = isUpdating || isCreating;
 
   return {
     data: {
       profile: profileData,
     },
     flags: {
-      isPending: isProfilePending,
-      hasError: isProfileError || isUpdateError,
-      errorMessage:
-        profileError?.message ||
-        updateError?.message ||
-        "An unexpected error occurred while loading your profile.",
-      isUpdating: isUpdatePending,
+      isPending,
+      hasError,
+      isProfileEmpty,
+      errorMessage,
+      isUpdating,
+      isCreating,
+      isActionInFlight,
     },
     actions: {
-      updateProfile: (body: UserProfileUpdate) => updateProfileMutation(body),
+      updateProfile,
+      createProfile,
     },
   };
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const useUserProfileDomain = () => {
+
+
+
+
+
+
+//   const queryClient = useQueryClient();
+
+//   // 1️⃣ Load profile (backend extracts user_id from JWT)
+//   const {
+//     data: profileData,
+//     isPending: isProfilePending,
+//     isError: isProfileError,
+//     error: profileError,
+//   } = useQuery<UserProfile>({
+//     queryKey: ["user-profile"],
+//     queryFn: () =>
+//       apiHelper({
+//         url: `${API_BASE_URL}/patient-profile`,
+//         method: "GET",
+//       }),
+//   });
+
+//   // 2️⃣ Update profile (PATCH /user/profile)
+//   const {
+//     mutate: updateProfileMutation,
+//     isPending: isUpdatePending,
+//     isError: isUpdateError,
+//     error: updateError,
+//   } = useMutation<UserProfile, Error, UserProfileUpdate>({
+//     mutationFn: (body) =>
+//       apiHelper({
+//         url: `${API_BASE_URL}/patient-profile`,
+//         method: "PATCH",
+//         body,
+//       }),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ["patient-profile"] });
+//     },
+//   });
+
+//   return {
+//     data: {
+//       profile: profileData,
+//     },
+//     flags: {
+//       isPending: isProfilePending,
+//       hasError: isProfileError || isUpdateError,
+//       errorMessage:
+//         profileError?.message ||
+//         updateError?.message ||
+//         "An unexpected error occurred while loading your profile.",
+//       isUpdating: isUpdatePending,
+//     },
+//     actions: {
+//       updateProfile: (body: UserProfileUpdate) => updateProfileMutation(body),
+//     },
+//   };
+// };

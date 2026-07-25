@@ -69,7 +69,7 @@ export const MedicalHistory = () => {
     useState<DocumentResponse | null>(null);
 
   const [showAddModal, setShowAddModal] = useState(false);
-const [showEditModal, setShowEditModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [editingMedication, setEditingMedication] =
     useState<MedicationResponse | null>(null);
 
@@ -92,9 +92,9 @@ const [showEditModal, setShowEditModal] = useState(false);
   };
 
 
-const mapAccessLevel = (level: string): "read" | "full" => {
-  return level === "read" ? "full" : "read";
-};
+  const mapAccessLevel = (level: string): "read" | "full" => {
+    return level === "read" ? "full" : "read";
+  };
 
 
   const [activeTab, setActiveTab] = useState<
@@ -191,11 +191,11 @@ const mapAccessLevel = (level: string): "read" | "full" => {
           contact={
             editingContact
               ? {
-                  contact_id: editingContact.id,
-                  contact_name: editingContact.contact_name,
-                  contact_email: editingContact.contact_email,
-                  access_level: mapAccessLevel(editingContact.access_level),
-                }
+                contact_id: editingContact.id,
+                contact_name: editingContact.contact_name,
+                contact_email: editingContact.contact_email,
+                access_level: mapAccessLevel(editingContact.access_level),
+              }
               : undefined
           }
         />
@@ -209,12 +209,12 @@ const mapAccessLevel = (level: string): "read" | "full" => {
           provider={
             editingProvider
               ? {
-                  provider_id: editingProvider.id,
-                  name: editingProvider.name,
-                  specialty: editingProvider.specialty ?? "",
-                  phone: editingProvider.phone ?? "",
-                  email: "", // FIXED: ProviderResponse has no email field
-                }
+                provider_id: editingProvider.id,
+                name: editingProvider.name,
+                specialty: editingProvider.specialty ?? "",
+                phone: editingProvider.phone ?? "",
+                email: "", // FIXED: ProviderResponse has no email field
+              }
               : undefined
           }
         />
