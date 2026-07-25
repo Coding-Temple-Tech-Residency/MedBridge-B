@@ -47,7 +47,6 @@ export default function EditProfileModal({
 
     actions.updateProfile({
       full_name: fullName,
-      email,
       preferred_language: preferredLanguage,
       explanation_level: explanationLevel,
     });
