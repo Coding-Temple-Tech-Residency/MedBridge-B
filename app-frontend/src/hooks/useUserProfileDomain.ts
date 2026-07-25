@@ -35,7 +35,7 @@ export const useUserProfileDomain = () => {
         body,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["patient-profile"] });
+      queryClient.invalidateQueries({ queryKey: ["user-profile"] });
     },
   });
 
