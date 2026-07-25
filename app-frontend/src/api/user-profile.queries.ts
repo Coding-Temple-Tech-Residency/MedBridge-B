@@ -1,19 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiHelper } from "./apiHelper";
-import type { UserProfile, UserProfileUpdate } from "../types/auth";
-
 import { API_BASE_URL as BASE_URL } from "../config/env";
+import type { PatientProfileCreate, PatientProfileResponse, PatientProfileUpdate } from "../types/user-profile";
 
-export interface UserProfileResponse {
-  id: string;
-  name: string;
-  email: string;
-  language?: string;
-  created_at: string;
-}
+
+
 
 export const useGetUserProfile = () => {
-  return useQuery<UserProfileResponse>({
+  return useQuery<PatientProfileResponse>({
     queryKey: ["user-profile"],
     queryFn: () => {
       return apiHelper({
@@ -25,11 +19,11 @@ export const useGetUserProfile = () => {
   });
 };
 
-// PATCH patient profile
-export const useUpdateUserProfile = () => {
+
+export const useUpdatePatientProfile = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<UserProfile, Error, UserProfileUpdate>({
+  return useMutation<PatientProfileResponse, Error, PatientProfileUpdate>({
     mutationFn: (body) =>
       apiHelper({
         url: `${BASE_URL}/patient-profile`,
@@ -45,6 +39,30 @@ export const useUpdateUserProfile = () => {
 
     onError: (error) => {
       console.error("Failed to update user profile:", error);
+    },
+  });
+};
+
+
+export const useCreatePatientProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<PatientProfileResponse, Error, PatientProfileCreate>({
+    mutationFn: (body) =>
+      apiHelper({
+        url: `${BASE_URL}/patient-profile`,
+        method: "POST",
+        body,
+      }),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["patient-profile"],
+      });
+    },
+
+    onError: (error) => {
+      console.error("Failed to create user profile:", error);
     },
   });
 };
