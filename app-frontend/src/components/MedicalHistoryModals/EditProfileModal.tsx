@@ -28,7 +28,7 @@ export default function EditProfileModal({
     profile?.preferred_language ?? "English",
   );
   const [explanationLevel, setExplanationLevel] = useState(
-    profile?.explanation_level ?? "simple",
+    profile?.explanation_level ?? "plain",
   );
   // Sync when profile changes
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function EditProfileModal({
       setFullName(profile.full_name ?? "");
       setEmail(profile.email ?? "");
       setPreferredLanguage(profile.preferred_language ?? "English");
-      setExplanationLevel(profile.explanation_level ?? "simple");
+      setExplanationLevel(profile.explanation_level ?? "plain");
     }
   }, [profile]);
 
@@ -97,7 +97,7 @@ export default function EditProfileModal({
               value={explanationLevel}
               onChange={(e) => setExplanationLevel(e.target.value)}
             >
-              <option value="simple">Plain</option>
+              <option value="plain">Plain</option>
               <option value="detailed">Detailed</option>
             </select>
           </label>
