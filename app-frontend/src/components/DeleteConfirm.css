@@ -1,44 +1,68 @@
+/* ============================
+   Delete Confirmation Container
+   (styled to match .modal-container)
+   ============================ */
+
+
+ 
+.delete-container h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1B3A5C;
+  margin: 0;
+}
+
 .delete-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 1.5rem 2rem;
-  max-width: 360px;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #F7FAFC;
+  width: 90%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(27, 58, 92, 0.25);
+  border: 1px solid #E8F4FD;
   text-align: center;
-  font-family: system-ui, -apple-system, sans-serif;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .delete-container p {
   margin: 0 0 0.5rem 0;
-  font-size: 0.95rem;
-  color: #1f2937;
-  line-height: 1.4;
+  font-size: 1rem;
+  color: #2D7DD2;
+  line-height: 1.5;
 }
 
+/* ============================
+   Buttons
+   (matches .modal-delete / .modal-cancel)
+   ============================ */
 .delete-button,
 .cancel-button {
   width: 100%;
-  padding: 0.6rem 1.25rem;
-  font-size: 0.9rem;
+  padding: 12px 24px;
+  font-size: 15px;
   font-weight: 600;
-  border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
 .delete-button {
-  background-color: #dc2626;
+  background-color: #3ABFBF; /* teal accent, same as .modal-delete */
   color: #ffffff;
+  border: none;
 }
 
 .delete-button:hover {
-  background-color: #b91c1c;
+  background-color: #1B3A5C; /* deep navy hover, same as .modal-delete */
 }
 
 .delete-button:active {
@@ -46,15 +70,22 @@
 }
 
 .cancel-button {
-  background-color: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background-color: #E8F4FD;
+  color: #1B3A5C;
+  border: 1px solid #C9D6E2;
 }
 
 .cancel-button:hover {
-  background-color: #e5e7eb;
+  background-color: #F7FAFC;
+  border-color: #2D7DD2;
 }
 
 .cancel-button:active {
   transform: scale(0.98);
+}
+
+.delete-button:disabled,
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
