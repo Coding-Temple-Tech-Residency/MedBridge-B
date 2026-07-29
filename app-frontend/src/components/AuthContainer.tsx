@@ -1,7 +1,7 @@
 import { FormFactory } from "./FormFactory";
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect, type JSX } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useLogin, useRegister } from "../api/auth.queries";
 import { useModal } from "../context/ModalContext";
 

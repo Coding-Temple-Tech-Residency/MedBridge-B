@@ -1,6 +1,6 @@
 import type { DocumentResponse } from "../../types/documents";
 import { useGetDocumentFileUrl } from "../../api/documents.queries";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 interface DocumentsTabProps {
   documents: DocumentResponse[];

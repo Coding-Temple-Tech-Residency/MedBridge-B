@@ -1,0 +1,6 @@
+# /pnpm-workspace.yaml (repo root)
+packages:
+  - "app-frontend"
+
+overrides:
+  brace-expansion: ^5.0.7
