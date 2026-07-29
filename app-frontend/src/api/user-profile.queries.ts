@@ -34,7 +34,7 @@ export const useUpdatePatientProfile = () => {
     onSuccess: (data) => {
       console.log("Patient Profile successfully updated", data)
       queryClient.invalidateQueries({
-        queryKey: ["patient-profile"],
+        queryKey: ["user-profile"],
       });
     },
 
