@@ -14,7 +14,9 @@ export const DeleteConfirm = ({ id, onDeleteConfirm, onCancel, type, name }: Del
     return (
         <div className="delete-container">
 
-            <p>Are you sure you want to delete {type} {name} ?</p>
+        
+            <h2>Delete {type}</h2>
+            <p>Are you sure you want to delete {type} {name} ? This action cannot be undone.</p>
             <button
                 className="delete-button"
                 onClick={() => onDeleteConfirm(id)}>

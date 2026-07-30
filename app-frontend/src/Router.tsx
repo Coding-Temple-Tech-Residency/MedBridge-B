@@ -1,5 +1,5 @@
 // src/Router.tsx
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router";
 import App from "./App";
 import { AppLayout } from "./layout/AppLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";

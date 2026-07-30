@@ -1,5 +1,5 @@
 // src/components/NavBar.tsx
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router";
 import type { ReactNode } from "react";
 import { useLogout } from "../api/auth.queries";
 import { useAuth } from "../context/AuthContext";

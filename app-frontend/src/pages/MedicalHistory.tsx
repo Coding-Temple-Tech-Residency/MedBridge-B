@@ -28,6 +28,8 @@ import type {
 } from "../types/features";
 import type { DocumentResponse } from "../types/documents";
 import type { MedicationResponse } from "../types/medication";
+import { DeleteConfirm } from "../components/DeleteConfirm";
+
 
 export const MedicalHistory = () => {
 
@@ -64,14 +66,19 @@ export const MedicalHistory = () => {
 
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  const [showDocumentModal, setShowDocumentModal] = useState(false);
-  const [editingDocument] =
+  // DOCUMENT DELETE STATE
+  // Replaces the old (broken) showDocumentModal / editingDocument pair.
+  // Truthiness of deletingDocument itself controls whether the confirm modal is shown.
+  const [deletingDocument, setDeletingDocument] =
     useState<DocumentResponse | null>(null);
 
   const [showAddModal, setShowAddModal] = useState(false);
-const [showEditModal, setShowEditModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [editingMedication, setEditingMedication] =
     useState<MedicationResponse | null>(null);
+
+  // MEDICATION DELETE STATE
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleStopMedication = (med: MedicationResponse) => {
     medicationActions.modifyMedication(med.id, {
@@ -88,14 +95,42 @@ const [showEditModal, setShowEditModal] = useState(false);
   };
 
   const handleDeleteMedication = (id: string) => {
-    medicationActions.removeMedication(id);
+    setDeletingId(id);
   };
 
+  const handleConfirmDelete = () => {
+    if (deletingId) {
+      medicationActions.removeMedication(deletingId);
+      setDeletingId(null);
+    }
+  };
 
-const mapAccessLevel = (level: string): "read" | "full" => {
-  return level === "read" ? "full" : "read";
-};
+  const handleCancelDelete = () => {
+    setDeletingId(null);
+  };
 
+  // DOCUMENT DELETE HANDLERS
+  const handleDeleteDocument = (id: string) => {
+    const doc = documents.find((d) => d.document_id === id)
+    if(doc){
+      setDeletingDocument(doc);
+    }
+  };
+
+  const handleConfirmDeleteDocument = () => {
+    if (deletingDocument) {
+      documentActions.deleteFile(deletingDocument.document_id);
+      setDeletingDocument(null);
+    }
+  };
+
+  const handleCancelDeleteDocument = () => {
+    setDeletingDocument(null);
+  };
+
+  const mapAccessLevel = (level: string): "read" | "full" => {
+    return level === "read" ? "full" : "read";
+  };
 
   const [activeTab, setActiveTab] = useState<
     "documents" | "charts" | "medications"
@@ -148,10 +183,19 @@ const mapAccessLevel = (level: string): "read" | "full" => {
         </div>
 
         <div className="tab-content">
+         {deletingId && (
+        <DeleteConfirm
+          id={deletingId}
+          type="medication"
+          onCancel={handleCancelDelete}
+          onDeleteConfirm={handleConfirmDelete}
+        />
+      )}
+
           {activeTab === "documents" && (
             <DocumentsTab
               documents={documents}
-              onDeleteDocument={(id) => documentActions.deleteFile(id)}
+              onDeleteDocument={handleDeleteDocument}
             />
           )}
 
@@ -172,6 +216,7 @@ const mapAccessLevel = (level: string): "read" | "full" => {
             />
           )}
         </div>
+      
       </main>
 
       {/* MODALS */}
@@ -191,11 +236,11 @@ const mapAccessLevel = (level: string): "read" | "full" => {
           contact={
             editingContact
               ? {
-                  contact_id: editingContact.id,
-                  contact_name: editingContact.contact_name,
-                  contact_email: editingContact.contact_email,
-                  access_level: mapAccessLevel(editingContact.access_level),
-                }
+                contact_id: editingContact.id,
+                contact_name: editingContact.contact_name,
+                contact_email: editingContact.contact_email,
+                access_level: mapAccessLevel(editingContact.access_level),
+              }
               : undefined
           }
         />
@@ -209,12 +254,12 @@ const mapAccessLevel = (level: string): "read" | "full" => {
           provider={
             editingProvider
               ? {
-                  provider_id: editingProvider.id,
-                  name: editingProvider.name,
-                  specialty: editingProvider.specialty ?? "",
-                  phone: editingProvider.phone ?? "",
-                  email: "", // FIXED: ProviderResponse has no email field
-                }
+                provider_id: editingProvider.id,
+                name: editingProvider.name,
+                specialty: editingProvider.specialty ?? "",
+                phone: editingProvider.phone ?? "",
+                email: "", // FIXED: ProviderResponse has no email field
+              }
               : undefined
           }
         />
@@ -228,14 +273,11 @@ const mapAccessLevel = (level: string): "read" | "full" => {
         />
       )}
 
-      {showDocumentModal && editingDocument && (
+      {deletingDocument && (
         <DeleteDocumentModal
-          documentName={editingDocument.file_name}
-          onConfirm={() => {
-            documentActions.deleteFile(editingDocument.document_id);
-            setShowDocumentModal(false);
-          }}
-          onCancel={() => setShowDocumentModal(false)}
+          documentName={deletingDocument.file_name}
+          onConfirm={handleConfirmDeleteDocument}
+          onCancel={handleCancelDeleteDocument}
           isDeleting={false}
         />
       )}
@@ -262,6 +304,11 @@ const mapAccessLevel = (level: string): "read" | "full" => {
           }}
         />
       )}
+
+     
     </div>
   );
 };
+
+
+

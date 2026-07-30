@@ -1,20 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiHelper } from "./apiHelper";
+import { API_BASE_URL as BASE_URL } from "../config/env";
+import type { PatientProfileCreate, PatientProfileResponse } from "../types/user-profile";
 import type { UserProfile, UserProfileUpdate } from "../types/auth";
 
-import { API_BASE_URL as BASE_URL } from "../config/env";
 
-export interface UserProfileResponse {
-  id: string;
-  name: string;
-  email: string;
-  language?: string;
-  created_at: string;
-}
 
 export const useGetUserProfile = () => {
-  return useQuery<UserProfileResponse>({
-    queryKey: ["user-profile"],
+  return useQuery<UserProfile, Error>({
+    queryKey: ["patient-profile"],
     queryFn: () => {
       return apiHelper({
         url: `${BASE_URL}/patient-profile`,
@@ -22,11 +16,11 @@ export const useGetUserProfile = () => {
         body: null,
       });
     },
-  });
-};
+  })
+}
 
-// PATCH patient profile
-export const useUpdateUserProfile = () => {
+
+export const useUpdatePatientProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation<UserProfile, Error, UserProfileUpdate>({
@@ -37,7 +31,8 @@ export const useUpdateUserProfile = () => {
         body,
       }),
 
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Patient Profile successfully updated", data)
       queryClient.invalidateQueries({
         queryKey: ["user-profile"],
       });
@@ -45,6 +40,31 @@ export const useUpdateUserProfile = () => {
 
     onError: (error) => {
       console.error("Failed to update user profile:", error);
+    },
+  });
+};
+
+
+export const useCreatePatientProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<PatientProfileResponse, Error, PatientProfileCreate>({
+    mutationFn: (body) =>
+      apiHelper({
+        url: `${BASE_URL}/patient-profile`,
+        method: "POST",
+        body,
+      }),
+
+    onSuccess: (data) => {
+      console.log("patient profile was successfully created", data);
+      queryClient.invalidateQueries({
+        queryKey: ["patient-profile"],
+      });
+    },
+
+    onError: (error) => {
+      console.error("Failed to create user profile:", error);
     },
   });
 };

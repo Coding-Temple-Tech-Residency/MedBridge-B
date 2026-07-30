@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { ChatbotWidget } from "../components/ChatbotWidget";
 import { DocumentContentPanel } from "../components/DocumentContentPanel";
 import { LoadingSpinner } from "../components/LoadingSpinner";
