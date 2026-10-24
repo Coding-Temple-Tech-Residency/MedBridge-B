@@ -28,7 +28,7 @@ nltk==3.10.0
 packaging==26.2
 pdfminer.six==20260107
 pdfplumber==0.11.10
-pillow==12.3.0
+pillow==13.0.0
 pluggy==1.6.0
 postgrest==2.31.0
 propcache==0.5.2
